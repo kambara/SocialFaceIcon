@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Text
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	initialize="onInitialize()"
+	selectable="false"
+	textAlign="center"
+	width="100"
+	color="#FFFFFF"
+	fontSize="12"
+	>
+	<mx:Script>
+		<![CDATA[
+			private var _lineNum:int = 0;
+			
+			private function onInitialize():void {
+				if (Capabilities.os.indexOf("Windows") >= 0) {
+					setFontStyle(12, "MS Sans Serif");
+				} else if (Capabilities.os.indexOf("Mac") >= 0) {
+					setFontStyle(13, "Lucida Grande");
+				} else if (Capabilities.os.indexOf("Linux") >= 0) {
+					setFontStyle(13, "Sans");
+				}
+				this.filters = [new DropShadowFilter(
+					1,  // distance
+					60, // angle
+					0x000000,
+					1,  // alpha
+					4,  // blurX
+					4,  // blurY
+					3,  // strength
+					2   // quality
+				)];
+				updateHeight();
+			}
+			
+			[Bindable]
+			public function get lineNumber():int {
+				return this._lineNum;
+			}
+			
+			public function set lineNumber(value:int):void {
+				_lineNum = value;
+				updateHeight();
+			}
+			
+			private function setFontStyle(size:uint, family:String):void {
+				setStyle("fontSize", size);
+				setStyle("fontFamily", family);
+			}
+			
+			private function updateHeight():void {
+				if (_lineNum <= 0) {
+					this.height = this.textHeight + 4;
+					return;
+				}
+				
+				var metrics:TextLineMetrics = getLineMetrics(0);
+				if (!metrics) return;
+				var margin:uint = 2;
+				this.height =
+					(metrics.ascent + metrics.descent) * _lineNum
+					+ metrics.leading*(_lineNum-1)
+					+ margin*2;
+			}
+		]]>
+	</mx:Script>
+</mx:Text>

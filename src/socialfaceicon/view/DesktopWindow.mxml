@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
+	 layout="absolute"
+	 title="Desktop"
+	 backgroundAlpha="0.4"
+	 backgroundColor="#FF0000"
+	 borderStyle="none"
+	 cornerRadius="0"
+	 
+	 showTitleBar="false"
+	 showStatusBar="false"
+	 showGripper="false"
+	 systemChrome="none"
+	 type="lightweight"
+	 transparent="true"
+	 
+	 dragEnter="onDragEnter(event)"
+	 dragDrop="onDragDrop(event)"
+	 >
+	<mx:Script>
+		<![CDATA[
+			import flash.utils.getDefinitionByName;
+			import socialfaceicon.model.GroupIcon;
+			import socialfaceicon.model.DragMousePoint;
+			import socialfaceicon.model.DesktopGroup;
+			import socialfaceicon.model.DragFormat;
+			import flash.utils.setTimeout;
+			import socialfaceicon.model.IUser;
+			import socialfaceicon.model.IconType;
+			import socialfaceicon.model.DesktopIcon;
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			private var icons:Array;
+			
+			private static var _instance:DesktopWindow;
+			
+			public static function get instance():DesktopWindow {
+				if (!_instance) {
+					_instance = new DesktopWindow();
+					_instance.open(false);
+					_instance.orderToBack();
+				}
+				return _instance;
+			}
+			
+			public function show():void {
+				this.fitToScreen();
+			}
+			
+			public function hide():void {
+				this.width = 0;
+				this.height = 0;
+				this.nativeWindow.x = -10000;
+				this.nativeWindow.y = -10000;
+				//this.visible = false; // Invisible moves the window to bottom
+			}
+			
+			private function fitToScreen():void {
+				this.width = Screen.mainScreen.visibleBounds.width;
+				this.height = Screen.mainScreen.visibleBounds.height;
+				this.nativeWindow.x = Screen.mainScreen.visibleBounds.x;
+				this.nativeWindow.y = Screen.mainScreen.visibleBounds.y;
+			}
+			
+			//
+			// Drag & Drop
+			//
+			private function onDragEnter(event:DragEvent):void {
+				if (event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_GROUP)
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON))
+				{
+					DragManager.acceptDragDrop(
+						DesktopWindow(event.currentTarget));
+				}
+			}
+			
+			private function onDragDrop(event:DragEvent):void {
+				if (event.dragSource.hasFormat( DragFormat.LIST_ITEMS )) {
+					onFriendsListItemsDragDrop(event);
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+					onDesktopIconDragDrop(
+							event,
+							DesktopIcon(
+								event.dragSource.dataForFormat(
+									DragFormat.DESKTOP_ICON)));
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP )) {
+					onDesktopGroupDragDrop(
+							event,
+							DesktopGroup(
+								event.dragSource.dataForFormat(
+									DragFormat.DESKTOP_GROUP)));
+				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON )) {
+					onGroupIconDragDrop(
+							event,
+							GroupIcon(
+								event.dragSource.dataForFormat(
+									DragFormat.GROUP_ICON)));
+				}
+			}
+			
+			//
+			// Add Icon from FriendsList
+			//
+			private function onFriendsListItemsDragDrop(event:DragEvent):void {
+				var dataArray:Array =
+						event.dragSource.dataForFormat(DragFormat.LIST_ITEMS) as Array;
+				var user:IUser = IUser(dataArray[0]);
+				DesktopIcon.addAndOpen(
+						user.iconType,
+						user.iconUserId,
+						event.localX - 50,
+						event.localY - 24);
+			}
+			
+			//
+			// Move DesktopIcon
+			//
+			private function onDesktopIconDragDrop(event:DragEvent, desktopIcon:DesktopIcon):void {
+				var d:Point = DragMousePoint.fromDragSource(
+									event.dragSource
+								).getDiffInScreen(
+									nativeWindow.x + event.stageX,
+									nativeWindow.y + event.stageY
+								);
+				desktopIcon.moveTo(
+						desktopIcon.x + d.x,
+						desktopIcon.y + d.y);
+			}
+			
+			//
+			// Move DesktopGroup
+			//
+			private function onDesktopGroupDragDrop(event:DragEvent, desktopGroup:DesktopGroup):void {
+				var d:Point = DragMousePoint.fromDragSource(
+									event.dragSource
+								).getDiffInScreen(
+									nativeWindow.x + event.stageX,
+									nativeWindow.y + event.stageY
+								);
+				desktopGroup.moveTo(
+						desktopGroup.x + d.x,
+						desktopGroup.y + d.y);
+			}
+			
+			//
+			// Move Icon from Group
+			//
+			private function onGroupIconDragDrop(event:DragEvent, groupIcon:GroupIcon):void {
+				var user:IUser = groupIcon.getUser();
+				DesktopIcon.addAndOpen(
+					user.iconType,
+					user.iconUserId,
+					event.localX - 50,
+					event.localY - 24);
+				
+				var group:DesktopGroup = groupIcon.getDesktopGroup();
+				callLater(function():void {
+					group.deleteGroupIconOrDisband( groupIcon );
+				});
+			}
+		]]>
+	</mx:Script>
+	
+</mx:Window>

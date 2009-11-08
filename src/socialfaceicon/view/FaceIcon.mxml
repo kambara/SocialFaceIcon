@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	 horizontalAlign="center"
+	 backgroundAlpha="0"
+	 backgroundColor="#999999"
+	 verticalGap="2"
+	 xmlns:view="socialfaceicon.view.*"
+	 doubleClick="onDoubleClick()"
+	 doubleClickEnabled="true"
+	 >
+	<mx:Script>
+		<![CDATA[
+			import flash.net.navigateToURL;
+			import mx.events.FlexEvent;
+			import socialfaceicon.model.ImageCache;
+			import mx.events.DragEvent;
+			import mx.core.DragSource;
+			import mx.managers.DragManager;
+			import socialfaceicon.model.IUser;
+			
+			[Bindable]
+			private var _iconName:String;
+			private var _iconNameChanged:Boolean = false;
+			private var _iconImageUrl:String;
+			private var _iconImageUrlChanged:Boolean = false;
+			private var _iconStatus:String;
+			private var _iconStatusChanged:Boolean = false;
+			private var imgCache:ImageCache;
+			private var iconUserUrl:String;
+			
+			public function init(user:IUser):FaceIcon
+			{
+				if (user.iconName) {
+					this._iconName = user.iconName;
+					this._iconNameChanged = true;
+				}
+				if (user.iconImageUrl) {
+					this._iconImageUrl = user.iconImageUrl;
+					this._iconImageUrlChanged = true;
+				}
+				this.status = user.getIconCurrentStatus();
+				this.iconUserUrl = user.iconUserUrl;
+				return this;
+			}
+			
+			protected override function commitProperties():void
+			{
+				super.commitProperties();
+				
+				if (this._iconNameChanged) {
+					this._iconNameChanged = false;
+					this.nameText.text = this._iconName;
+				}
+				if (this._iconStatusChanged) {
+					this._iconStatusChanged = false;
+					this.statusText.text = this._iconStatus;
+				}
+				if (this._iconImageUrlChanged) {
+					this._iconImageUrlChanged = false;
+					loadImage(this._iconImageUrl);
+				}
+			}
+			
+			public function set status(str:String):void {
+				this._iconStatus = str;
+				this._iconStatusChanged = true;
+				this.invalidateProperties();
+				this.invalidateDisplayList();
+			}
+			
+			private function loadImage(url:String):void {
+				if (imgCache) return;
+				imgCache = new ImageCache();
+				imgCache.addEventListener(
+					Event.COMPLETE,
+					onImageLoad);
+				imgCache.addEventListener(
+					IOErrorEvent.IO_ERROR,
+					onImageIOError);
+				imgCache.loadImage(url);
+			}
+			
+			private function onImageLoad(event:Event):void {
+				image.source = imgCache.bitmap;
+				image.filters = [new DropShadowFilter(
+					1,  // distance
+					60, // angle
+					0x000000,
+					1,  // alpha
+					3,  // blurX
+					3,  // blurY
+					2,  // strength
+					2   // quality
+				)]
+				imgCache = null;
+			}
+			
+			private function onImageIOError(event:IOErrorEvent):void {
+				trace(([
+					this.className,
+					event.type
+				]).join(": "));
+				imgCache = null;
+			}
+			
+			private function onDoubleClick():void {
+				if (!iconUserUrl) return;
+				trace("open: "+iconUserUrl);
+				navigateToURL(new URLRequest(iconUserUrl));
+			}
+		]]>
+	</mx:Script>
+	<mx:Image id="image" width="48" height="48"/>
+	<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
+	<view:FaceIconText id="statusText" text="" lineNumber="2"/>
+</mx:VBox>

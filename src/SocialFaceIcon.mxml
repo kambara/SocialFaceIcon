@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:WindowedApplication xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute"
+	width="200"
+	height="100"
+	initialize="onInitialize()"
+	closing="onClosing()"
+	visible="false"
+	>
+	<mx:Script>
+		<![CDATA[
+			import socialfaceicon.model.HumanDockIcon;
+			import flash.utils.setTimeout;
+			import mx.core.Window;
+			import mx.core.Application;
+			import org.libspark.thread.EnterFrameThreadExecutor;
+			import org.libspark.thread.Thread;
+			import socialfaceicon.model.DesktopGroup;
+			import socialfaceicon.model.threads.CrawlTwitFriendsThread;
+			import socialfaceicon.model.threads.CrawlTwitFriendsTimelineThread;
+			import socialfaceicon.model.threads.TwitFriendsTimelineThread;
+			import socialfaceicon.model.DesktopIcon;
+			import socialfaceicon.model.TwitSession;
+			import socialfaceicon.model.Setting;
+			import socialfaceicon.model.DB;
+			import socialfaceicon.view.DockWindow;
+			import socialfaceicon.view.DesktopWindow;
+			
+			private function onInitialize():void {
+				Thread.initialize(new EnterFrameThreadExecutor());
+				DB.createTables();
+				initTwitter();
+				
+				DesktopWindow.instance.hide();
+				DesktopIcon.openAll();
+				DesktopGroup.openAll();
+				HumanDockIcon.openAll();
+				
+				// Start crawling
+				setTimeout(function():void {
+					(new CrawlTwitFriendsThread()).start();
+				}, 5 * 1000);
+				
+				setTimeout(function():void {
+					(new CrawlTwitFriendsTimelineThread()).start();
+				}, 2 * 60 * 1000);
+			}
+			
+			private function initTwitter():void {
+				if (Setting.twitterUsername
+					&& Setting.twitterUsername)
+				{
+					TwitSession.start(
+							Setting.twitterUsername,
+							Setting.twitterPassword);
+				}
+			}
+			
+			private function onClosing():void {
+				////if (dockWindow) dockWindow.close();
+				if (DesktopWindow.instance) {
+					DesktopWindow.instance.close();
+				}
+				DesktopIcon.closeAll();
+			}
+		]]>
+	</mx:Script>
+</mx:WindowedApplication>

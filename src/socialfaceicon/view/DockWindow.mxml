@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
+	title="Dock"
+	alwaysInFront="true"
+	verticalAlign="middle"
+	
+	width="{frame.width}"
+	height="{frame.height}"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	
+	resizable="false"
+	showStatusBar="false"
+	showTitleBar="false"
+	showGripper="false"
+	type="lightweight"
+	systemChrome="none"
+	transparent="true"
+	backgroundAlpha="0"
+	cornerRadius="0"
+	borderStyle="none"
+	
+	resize="onResize()"
+	dragEnter="onDragEnter(event)"
+	dragDrop="onDragDrop(event)"
+	>
+	<mx:Script>
+		<![CDATA[
+			import socialfaceicon.model.IUser;
+			import socialfaceicon.model.HumanDockIcon;
+			import socialfaceicon.model.DesktopIcon;
+			import socialfaceicon.model.DragFormat;
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			import mx.managers.WindowedSystemManager;
+			import mx.core.WindowedApplication;
+			import mx.core.Application;
+			
+			private var friendsWindow:FriendsListWindow;
+			private var faceIconTable:Object = {};
+			
+			private function onResize():void {
+				if (!this.nativeWindow) return;
+				var bounds:Rectangle = Screen.mainScreen.visibleBounds;
+				nativeWindow.x = bounds.left + (bounds.width - nativeWindow.width)/2;
+				nativeWindow.y = bounds.bottom - nativeWindow.height;
+			}
+			
+			private function onFriendsButtonClick():void {
+				if (!friendsWindow) {
+					friendsWindow = new FriendsListWindow();
+					friendsWindow.open();
+				} else {
+					friendsWindow.visible = !friendsWindow.visible;
+				}
+			}
+			
+			private function onExitButtonClick():void {
+				Application.application.exit();
+			}
+			
+			//
+			// add FaceIcon
+			//
+			public function addIcon(dockIcon:HumanDockIcon):void {
+				var user:IUser = dockIcon.getUser();
+				if (!user) return;
+				var faceIcon:FaceIcon = new FaceIcon();
+				faceIcon.init(user);
+				faceIconContainer.addChild(faceIcon);
+				faceIconTable[ dockIcon.id ] = faceIcon;
+				
+				faceIcon.addEventListener(
+					MouseEvent.MOUSE_DOWN,
+					function(mouse:MouseEvent):void {
+						mouse.stopPropagation();
+					});
+			}
+			
+			//
+			// Drag & Drop
+			//
+			private function onDragEnter(event:DragEvent):void {
+				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON)
+					/*|| event.dragSource.hasFormat(DragFormat.LIST_ITEMS)*/
+					/*|| event.dragSource.hasFormat(DragFormat.GROUP_ICON)*/)
+				{
+					DragManager.acceptDragDrop(
+							DockWindow(event.currentTarget));
+				}
+			}
+			
+			private function onDragDrop(event:DragEvent):void {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+					onDesktopIconDragDrop(
+							event,
+							DesktopIcon(
+								event.dragSource.dataForFormat(
+									DragFormat.DESKTOP_ICON)));
+				}
+			}
+			
+			//
+			// Drop DesktopIcon
+			//
+			private function onDesktopIconDragDrop(event:DragEvent,
+													desktopIcon:DesktopIcon):void
+			{
+				HumanDockIcon.addUser( desktopIcon.getUser() );
+				
+				callLater(function():void {
+					desktopIcon.closeAndDelete();
+				});
+			}
+		]]>
+	</mx:Script>
+	<mx:HBox
+		id="frame"
+		backgroundColor="#FFFFFF"
+		backgroundAlpha="0.5"
+		borderColor="#000000"
+		borderThickness="2"
+		borderStyle="solid"
+		paddingTop="10"
+		paddingBottom="10"
+		paddingLeft="10"
+		paddingRight="10"
+		>
+		<mx:HBox
+			id="faceIconContainer"
+			/>
+		<mx:VBox>
+			<mx:Button
+				id="friendsButton"
+				label="Friends"
+				click="onFriendsButtonClick()"
+				/>
+			<mx:Button
+				id="exitButton"
+				label="x"
+				click="onExitButtonClick()"
+				/>
+		</mx:VBox>
+	</mx:HBox>
+</mx:Window>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:VBox
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	horizontalAlign="center"
+	verticalGap="0"
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	initialize="onInitialize()"
+	>
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import socialfaceicon.model.ImageCache;
+			
+			private function onInitialize():void {
+				addEventListener(
+					FlexEvent.DATA_CHANGE,
+					onDataChange);
+			}
+			
+			private function onDataChange(event:FlexEvent):void {
+				image.source = null;
+				var imgCache:ImageCache = new ImageCache();
+				imgCache.addEventListener(
+					Event.COMPLETE,
+					onImageLoad);
+				imgCache.addEventListener(
+					IOErrorEvent.IO_ERROR,
+					onImageIOError);
+				imgCache.loadImage(data.iconImageUrl);
+			}
+			
+			private function onImageLoad(event:Event):void {
+				image.source = ImageCache(event.target).bitmap
+			}
+			
+			private function onImageIOError(event:IOErrorEvent):void {
+				trace(([
+					"FriendsListIcon",
+					event.type,
+					data.iconImageUrl
+				]).join(": "));
+			}
+		]]>
+	</mx:Script>
+	<mx:Image
+		id="image"
+		width="36"
+		height="36"
+		scaleContent="true"
+		verticalAlign="middle"
+		autoLoad="true"
+		/>
+	<mx:Label
+		text="{data.iconName}"
+		width="80"
+		textAlign="center" />
+</mx:VBox>

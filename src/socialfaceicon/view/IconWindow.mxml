@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window
+	 xmlns:mx="http://www.adobe.com/2006/mxml"
+	 xmlns:ns1="socialfaceicon.view.*"
+	 layout="absolute"
+	 
+	 backgroundAlpha="0"
+	 borderStyle="none"
+	 showTitleBar="false"
+	 showGripper="false"
+	 showStatusBar="false"
+	 type="lightweight"
+	 systemChrome="none"
+	 transparent="true"
+	 
+	 initialize="onInitialize()"
+	 dragEnter="onDragEnter(event)"
+	 dragDrop="onDragDrop(event)"
+	 >
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import socialfaceicon.model.DragFormat;
+			import socialfaceicon.model.DragMousePoint;
+			import socialfaceicon.model.DesktopGroup;
+			import mx.core.DragSource;
+			import socialfaceicon.model.IUser;
+			import mx.managers.DragManager;
+			import mx.events.DragEvent;
+			import socialfaceicon.model.DesktopIcon;
+			
+			private var _desktopIconId:Number = NaN;
+			private var _desktopIconIdChanged:Boolean = false;
+			
+			public function init(desktopIconId:Number):IconWindow {
+				this.desktopIconId = desktopIconId;
+				return this;
+			}
+			
+			private function onInitialize():void {
+				initContextMenu();
+			}
+			
+			private function set desktopIconId(iconId:Number):void {
+				this._desktopIconId = iconId;
+				this._desktopIconIdChanged = true;
+				invalidateProperties();
+				invalidateDisplayList();
+			}
+			
+			protected override function commitProperties():void {
+				super.commitProperties();
+				
+				if (this._desktopIconIdChanged) {
+					this._desktopIconIdChanged = false;
+					
+					var desktopIcon:DesktopIcon = getDesktopIcon();
+					if (desktopIcon) {
+						var user:IUser = desktopIcon.getUser();
+						this.faceIcon.init( user );
+						this.moveWindowTo( desktopIcon.x, desktopIcon.y );
+						initContextMenu();
+					}
+				}
+			}
+			
+			private function getDesktopIcon():DesktopIcon {
+				if (!isNaN(_desktopIconId)) {
+					var desktopIcon:DesktopIcon = new DesktopIcon();
+					if (desktopIcon.loadById( _desktopIconId )) {
+						return desktopIcon;
+					}
+				}
+				return null;
+			}
+			
+			private function initContextMenu():void {
+				var menu:ContextMenu = new ContextMenu();
+				var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete");
+				menuItemDelete.addEventListener(
+					ContextMenuEvent.MENU_ITEM_SELECT,
+					onMenuItemDeleteSelect);
+				menu.addItem(menuItemDelete);
+				this.contextMenu = menu;
+			}
+			
+			private function onMenuItemDeleteSelect(event:ContextMenuEvent):void {
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (desktopIcon) {
+					desktopIcon.closeAndDelete();
+				}
+			}
+			
+			public function moveWindowTo(_x:Number, _y:Number):void {
+				if (this.nativeWindow) {
+					this.nativeWindow.x = _x;
+					this.nativeWindow.y = _y;
+				}
+			}
+			
+			public function updateStatus():void {
+				var desktopIcon:DesktopIcon = this.getDesktopIcon();
+				if (desktopIcon) {
+					this.faceIcon.status = desktopIcon.getUser().getIconCurrentStatus();
+				}
+			}
+			
+			private function onFaceIconResize():void {
+				this.width = faceIcon.width;
+				this.height = faceIcon.height;
+			}
+			
+			//
+			// Drag & Drop
+			//
+			private function onFaceIconDragComplete():void {
+				DesktopWindow.instance.hide();
+			}
+			
+			private function onFaceIconMouseDown(mouse:MouseEvent):void {
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				
+				var dragSource:DragSource = new DragSource();
+				dragSource.addData(
+					desktopIcon,
+					DragFormat.DESKTOP_ICON);
+				dragSource.addData(
+					new DragMousePoint(mouse, this.nativeWindow),
+					DragFormat.DRAG_MOUSE_POINT);
+				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
+				DesktopWindow.instance.show();
+			}
+			
+			private function onDragEnter(event:DragEvent):void {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+					DragManager.acceptDragDrop(this);
+				}
+			}
+			
+			private function onDragDrop(event:DragEvent):void {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+					onDesktopIconDragDrop(event);
+				}
+			}
+			
+			private function onDesktopIconDragDrop(event:DragEvent):void {
+				var sourceDesktopIcon:DesktopIcon =
+						DesktopIcon(event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_ICON));
+								
+				if (this._desktopIconId == sourceDesktopIcon.id) {
+					onMyselfDesktopIconDragDrop(event);
+				} else {
+					onAnotherDesktopIconDragDrop(event, sourceDesktopIcon);
+				}
+			}
+			
+			private function onMyselfDesktopIconDragDrop(event:DragEvent):void {
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				
+				var d:Point = DragMousePoint.fromDragSource(
+									event.dragSource
+								).getDiffInStage(
+									event.stageX,
+									event.stageY
+								);
+				desktopIcon.moveTo(
+					this.nativeWindow.x + d.x,
+					this.nativeWindow.y + d.y);
+			}
+			
+			private function onAnotherDesktopIconDragDrop(event:DragEvent,
+														sourceDesktopIcon:DesktopIcon):void {
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				// New Group
+				DesktopGroup.createAndOpen(
+						desktopIcon.getUser(),
+						sourceDesktopIcon.getUser(),
+						desktopIcon.x - 12,
+						desktopIcon.y - 50);
+				// Delete DesktopIcons
+				callLater(function():void { // for DragComplete Event Handler
+					sourceDesktopIcon.closeAndDelete();
+					desktopIcon.closeAndDelete();
+				});
+			}
+			
+			
+		]]>
+	</mx:Script>
+	<ns1:FaceIcon
+		id="faceIcon"
+		resize="onFaceIconResize()"
+		mouseDown="onFaceIconMouseDown(event)"
+		dragComplete="onFaceIconDragComplete();"
+		/>
+</mx:Window>

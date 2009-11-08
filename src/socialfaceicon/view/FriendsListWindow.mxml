@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute"
+	width="500"
+	height="400"
+	title="Friends"
+	type="utility"
+	backgroundColor="#EEEEEE"
+	alwaysInFront="true"
+	
+	closing="onClosing(event)"
+	>
+	<mx:Script>
+		<![CDATA[
+			import flash.utils.setTimeout;
+			import socialfaceicon.model.TwitUser;
+			import twitter.api.TwitterSearch;
+			import socialfaceicon.model.threads.UpdateTwitFriendsThread;
+			import socialfaceicon.model.TwitSession;
+			import socialfaceicon.model.TwitFriend;
+			import socialfaceicon.model.Setting;
+			
+			[Bindable]
+			private var twitterDataList:Array;
+			
+			private function onClosing(event:Event):void {
+				event.preventDefault();
+				this.visible = false;
+			}
+			
+			private function onTabChange():void {
+				// TODO: Init Other Tabs
+			}
+			
+			//
+			// Twitter Friend List
+			//
+			private function onTabCreationComplete():void {
+				// Init Twitter Tab
+				var username:String = Setting.twitterUsername;
+				var password:String = Setting.twitterPassword;
+				if (username) {
+					twitterUsernameTextInput.text = username;
+					twitterPasswordTextInput.text = password || "";
+					setTimeout(showTwitterFriends, 100);
+				}
+			}
+			
+			private function onTwitterSignInButtonClick():void {
+				twitterDataList = [];
+				Setting.twitterUsername = twitterUsernameTextInput.text;
+				Setting.twitterPassword = twitterPasswordTextInput.text;
+				TwitSession.start(
+						Setting.twitterUsername,
+						Setting.twitterPassword);
+				loadingTwitterFriends = true;
+				var t:UpdateTwitFriendsThread =
+						new UpdateTwitFriendsThread(Setting.twitterUsername);
+				t.addEventListener(
+					UpdateTwitFriendsThread.FINISH,
+					function():void {
+						loadingTwitterFriends = false;
+						showTwitterFriends();
+					});
+				t.start();
+			}
+			
+			private function set loadingTwitterFriends(value:Boolean):void {
+				signInButton.enabled = !value;
+				loadingLabel.visible = value;
+			}
+			
+			public function showTwitterFriends():void {
+				var users:Array = TwitFriend.getUsers( TwitSession.username );
+				twitterDataList = users;
+			}
+			
+			//
+			// Drag & Drop
+			//
+			private function onDragStart():void {
+				DesktopWindow.instance.show();
+			}
+			
+			private function onDragComplete():void {
+				DesktopWindow.instance.hide();
+			}
+			
+		]]>
+	</mx:Script>
+	<mx:TabNavigator
+		id="tab"
+		left="0" right="0" bottom="0" top="10" fontSize="12"
+		change="onTabChange()"
+		creationComplete="onTabCreationComplete()"
+		>
+		<mx:Canvas label="Twitter" width="100%" height="100%">
+			<mx:TextInput x="10" y="28" width="100" id="twitterUsernameTextInput"/>
+			<mx:TextInput x="118" y="28" width="100" displayAsPassword="true" id="twitterPasswordTextInput"/>
+			<mx:Label x="10" y="0" text="Username"/>
+			<mx:Label x="118" y="0" text="Password"/>
+			<mx:Button x="226" y="28"
+				 label="Sign in"
+				 click="onTwitterSignInButtonClick()"
+				 id="signInButton"/>
+			<mx:TileList
+				left="0" right="0" bottom="0" top="60"
+				borderStyle="inset"
+				dragEnabled="true"
+				dataProvider="{twitterDataList}"
+				itemRenderer="socialfaceicon.view.FriendsListIcon"
+				dragStart="onDragStart()"
+				dragComplete="onDragComplete()"
+				/>
+			<mx:Label x="305" y="30" text="Loading..." fontWeight="bold" id="loadingLabel" visible="false"/>
+		</mx:Canvas>
+		<mx:Canvas label="Facebook" width="100%" height="100%">
+		</mx:Canvas>
+	</mx:TabNavigator>
+</mx:Window>
