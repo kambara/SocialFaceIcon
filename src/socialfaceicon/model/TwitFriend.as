@@ -38,5 +38,25 @@ package socialfaceicon.model
 			}
 			return users;
 		}
+		
+		public static function updateAll(screenName:String, users:Array):void {
+			// Delete all friends
+			var twitFriend:TwitFriend = new TwitFriend();
+			twitFriend.del({
+				screenName: screenName
+			});
+			if (!users || users.length == 0) return;
+			
+			// Insert all friends
+			try {
+				twitFriend.begin();
+				for each (var user:TwitUser in users) {
+					(new TwitFriend(screenName, user.id)).insert();
+				}
+				twitFriend.commit();
+			} catch (err:Error) {
+				trace("TwitFriend: updateAll: " + err.message);
+			}
+		}
 	}
 }

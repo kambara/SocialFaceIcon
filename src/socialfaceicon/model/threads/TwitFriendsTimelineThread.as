@@ -33,9 +33,13 @@ package socialfaceicon.model.threads
 		
 		private function onLoad():void {
 			var xml:XML = new XML(loader.loader.data);
+			var statuses:Array = [];
 			for each (var x:XML in xml.children()) {
-				saveStatus(x);
+				//saveStatus(x);
+				statuses.push(
+					TwitStatus.newFromStatusXml(x, x.user[0].id) );
 			}
+			(new TwitStatus()).insertAll( statuses );
 		}
 		
 		private function saveStatus(xml:XML):void {

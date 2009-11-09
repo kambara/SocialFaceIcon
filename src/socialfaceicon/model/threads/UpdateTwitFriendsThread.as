@@ -5,7 +5,6 @@ package socialfaceicon.model.threads
 	import org.libspark.thread.Thread;
 	import org.libspark.thread.utils.EventDispatcherThread;
 	
-	import socialfaceicon.model.DesktopIcon;
 	import socialfaceicon.model.IconStatus;
 	import socialfaceicon.model.TwitFriend;
 	import socialfaceicon.model.TwitStatus;
@@ -69,42 +68,9 @@ package socialfaceicon.model.threads
 		// Save friends
 		//
 		private function saveAllFriends():void {
-			// delete all friends
-			(new TwitFriend()).del({
-								screenName: username
-								});
-			for each (var user:TwitUser in allUsers) {
-				saveUserAndFriend(user);
-			}
-			for each (var status:TwitStatus in allStatuses) {
-				saveStatus(status);
-			}
-		}
-		
-		private function saveUserAndFriend(user:TwitUser):void {
-			// save user
-			// TODO: I/O is too heavy...
-			try {
-				user.save();
-			} catch (err:Error) {
-				trace([
-					this.className,
-					"save user",
-					err.message
-				].join(": "));
-				return;
-			}
-			
-			// save friend
-			try {
-				(new TwitFriend(username, user.id)).insert();
-			} catch (err:Error) {}
-		}
-		
-		private function saveStatus(status:TwitStatus):void {
-			try {
-				status.insert();
-			} catch (err:Error) {}
+			(new TwitUser()).saveAll( allUsers );
+			TwitFriend.updateAll(username, allUsers);
+			(new TwitStatus()).insertAll( allStatuses );
 		}
 		
 		private function onFriendsStatusError(err:Error, t:Thread):void {

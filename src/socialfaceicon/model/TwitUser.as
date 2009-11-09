@@ -44,21 +44,15 @@ package socialfaceicon.model
 			return user;
 		}
 		
+		/*
 		public function save():void {
 			if ( (new TwitUser()).load({id: id}) ) {
 				update({id: id}, null);
 			} else {
 				insert();
 			}
-			/*
-			try {
-				insert();
-			} catch (err:Error) {
-				trace(err.name +" "+err.message);
-				update({id: id}, null);
-			}
-			*/
 		}
+		*/
 		
 		private function getCurrentTwitStatus():TwitStatus {
 			var twitStatus:TwitStatus = new TwitStatus();

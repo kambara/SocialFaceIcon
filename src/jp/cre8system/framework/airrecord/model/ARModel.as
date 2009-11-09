@@ -94,6 +94,69 @@ package jp.cre8system.framework.airrecord.model
 		public function loadById(value:Object):Boolean {
 			return load({id: value.toString()});
 		}
+		
+		public function findByARModelIds(models:Array):Array {
+			if (!models || models.length == 0) return [];
+			var condAry:Array = [];
+			for each (var model:Object in models) {
+				if (model.hasOwnProperty("id")
+					&& model["id"] is Number
+					&& !isNaN(model["id"])) {
+					condAry.push("id = " + model["id"]);
+				}
+			}
+			if (condAry.length == 0) return [];
+			return find( condAry.join(" OR ") );
+		}
+		
+		public function findIdTableByARModelIds(models:Array):Object {
+			var existModels:Array = findByARModelIds(models);
+			var obj:Object = {};
+			for each (var m:Object in existModels) {
+				obj[m.id] = m;
+			}
+			return obj;
+		}
+		
+		public function saveAll(models:Array):void {
+			try {
+				var existTable:Object = findIdTableByARModelIds( models );
+			} catch (err:Error) {
+				return;
+			}
+			try {
+				begin();
+				for each (var model:ARModel in models) {
+					if (existTable[ model["id"] ]) {
+						model.update({ id: model["id"] });
+					} else {
+						model.insert();
+					}
+				}
+				commit();
+			} catch (err:Error) {
+				trace(this.className + ": saveAll: " + err.message);
+			}
+		}
+		
+		public function insertAll(models:Array):void {
+			try {
+				var existTable:Object = findIdTableByARModelIds( models );
+			} catch (err:Error) {
+				return;
+			}
+			try {
+				begin();
+				for each (var model:ARModel in models) {
+					if (!existTable[ model["id"] ]) {
+						model.insert();
+					}
+				}
+				commit();
+			} catch (err:Error) {
+				trace(this.className + ": insertAll: " + err.message);
+			}
+		}
 
 		public function generateList(condition:* = null, order:String = "", limit:String = ""):Array
 		{
