@@ -44,11 +44,9 @@
 				faceIcon.addEventListener(
 						MouseDragStartEvent.MOUSE_DRAG_START,
 						onFaceIconMouseDragStart);
-				/*
-				this.faceIcon.addEventListener("MouseDrag", function(mouse:MouseEvent):void {
-					trace(mouse.type);
-				});
-				*/
+				faceIcon.addEventListener(
+						DragEvent.DRAG_COMPLETE,
+						onFaceIconDragComplete);
 			}
 			
 			private function set desktopIconId(iconId:Number):void {
@@ -124,7 +122,6 @@
 			// Drag Icon
 			//
 			private function onFaceIconMouseDragStart(mouse:MouseDragStartEvent):void {
-				trace("drag: stageX:"+mouse.stageX+" stageY:"+mouse.stageY+" localX:"+mouse.localX+" localY:"+mouse.localY);
 				var desktopIcon:DesktopIcon = getDesktopIcon();
 				if (!desktopIcon) return;
 				
@@ -139,7 +136,7 @@
 				DesktopWindow.instance.show();
 			}
 			
-			private function onFaceIconDragComplete():void {
+			private function onFaceIconDragComplete(event:DragEvent):void {
 				DesktopWindow.instance.hide();
 			}
 			
@@ -208,6 +205,5 @@
 	<ns1:FaceIcon
 		id="faceIcon"
 		resize="onFaceIconResize()"
-		dragComplete="onFaceIconDragComplete();"
 		/>
 </mx:Window>

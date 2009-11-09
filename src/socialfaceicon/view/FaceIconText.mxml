@@ -39,7 +39,7 @@
 			}
 			
 			public function set lineNumber(value:int):void {
-				_lineNum = value;
+				_lineNum = value || 0;
 				updateHeight();
 			}
 			

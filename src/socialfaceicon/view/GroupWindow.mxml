@@ -23,6 +23,7 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.events.MouseDragStartEvent;
 			import mx.events.FlexEvent;
 			import socialfaceicon.model.DesktopIcon;
 			import socialfaceicon.model.DragMousePoint;
@@ -117,13 +118,19 @@
 				
 				faceIcon.addEventListener(
 					MouseEvent.MOUSE_DOWN,
-					function(mouse:MouseEvent):void {
-						mouse.stopPropagation();
+					onFaceIconMouseDown);
+				faceIcon.addEventListener(
+					MouseDragStartEvent.MOUSE_DRAG_START,
+					function(mouse:MouseDragStartEvent):void {
 						doDragFaceIcon(groupIcon.id, mouse);
 					});
 				faceIcon.addEventListener(
 					DragEvent.DRAG_COMPLETE,
 					onFaceIconDragComplete);
+			}
+			
+			private function onFaceIconMouseDown(mouse:MouseEvent):void {
+				mouse.stopPropagation();
 			}
 			
 			//

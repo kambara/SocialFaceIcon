@@ -7,12 +7,16 @@
 	 xmlns:view="socialfaceicon.view.*"
 	 
 	 mouseDown="onMouseDown(event)"
+	 click="onClick(event)"
+	 rollOver="onRollOver(event)"
+	 rollOut="onRollOut(event)"
 	 doubleClick="onDoubleClick()"
 	 doubleClickEnabled="true"
-	 
 	 >
 	<mx:Script>
 		<![CDATA[
+			import flash.utils.clearTimeout;
+			import flash.utils.setTimeout;
 			import socialfaceicon.events.MouseDragStartEvent;
 			import flash.net.navigateToURL;
 			import mx.events.FlexEvent;
@@ -31,6 +35,10 @@
 			private var _iconStatusChanged:Boolean = false;
 			private var imgCache:ImageCache;
 			private var iconUserUrl:String;
+			private var mousePauseTimeoutId:int;
+			private var mouseDragStartEvent:MouseDragStartEvent;
+			
+			private static var selectedFaceIcon:FaceIcon = null;
 			
 			public function init(user:IUser):FaceIcon
 			{
@@ -108,23 +116,14 @@
 			}
 			
 			//
-			// Mouse Event Handler
+			// Mouse Drag Start
 			//
-			//private var mouseDragEvent:MouseDragStartEvent;
+			
 			
 			private function onMouseDown(mouse:MouseEvent):void {
-				trace("d---: stageX:"+mouse.stageX+" stageY:"+mouse.stageY+" localX:"+mouse.localX+" localY:"+mouse.localY);
-				
 				addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 				addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-			}
-			
-			private function onMouseMove(mouse:MouseEvent):void {
-				trace("m---: stageX:"+mouse.stageX+" stageY:"+mouse.stageY+" localX:"+mouse.localX+" localY:"+mouse.localY);
-				
-				removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
-				removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-				var mouseDragEvent:MouseDragStartEvent =
+				mouseDragStartEvent =
 					new MouseDragStartEvent(
 						MouseDragStartEvent.MOUSE_DRAG_START,
 						mouse.stageX,
@@ -142,19 +141,72 @@
 						mouse.commandKey,
 						mouse.controlKey,
 						mouse.clickCount);
-				dispatchEvent( mouseDragEvent );
+			}
+			
+			private function onMouseMove(mouse:MouseEvent):void {
+				cancelDragStart();
+				dispatchEvent( mouseDragStartEvent );
 			}
 			
 			private function onMouseUp(mouse:MouseEvent):void {
+				cancelDragStart();
+			}
+			
+			private function cancelDragStart():void {
 				removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 				removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 			}
 			
 			private function onDoubleClick():void {
 				if (!iconUserUrl) return;
-				trace("open: "+iconUserUrl);
 				navigateToURL(new URLRequest(iconUserUrl));
 			}
+			
+			//
+			// Mouse Pause
+			//
+			private function onRollOver(mouse:Event):void {
+				mousePauseTimeoutId =
+					setTimeout(onMousePause, 1500);
+			}
+			
+			private function onMousePause():void {
+				this.statusText.lineNumber = 0; // not select
+			}
+			
+			private function onRollOut(mouse:Event):void {
+				clearTimeout( mousePauseTimeoutId );
+				if (FaceIcon.selectedFaceIcon != this) {
+					this.statusText.lineNumber = 2;
+				}
+			}
+			
+			private function isSelected():Boolean {
+				return (FaceIcon.selectedFaceIcon
+						&& FaceIcon.selectedFaceIcon == this);
+			}
+			
+			private function onClick(mouse:Event):void {
+				if (this.isSelected()) {
+					unselect();
+				} else {
+					select();
+				}
+			}
+			
+			private function select():void {
+				if (FaceIcon.selectedFaceIcon) {
+					FaceIcon.selectedFaceIcon.unselect();
+				}
+				FaceIcon.selectedFaceIcon = this;
+				this.statusText.lineNumber = 0;
+			}
+			
+			private function unselect():void {
+				FaceIcon.selectedFaceIcon = null;
+				this.statusText.lineNumber = 2;
+			}
+			
 		]]>
 	</mx:Script>
 	<mx:Image id="image" width="48" height="48"/>

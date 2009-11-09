@@ -26,6 +26,7 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.events.MouseDragStartEvent;
 			import mx.core.DragSource;
 			import socialfaceicon.model.IUser;
 			import socialfaceicon.model.HumanDockIcon;
@@ -73,13 +74,19 @@
 				
 				faceIcon.addEventListener(
 					MouseEvent.MOUSE_DOWN,
-					function(mouse:MouseEvent):void {
-						mouse.stopPropagation();
+					onFaceIconMouseDown);
+				faceIcon.addEventListener(
+					MouseDragStartEvent.MOUSE_DRAG_START,
+					function(mouse:MouseDragStartEvent):void {
 						doDragFaceIcon(dockIcon.id, mouse);
 					});
 				faceIcon.addEventListener(
 					DragEvent.DRAG_COMPLETE,
 					onFaceIconDragComplete);
+			}
+			
+			private function onFaceIconMouseDown(mouse:MouseEvent):void {
+				mouse.stopPropagation();
 			}
 			
 			public function removeIcon(dockIcon:HumanDockIcon):void {
@@ -92,13 +99,6 @@
 			// Drag FaceIcon
 			//
 			private function doDragFaceIcon(dockIconId:Number, mouse:MouseEvent):void {
-				/*
-				var dockIcon:HumanDockIcon = new HumanDockIcon();
-				if ( !dockIcon.load({id: dockIconId}) ) {
-					throw new Error("No such DockIcon: dockIconId:" + dockIconId);
-					return;
-				}
-				*/
 				var dragSource:DragSource = new DragSource();
 				dragSource.addData(
 					dockIconId,
