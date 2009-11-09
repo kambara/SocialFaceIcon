@@ -26,6 +26,7 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import mx.core.DragSource;
 			import socialfaceicon.model.IUser;
 			import socialfaceicon.model.HumanDockIcon;
 			import socialfaceicon.model.DesktopIcon;
@@ -74,7 +75,42 @@
 					MouseEvent.MOUSE_DOWN,
 					function(mouse:MouseEvent):void {
 						mouse.stopPropagation();
+						doDragFaceIcon(dockIcon.id, mouse);
 					});
+				faceIcon.addEventListener(
+					DragEvent.DRAG_COMPLETE,
+					onFaceIconDragComplete);
+			}
+			
+			public function removeIcon(dockIcon:HumanDockIcon):void {
+				var faceIcon:FaceIcon = faceIconTable[ dockIcon.id ] as FaceIcon;
+				if (!faceIcon) return;
+				faceIconContainer.removeChild( faceIcon );
+			}
+			
+			//
+			// Drag FaceIcon
+			//
+			private function doDragFaceIcon(dockIconId:Number, mouse:MouseEvent):void {
+				/*
+				var dockIcon:HumanDockIcon = new HumanDockIcon();
+				if ( !dockIcon.load({id: dockIconId}) ) {
+					throw new Error("No such DockIcon: dockIconId:" + dockIconId);
+					return;
+				}
+				*/
+				var dragSource:DragSource = new DragSource();
+				dragSource.addData(
+					dockIconId,
+					DragFormat.DOCK_ICON_ID);
+					
+				var faceIcon:FaceIcon = FaceIcon(mouse.currentTarget);
+				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
+				DesktopWindow.instance.show();
+			}
+			
+			private function onFaceIconDragComplete(event:DragEvent):void {
+				DesktopWindow.instance.hide();
 			}
 			
 			//

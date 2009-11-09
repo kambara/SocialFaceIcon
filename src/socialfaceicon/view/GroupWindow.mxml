@@ -130,13 +130,10 @@
 			// Delete FaceIcon
 			//
 			public function removeFaceIcon(groupIcon:GroupIcon):void {
-				var faceIcon:FaceIcon = FaceIcon(faceIconTable[ groupIcon.id ]);
-				if (faceIcon) {
-					faceIconContainer.removeChild( faceIcon );
-					delete faceIconTable[ groupIcon.id ];
-				} else {
-					trace("No such icon !? GroupIcon id: "+ groupIcon.id);
-				}
+				var faceIcon:FaceIcon = faceIconTable[ groupIcon.id ] as FaceIcon;
+				if (!faceIcon) return;
+				faceIconContainer.removeChild( faceIcon );
+				delete faceIconTable[ groupIcon.id ];
 			}
 			
 			//

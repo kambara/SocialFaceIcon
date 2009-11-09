@@ -5,11 +5,15 @@
 	 backgroundColor="#999999"
 	 verticalGap="2"
 	 xmlns:view="socialfaceicon.view.*"
+	 
+	 mouseDown="onMouseDown(event)"
 	 doubleClick="onDoubleClick()"
 	 doubleClickEnabled="true"
+	 
 	 >
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.events.MouseDragStartEvent;
 			import flash.net.navigateToURL;
 			import mx.events.FlexEvent;
 			import socialfaceicon.model.ImageCache;
@@ -101,6 +105,49 @@
 					event.type
 				]).join(": "));
 				imgCache = null;
+			}
+			
+			//
+			// Mouse Event Handler
+			//
+			//private var mouseDragEvent:MouseDragStartEvent;
+			
+			private function onMouseDown(mouse:MouseEvent):void {
+				trace("d---: stageX:"+mouse.stageX+" stageY:"+mouse.stageY+" localX:"+mouse.localX+" localY:"+mouse.localY);
+				
+				addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+				addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+			}
+			
+			private function onMouseMove(mouse:MouseEvent):void {
+				trace("m---: stageX:"+mouse.stageX+" stageY:"+mouse.stageY+" localX:"+mouse.localX+" localY:"+mouse.localY);
+				
+				removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+				removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
+				var mouseDragEvent:MouseDragStartEvent =
+					new MouseDragStartEvent(
+						MouseDragStartEvent.MOUSE_DRAG_START,
+						mouse.stageX,
+						mouse.stageY,
+						mouse.bubbles,
+						mouse.cancelable,
+						mouse.localX,
+						mouse.localY,
+						mouse.relatedObject,
+						mouse.ctrlKey,
+						mouse.altKey,
+						mouse.shiftKey,
+						mouse.buttonDown,
+						mouse.delta,
+						mouse.commandKey,
+						mouse.controlKey,
+						mouse.clickCount);
+				dispatchEvent( mouseDragEvent );
+			}
+			
+			private function onMouseUp(mouse:MouseEvent):void {
+				removeEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
+				removeEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 			}
 			
 			private function onDoubleClick():void {

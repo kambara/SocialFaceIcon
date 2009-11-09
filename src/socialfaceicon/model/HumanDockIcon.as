@@ -34,10 +34,78 @@ package socialfaceicon.model
 			this.isFirst = isFirst;
 		}
 		
-		public static function updateStatus():void {
-			
+		public static function updateViewStatus():void {
+			// TODO:
 		}
 		
+		private static function setFirstIcon(iconId:Number):void {
+			var dockIcon:HumanDockIcon = new HumanDockIcon();
+			dockIcon.update({isFirst: 1}, {isFirst: 0});
+			dockIcon.update({id: iconId}, {isFirst: 1});
+		}
+		
+		public function updateNextId(newNextId:Number):void {
+			if (this.id == newNextId) {
+				throw new Error("nextId can not be equal to icon id.");
+				return;
+			}
+			this.nextId = newNextId;
+			update(
+				{id: this.id},
+				{nextId: newNextId}
+			);
+		}
+		
+		//
+		// DockIcons
+		//
+		private static function getAllDockIcons():Array {
+			var first:HumanDockIcon = getFirstDockIcon();
+			if (first) {
+				return first.getDockIcons();
+			}
+			return [];
+		}
+		
+		private function getDockIcons():Array {
+			var nextIcon:HumanDockIcon = getNextDockIcon();
+			if (nextIcon) {
+				var icons:Array = nextIcon.getDockIcons();
+				icons.unshift(this);
+				return icons;
+			}
+			return [this];
+		}
+		
+		private function getNextDockIcon():HumanDockIcon {
+			var dockIcon:HumanDockIcon = new HumanDockIcon();
+			if (!isNaN(this.nextId)) {
+				if ( dockIcon.load({ id: this.nextId }) ) {
+					return dockIcon;
+				}
+			}
+			return null;
+		}
+		
+		private function getPrevDockIcon():HumanDockIcon {
+			var dockIcon:HumanDockIcon = new HumanDockIcon();
+			if (dockIcon.load({ nextId: this.id })) {
+				return dockIcon;
+			}
+			return null;
+		}
+		
+		private static function getFirstDockIcon():HumanDockIcon {
+			var dockIcon:HumanDockIcon = new HumanDockIcon();
+			if ( dockIcon.load({ isFirst: 1 }) ) {
+				return dockIcon;
+			}
+			return null;
+		}
+		
+		//
+		// Add
+		//
 		public static function addUser(user:IUser,
 										x:Number=NaN,
 										y:Number=NaN):void
@@ -70,70 +138,22 @@ package socialfaceicon.model
 			}
 		}
 		
-		private static function setFirstIcon(iconId:Number):void {
-			var dockIcon:HumanDockIcon = new HumanDockIcon();
-			dockIcon.update({isFirst: 1}, {isFirst: 0});
-			dockIcon.update({id: iconId}, {isFirst: 1});
-		}
-		
-		private static function updateFirstIconId():void {
-			
-		}
-		
-		private static function getAllDockIcons():Array {
-			var first:HumanDockIcon = getFirstDockIcon();
-			if (first) {
-				return first.getDockIcons();
-			}
-			return [];
-		}
-		
-		private function getDockIcons():Array {
-			var nextIcon:HumanDockIcon = getNextDockIcon();
-			if (nextIcon) {
-				var icons:Array = nextIcon.getDockIcons();
-				icons.unshift(this);
-				return icons;
-			}
-			return [this];
-		}
-		
-		private function getNextDockIcon():HumanDockIcon {
-			var dockIcon:HumanDockIcon = new HumanDockIcon();
-			if (!isNaN(this.nextId)) {
-				if ( dockIcon.load({ id: this.nextId }) ) {
-					return dockIcon;
+		//
+		// TODO: Close
+		//
+		public function closeAndDelete():void {
+			// View
+			dockWindow.removeIcon( this );
+			// Update chain
+			if (this.isFirst) {
+				HumanDockIcon.setFirstIcon(nextId);
+			} else {
+				var prevIcon:HumanDockIcon = getPrevDockIcon();
+				if (prevIcon) {
+					prevIcon.updateNextId(nextId);
 				}
 			}
-			return null;
-		}
-		
-		private static function getFirstDockIcon():HumanDockIcon {
-			var dockIcon:HumanDockIcon = new HumanDockIcon();
-			if ( dockIcon.load({ isFirst: 1 }) ) {
-				return dockIcon;
-			}
-			return null;
-		}
-		
-		public function updateNextId(newNextId:Number):void {
-			if (this.id == newNextId) {
-				throw new Error("nextId can not be equal to icon id.");
-				return;
-			}
-			this.nextId = newNextId;
-			update(
-				{id: this.id},
-				{nextId: newNextId}
-			);
-		}
-		
-		//
-		// TODO: Open & Close
-		//
-		
-		public function closeAndDelete():void {
-			
+			del({id: this.id});
 		}
 	}
 }

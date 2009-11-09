@@ -2,8 +2,8 @@
 <mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
 	 layout="absolute"
 	 title="Desktop"
-	 backgroundAlpha="0.4"
-	 backgroundColor="#FF0000"
+	 backgroundAlpha="0.2"
+	 backgroundColor="#6666FF"
 	 borderStyle="none"
 	 cornerRadius="0"
 	 
@@ -19,6 +19,7 @@
 	 >
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.HumanDockIcon;
 			import flash.utils.getDefinitionByName;
 			import socialfaceicon.model.GroupIcon;
 			import socialfaceicon.model.DragMousePoint;
@@ -66,10 +67,11 @@
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
+				if (   event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
 					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON)
 					|| event.dragSource.hasFormat(DragFormat.DESKTOP_GROUP)
-					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON))
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON)
+					|| event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID) )
 				{
 					DragManager.acceptDragDrop(
 						DesktopWindow(event.currentTarget));
@@ -97,6 +99,11 @@
 							GroupIcon(
 								event.dragSource.dataForFormat(
 									DragFormat.GROUP_ICON)));
+				} else if (event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID)) {
+					onDockIconDragDrop(
+							event,
+							Number(event.dragSource.dataForFormat(
+								DragFormat.DOCK_ICON_ID)));
 				}
 			}
 			
@@ -145,7 +152,7 @@
 			}
 			
 			//
-			// Move Icon from Group
+			// Drag Icon from Group
 			//
 			private function onGroupIconDragDrop(event:DragEvent, groupIcon:GroupIcon):void {
 				var user:IUser = groupIcon.getUser();
@@ -158,6 +165,25 @@
 				var group:DesktopGroup = groupIcon.getDesktopGroup();
 				callLater(function():void {
 					group.deleteGroupIconOrDisband( groupIcon );
+				});
+			}
+			
+			//
+			// Drag Icon from Dock
+			//
+			private function onDockIconDragDrop(event:DragEvent, dockIconId:Number):void {
+				var dockIcon:HumanDockIcon = new HumanDockIcon();
+				if (!dockIcon.loadById( dockIconId )) return;
+				var user:IUser = dockIcon.getUser();
+				if (!user) return;
+				DesktopIcon.addAndOpen(
+					user.iconType,
+					user.iconUserId,
+					event.localX - 50,
+					event.localY - 24);
+				
+				callLater(function():void {
+					dockIcon.closeAndDelete();
 				});
 			}
 		]]>
