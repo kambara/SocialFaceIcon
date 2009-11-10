@@ -281,7 +281,7 @@
 		paddingRight="2"
 		
 		backgroundColor="#FFFFFF"
-		backgroundAlpha="0.2"
+		backgroundAlpha="0.3"
 		
 		borderColor="#EEEEEE"
 		borderThickness="1"
@@ -305,6 +305,8 @@
 			paddingBottom="6"
 			paddingLeft="6"
 			paddingRight="6"
+			verticalScrollPolicy="off"
+			horizontalScrollPolicy="off"
 			/>
 	</mx:VBox>
 	

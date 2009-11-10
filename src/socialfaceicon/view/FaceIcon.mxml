@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:VBox xmlns:mx="http://www.adobe.com/2006/mxml"
-	 horizontalAlign="center"
-	 backgroundAlpha="0"
-	 backgroundColor="#999999"
-	 verticalGap="2"
-	 xmlns:view="socialfaceicon.view.*"
-	 
-	 mouseDown="onMouseDown(event)"
-	 click="onClick(event)"
-	 rollOver="onRollOver(event)"
-	 rollOut="onRollOut(event)"
-	 doubleClick="onDoubleClick()"
-	 doubleClickEnabled="true"
-	 >
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:view="socialfaceicon.view.*"
+	
+	backgroundAlpha="0"
+	backgroundColor="#FF0000"
+	
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	
+	mouseDown="onMouseDown(event)"
+	click="onClick(event)"
+	rollOver="onRollOver(event)"
+	rollOut="onRollOut(event)"
+	doubleClick="onDoubleClick()"
+	doubleClickEnabled="true"
+	>
 	<mx:Script>
 		<![CDATA[
 			import flash.utils.clearTimeout;
@@ -118,8 +120,6 @@
 			//
 			// Mouse Drag Start
 			//
-			
-			
 			private function onMouseDown(mouse:MouseEvent):void {
 				addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 				addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -181,17 +181,16 @@
 				}
 			}
 			
+			//
+			// Click & Select
+			//
+			private function onClick(mouse:Event):void {
+				select();
+			}
+			
 			private function isSelected():Boolean {
 				return (FaceIcon.selectedFaceIcon
 						&& FaceIcon.selectedFaceIcon == this);
-			}
-			
-			private function onClick(mouse:Event):void {
-				if (this.isSelected()) {
-					unselect();
-				} else {
-					select();
-				}
 			}
 			
 			private function select():void {
@@ -199,17 +198,66 @@
 					FaceIcon.selectedFaceIcon.unselect();
 				}
 				FaceIcon.selectedFaceIcon = this;
-				this.statusText.lineNumber = 0;
+				highlight();
+				expand();
 			}
 			
 			private function unselect():void {
 				FaceIcon.selectedFaceIcon = null;
-				this.statusText.lineNumber = 2;
+				offlight();
+				unexpand();
 			}
 			
+			private function highlight():void {
+				this.background.visible = true;
+			}
+			
+			private function offlight():void {
+				this.background.visible = false;
+			}
+			
+			private function expand():void {
+				statusText.lineNumber = 0;
+			}
+			
+			private function unexpand():void {
+				statusText.lineNumber = 2;
+			}
 		]]>
 	</mx:Script>
-	<mx:Image id="image" width="48" height="48"/>
-	<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
-	<view:FaceIconText id="statusText" text="" lineNumber="2"/>
-</mx:VBox>
+	<mx:Canvas
+		id="background"
+		
+		width="{frame.width}"
+		height="{frame.height}"
+		visible="false"
+		
+		backgroundAlpha="0.3"
+		backgroundColor="#CCCCFF"
+		
+		borderStyle="solid"
+	 	borderThickness="1"
+	 	borderColor="#AAAAFF"
+	 	cornerRadius="6"
+		/>
+	<mx:VBox
+		id="frame"
+		x="1"
+		y="1"
+		
+	 	paddingTop="6"
+	 	paddingBottom="4"
+	 	paddingLeft="2"
+		paddingRight="2"
+		
+		horizontalAlign="center"
+		verticalGap="2"
+		
+		verticalScrollPolicy="off"
+		horizontalScrollPolicy="off"
+		>
+		<mx:Image id="image" width="48" height="48"/>
+		<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
+		<view:FaceIconText id="statusText" text="" lineNumber="2"/>
+	</mx:VBox>
+</mx:Canvas>

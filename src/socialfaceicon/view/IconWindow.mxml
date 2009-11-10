@@ -13,6 +13,9 @@
 	 systemChrome="none"
 	 transparent="true"
 	 
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	 
 	 initialize="onInitialize()"
 	 dragEnter="onDragEnter(event)"
 	 dragDrop="onDragDrop(event)"

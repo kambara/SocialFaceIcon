@@ -4,8 +4,6 @@
 	alwaysInFront="true"
 	verticalAlign="top"
 	
-	width="{frame.width}"
-	height="{frame.height - 8}"
 	verticalScrollPolicy="off"
 	horizontalScrollPolicy="off"
 	
@@ -20,13 +18,19 @@
 	cornerRadius="0"
 	borderStyle="none"
 	
+	width="{background.width}"
+	height="{background.height - 8}"
+	
 	initialize="onInitialize()"
 	resize="onResize()"
+	
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
 	>
 	<mx:Script>
 		<![CDATA[
+			import flash.utils.setTimeout;
+			import mx.events.ResizeEvent;
 			import socialfaceicon.events.MouseDragStartEvent;
 			import mx.core.DragSource;
 			import socialfaceicon.model.IUser;
@@ -58,6 +62,13 @@
 			
 			private function onMenuItemExitSelect(event:ContextMenuEvent):void {
 				Application.application.exit();
+			}
+			
+			private function onFrameResize():void {
+				setTimeout(function():void {
+					background.width = frame.width + 1;
+					background.height = frame.height + 8;
+				}, 400);
 			}
 			
 			private function onResize():void {
@@ -183,32 +194,42 @@
 			}
 		]]>
 	</mx:Script>
-	<mx:HBox
-		id="frame"
-		x="0"
-		y="0"
+	<mx:Canvas
+		id="background"
+		
 		backgroundColor="#FFFFFF"
 		backgroundAlpha="0.4"
 		borderColor="#DDDDDD"
 		borderThickness="1"
 		borderStyle="solid"
-		paddingTop="8"
-		paddingBottom="16"
-		paddingLeft="8"
-		paddingRight="8"
 		cornerRadius="8"
+		
+		verticalScrollPolicy="off"
+		horizontalScrollPolicy="off"
 		>
 		<mx:HBox
-			id="faceIconContainer"
-			/>
-		<mx:VBox>
-			<mx:Button
-				id="friendsButton"
-				label="Friends"
-				width="70"
-				height="70"
-				click="onFriendsButtonClick()"
+			id="frame"
+			x="0"
+			y="0"
+			paddingTop="8"
+			paddingBottom="8"
+			paddingLeft="8"
+			paddingRight="8"
+			
+			resize="onFrameResize()"
+			>
+			<mx:HBox
+				id="faceIconContainer"
 				/>
-		</mx:VBox>
-	</mx:HBox>
+			<mx:VBox>
+				<mx:Button
+					id="friendsButton"
+					label="Friends"
+					width="70"
+					height="70"
+					click="onFriendsButtonClick()"
+					/>
+			</mx:VBox>
+		</mx:HBox>
+	</mx:Canvas>
 </mx:Window>
