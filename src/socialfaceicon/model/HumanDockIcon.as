@@ -35,7 +35,7 @@ package socialfaceicon.model
 		}
 		
 		public static function updateViewStatus():void {
-			// TODO:
+			dockWindow.updateStatus();
 		}
 		
 		private static function setFirstIcon(iconId:Number):void {
@@ -57,20 +57,20 @@ package socialfaceicon.model
 		}
 		
 		//
-		// DockIcons
+		// Manage DockIcons
 		//
-		private static function getAllDockIcons():Array {
+		public static function getAllDockIcons():Array {
 			var first:HumanDockIcon = getFirstDockIcon();
 			if (first) {
-				return first.getDockIcons();
+				return first.getDockIconList();
 			}
 			return [];
 		}
 		
-		private function getDockIcons():Array {
+		private function getDockIconList():Array {
 			var nextIcon:HumanDockIcon = getNextDockIcon();
 			if (nextIcon) {
-				var icons:Array = nextIcon.getDockIcons();
+				var icons:Array = nextIcon.getDockIconList();
 				icons.unshift(this);
 				return icons;
 			}
@@ -104,7 +104,7 @@ package socialfaceicon.model
 		}
 		
 		//
-		// Add
+		// Add Icon
 		//
 		public static function addUser(user:IUser,
 										x:Number=NaN,
@@ -139,7 +139,7 @@ package socialfaceicon.model
 		}
 		
 		//
-		// TODO: Close
+		//  Close Icon
 		//
 		public function closeAndDelete():void {
 			// View

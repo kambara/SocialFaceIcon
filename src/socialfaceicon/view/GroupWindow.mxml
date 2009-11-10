@@ -18,6 +18,7 @@
 	cornerRadius="0"
 	borderStyle="none"
 	
+	initialize="onInitialize()"
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
 	>
@@ -42,6 +43,21 @@
 			public function init(groupId:Number):GroupWindow {
 				this.desktopGroupId = groupId;
 				return this;
+			}
+			
+			private function onInitialize():void {
+				/*
+				this.frame.filters = [new DropShadowFilter(
+					2,  // distance
+					60, // angle
+					0x000000,
+					0.7,  // alpha
+					6,  // blurX
+					6,  // blurY
+					2,  // strength
+					2   // quality
+				)];
+				*/
 			}
 			
 			private function set desktopGroupId(groupId:Number):void {
@@ -86,7 +102,7 @@
 				var desktopGroup:DesktopGroup = getDesktopGroup();
 				if (!desktopGroup) return;
 				for each (var groupIcon:GroupIcon in desktopGroup.getGroupIcons()) {
-					var faceIcon:FaceIcon = FaceIcon(this.faceIconTable[ groupIcon.id ]);
+					var faceIcon:FaceIcon = this.faceIconTable[ groupIcon.id ] as FaceIcon;
 					if (faceIcon) {
 						var user:IUser = groupIcon.getUser();
 						if (user) {
@@ -258,11 +274,17 @@
 	</mx:Script>
 	<mx:VBox
 		id="frame"
-		backgroundColor="#FFFFFF"
-		backgroundAlpha="0.1"
+
+		paddingTop="2"
+		paddingBottom="2"
+		paddingLeft="2"
+		paddingRight="2"
 		
-		borderColor="#333333"
-		borderThickness="2"
+		backgroundColor="#FFFFFF"
+		backgroundAlpha="0.2"
+		
+		borderColor="#EEEEEE"
+		borderThickness="1"
 		borderStyle="solid"
 		cornerRadius="8"
 		
@@ -274,15 +296,17 @@
 		>
 		<mx:Button
 			label="-"
-			width="36"
+			width="30"
 			height="30"
 			/>
 		<mx:HBox
 			id="faceIconContainer"
-			paddingTop="10"
-			paddingBottom="10"
-			paddingLeft="10"
-			paddingRight="10"
+			paddingTop="0"
+			paddingBottom="6"
+			paddingLeft="6"
+			paddingRight="6"
 			/>
 	</mx:VBox>
+	
+		
 </mx:Window>

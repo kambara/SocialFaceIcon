@@ -94,7 +94,7 @@ package socialfaceicon.model
 		//
 		// Invalidate status
 		//
-		public static function updateStatus():void {
+		public static function updateViewStatus():void {
 			for each (var groupWindow:GroupWindow in groupWindowTable) {
 				groupWindow.updateStatus();
 			}

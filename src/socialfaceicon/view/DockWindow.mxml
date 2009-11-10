@@ -2,10 +2,10 @@
 <mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
 	title="Dock"
 	alwaysInFront="true"
-	verticalAlign="middle"
+	verticalAlign="top"
 	
 	width="{frame.width}"
-	height="{frame.height}"
+	height="{frame.height - 8}"
 	verticalScrollPolicy="off"
 	horizontalScrollPolicy="off"
 	
@@ -20,6 +20,7 @@
 	cornerRadius="0"
 	borderStyle="none"
 	
+	initialize="onInitialize()"
 	resize="onResize()"
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
@@ -41,6 +42,24 @@
 			private var friendsWindow:FriendsListWindow;
 			private var faceIconTable:Object = {};
 			
+			private function onInitialize():void {
+				initContextMenu();
+			}
+			
+			private function initContextMenu():void {
+				var menu:ContextMenu = new ContextMenu();
+				var menuItemExit:ContextMenuItem = new ContextMenuItem("Exit");
+				menuItemExit.addEventListener(
+					ContextMenuEvent.MENU_ITEM_SELECT,
+					onMenuItemExitSelect);
+				menu.addItem(menuItemExit);
+				this.contextMenu = menu;
+			}
+			
+			private function onMenuItemExitSelect(event:ContextMenuEvent):void {
+				Application.application.exit();
+			}
+			
 			private function onResize():void {
 				if (!this.nativeWindow) return;
 				var bounds:Rectangle = Screen.mainScreen.visibleBounds;
@@ -48,6 +67,9 @@
 				nativeWindow.y = bounds.bottom - nativeWindow.height;
 			}
 			
+			//
+			// Friends Button
+			//
 			private function onFriendsButtonClick():void {
 				if (!friendsWindow) {
 					friendsWindow = new FriendsListWindow();
@@ -57,8 +79,19 @@
 				}
 			}
 			
-			private function onExitButtonClick():void {
-				Application.application.exit();
+			//
+			// Update Status
+			//
+			public function updateStatus():void {
+				for each (var dockIcon:HumanDockIcon in HumanDockIcon.getAllDockIcons()) {
+					var faceIcon:FaceIcon = faceIconTable[ dockIcon.id ] as FaceIcon;
+					if (faceIcon) {
+						var user:IUser = dockIcon.getUser();
+						if (user) {
+							faceIcon.status = user.getIconCurrentStatus();
+						}
+					}
+				}
 			}
 			
 			//
@@ -152,15 +185,18 @@
 	</mx:Script>
 	<mx:HBox
 		id="frame"
+		x="0"
+		y="0"
 		backgroundColor="#FFFFFF"
-		backgroundAlpha="0.5"
-		borderColor="#000000"
-		borderThickness="2"
+		backgroundAlpha="0.4"
+		borderColor="#DDDDDD"
+		borderThickness="1"
 		borderStyle="solid"
-		paddingTop="10"
-		paddingBottom="10"
-		paddingLeft="10"
-		paddingRight="10"
+		paddingTop="8"
+		paddingBottom="16"
+		paddingLeft="8"
+		paddingRight="8"
+		cornerRadius="8"
 		>
 		<mx:HBox
 			id="faceIconContainer"
@@ -169,12 +205,9 @@
 			<mx:Button
 				id="friendsButton"
 				label="Friends"
+				width="70"
+				height="70"
 				click="onFriendsButtonClick()"
-				/>
-			<mx:Button
-				id="exitButton"
-				label="x"
-				click="onExitButtonClick()"
 				/>
 		</mx:VBox>
 	</mx:HBox>

@@ -40,7 +40,7 @@ package socialfaceicon.model
 		//
 		// Status
 		//
-		public static function updateStatus():void {
+		public static function updateViewStatus():void {
 			for each (var icon:IconWindow in DesktopIcon.iconWindowTable) {
 				icon.updateStatus();
 			}
