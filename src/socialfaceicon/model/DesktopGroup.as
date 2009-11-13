@@ -10,7 +10,7 @@ package socialfaceicon.model
 		public var firstIconId:Number;
 		public var x:Number;
 		public var y:Number;
-		public var folded:Number;
+		public var piled:Number;
 		
 		private static var groupWindowTable:Object = {}; // groups in view
 		
@@ -18,7 +18,7 @@ package socialfaceicon.model
 										firstIconId:Number = NaN,
 										x:Number = 0,
 										y:Number = 0,
-										folded:Number = 0)
+										piled:Number = 0)
 		{
 			super();
 			this.__table = "desktop_groups";
@@ -27,7 +27,7 @@ package socialfaceicon.model
 			this.firstIconId = firstIconId;
 			this.x = x;
 			this.y = y;
-			this.folded = folded;
+			this.piled = piled;
 		}
 		
 		private static function create(firstIconId:Number, // not null
@@ -77,11 +77,23 @@ package socialfaceicon.model
 		}
 		
 		//
+		// Pile
+		//
+		public function togglePiled():void {
+			updateParams({
+				piled: (piled ? 0 : 1)
+			});
+			if (groupWindow) {
+				groupWindow.piled = this.piled;
+			}
+		}
+		
+		//
 		// move
 		//
 		public function moveTo(_x:Number, _y:Number):void {
-			this.x = _x;
-			this.y = _y;
+			this.x = Math.round(_x);
+			this.y = Math.round(_y);
 			this.update({
 				id: this.id
 			}, null);
@@ -92,7 +104,7 @@ package socialfaceicon.model
 		}
 		
 		//
-		// Invalidate status
+		// View status
 		//
 		public static function updateViewStatus():void {
 			for each (var groupWindow:GroupWindow in groupWindowTable) {

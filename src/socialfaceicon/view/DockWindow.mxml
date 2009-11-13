@@ -18,7 +18,7 @@
 	cornerRadius="0"
 	borderStyle="none"
 	
-	width="{background.width}"
+	width="{background.width + 1}"
 	height="{background.height - 8}"
 	
 	initialize="onInitialize()"
@@ -45,6 +45,10 @@
 			
 			private var friendsWindow:FriendsListWindow;
 			private var faceIconTable:Object = {};
+			
+			[Embed(source="socialfaceicon/assets/system-users.png")]
+			[Bindable]
+			public var UsersImage:Class;
 			
 			private function onInitialize():void {
 				initContextMenu();
@@ -161,7 +165,7 @@
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON)
+				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
 					/*|| event.dragSource.hasFormat(DragFormat.LIST_ITEMS)*/
 					/*|| event.dragSource.hasFormat(DragFormat.GROUP_ICON)*/)
 				{
@@ -171,12 +175,12 @@
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					onDesktopIconDragDrop(
 							event,
-							DesktopIcon(
-								event.dragSource.dataForFormat(
-									DragFormat.DESKTOP_ICON)));
+							event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_ICON_ID)
+									as Number);
 				}
 			}
 			
@@ -184,8 +188,12 @@
 			// Drop DesktopIcon
 			//
 			private function onDesktopIconDragDrop(event:DragEvent,
-													desktopIcon:DesktopIcon):void
+													desktopIconId:Number):void
 			{
+				if (isNaN(desktopIconId)) return;
+				var desktopIcon:DesktopIcon = new DesktopIcon();
+				if (!desktopIcon.loadById( desktopIconId )) return;
+				
 				HumanDockIcon.addUser( desktopIcon.getUser() );
 				
 				callLater(function():void {
@@ -197,10 +205,11 @@
 	<mx:Canvas
 		id="background"
 		
-		backgroundColor="#FFFFFF"
+		backgroundColor="#000000"
 		backgroundAlpha="0.4"
-		borderColor="#DDDDDD"
-		borderThickness="1"
+		
+		borderColor="#333333"
+		borderThickness="2"
 		borderStyle="solid"
 		cornerRadius="8"
 		
@@ -220,13 +229,23 @@
 			>
 			<mx:HBox
 				id="faceIconContainer"
+				minWidth="60"
+				/>
+			<mx:Canvas
+				height="100%"
+				width="1"
+				backgroundColor="#555555"
 				/>
 			<mx:VBox>
-				<mx:Button
+				<mx:LinkButton
 					id="friendsButton"
+					icon="{UsersImage}"
 					label="Friends"
-					width="70"
-					height="70"
+					labelPlacement="bottom"
+					color="#EEEEEE"
+					fontWeight="normal"
+					fontSize="12"
+					
 					click="onFriendsButtonClick()"
 					/>
 			</mx:VBox>

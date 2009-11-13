@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"
+	width="18"
+	height="18"
+	initialize="onInitialize()"
+	rollOver="onRollOver()"
+	rollOut="onRollOut()"
+	mouseDown="onMouseDown()"
+	mouseUp="onMouseUp()"
+	>
+	<mx:Script>
+		<![CDATA[
+			private var _piled:Boolean = false;
+			
+			private var fillColor:uint = 0x333333;
+			private var fillOverColor:uint = 0x6666FF;
+			private var fillDownColor:uint = 0x3333CC;
+			
+			private var lineColor:uint = 0xEEEEEE;
+			private var lineLength:int = 10;
+			private var lineThickness:int = 2;
+			private var center:Number = 9;
+			
+			
+			private const UP:int = 0;
+			private const OVER:int = 1;
+			private const DOWN:int = 2;
+			private var buttonState:int = UP;
+			
+			private function onInitialize():void {
+				buttonState = UP;
+				this.update();
+			}
+			
+			private function onRollOver():void {
+				buttonState = OVER;
+				update();
+			}
+			
+			private function onRollOut():void {
+				buttonState = UP;
+				update();
+			}
+			
+			private function onMouseDown():void {
+				buttonState = DOWN;
+				update();
+			}
+			
+			private function onMouseUp():void {
+				buttonState = OVER;
+				update();
+			}
+			
+			public function get piled():Boolean {
+				return _piled;
+			}
+			
+			public function set piled(value:Boolean):void {
+				this._piled = value;
+				update();
+			}
+			
+			public function toggle():void {
+				this._piled = !this._piled;
+				update();
+			}
+			
+			private function update():void {
+				var g:Graphics = this.container.graphics;
+				g.clear();
+				g.lineStyle(lineThickness,
+						lineColor,
+						1,
+						false,
+						LineScaleMode.NONE,
+						CapsStyle.NONE);
+				if (_piled) {
+					drawPiledButton(g);
+				} else {
+					drawUnpiledButton(g);
+				}
+			}
+			
+			private function drawPiledButton(g:Graphics):void {
+				drawCircle(g);
+				drawHorizontalLine(g);
+				drawVerticalLine(g);
+			}
+			
+			private function drawUnpiledButton(g:Graphics):void {
+				drawCircle(g);
+				drawHorizontalLine(g);
+			}
+			
+			private function drawVerticalLine(g:Graphics):void {
+				g.moveTo(center, center - lineLength/2);
+				g.lineTo(center, center + lineLength/2);
+			}
+			
+			private function drawHorizontalLine(g:Graphics):void {
+				g.moveTo(center - lineLength/2, center);
+				g.lineTo(center + lineLength/2, center);
+			}
+			
+			private function drawCircle(g:Graphics):void {
+				g.beginFill( getFillColor() );
+				g.drawCircle(center, center, center);
+				g.endFill();
+			}
+			
+			private function getFillColor():int {
+				switch (buttonState) {
+					case UP:
+						return fillColor;
+					case DOWN:
+						return fillDownColor;
+					case OVER:
+						return fillOverColor;
+				}
+				return fillColor;
+			}
+		]]>
+	</mx:Script>
+	
+	<mx:UIComponent
+		id="container"
+		/>
+</mx:Canvas>

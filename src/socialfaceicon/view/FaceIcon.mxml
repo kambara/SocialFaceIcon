@@ -35,7 +35,8 @@
 			private var _iconImageUrlChanged:Boolean = false;
 			private var _iconStatus:String;
 			private var _iconStatusChanged:Boolean = false;
-			private var imgCache:ImageCache;
+			//private var imgCache:ImageCache;
+			
 			private var iconUserUrl:String;
 			private var mousePauseTimeoutId:int;
 			private var mouseDragStartEvent:MouseDragStartEvent;
@@ -71,7 +72,7 @@
 				}
 				if (this._iconImageUrlChanged) {
 					this._iconImageUrlChanged = false;
-					loadImage(this._iconImageUrl);
+					this.image.source = this._iconImageUrl;
 				}
 			}
 			
@@ -82,6 +83,7 @@
 				this.invalidateDisplayList();
 			}
 			
+			/*
 			private function loadImage(url:String):void {
 				if (imgCache) return;
 				imgCache = new ImageCache();
@@ -116,6 +118,7 @@
 				]).join(": "));
 				imgCache = null;
 			}
+			*/
 			
 			//
 			// Mouse Drag Start
@@ -232,7 +235,7 @@
 		height="{frame.height}"
 		visible="false"
 		
-		backgroundAlpha="0.3"
+		backgroundAlpha="0.4"
 		backgroundColor="#CCCCFF"
 		
 		borderStyle="solid"
@@ -256,7 +259,7 @@
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
 		>
-		<mx:Image id="image" width="48" height="48"/>
+		<view:CachedImage id="image" width="48" height="48"/>
 		<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
 		<view:FaceIconText id="statusText" text="" lineNumber="2"/>
 	</mx:VBox>

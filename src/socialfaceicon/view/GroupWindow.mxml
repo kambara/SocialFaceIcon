@@ -18,10 +18,9 @@
 	cornerRadius="0"
 	borderStyle="none"
 	
-	initialize="onInitialize()"
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
-	>
+	xmlns:view="socialfaceicon.view.*">
 	<mx:Script>
 		<![CDATA[
 			import socialfaceicon.events.MouseDragStartEvent;
@@ -38,26 +37,16 @@
 			
 			private var _desktopGroupId:Number = NaN;
 			private var _desktopGroupIdChanged:Boolean = false;
-			private var faceIconTable:Object = {};
+			private var _piled:Number = 0;
+			private var _piledChanged:Boolean = false;
+			private var faceIcons:IFaceIcons = null;
+			
+			[Bindable]
+			private var _number:int = 0;
 			
 			public function init(groupId:Number):GroupWindow {
 				this.desktopGroupId = groupId;
 				return this;
-			}
-			
-			private function onInitialize():void {
-				/*
-				this.frame.filters = [new DropShadowFilter(
-					2,  // distance
-					60, // angle
-					0x000000,
-					0.7,  // alpha
-					6,  // blurX
-					6,  // blurY
-					2,  // strength
-					2   // quality
-				)];
-				*/
 			}
 			
 			private function set desktopGroupId(groupId:Number):void {
@@ -67,18 +56,46 @@
 				invalidateDisplayList();
 			}
 			
+			public function set piled(value:Number):void {
+				this._piled = value;
+				this._piledChanged = true;
+				invalidateProperties();
+				invalidateDisplayList();
+			}
+			
 			protected override function commitProperties():void {
 				super.commitProperties();
-				
 				if (this._desktopGroupIdChanged) {
 					this._desktopGroupIdChanged = false;
-					var desktopGroup:DesktopGroup = getDesktopGroup();
-					if (desktopGroup) {
-						this.moveWindowTo( desktopGroup.x, desktopGroup.y );
-						// TODO: remove all icons
-						this.addAllIcon();
-					}
+					update();
 				}
+				if (this._piledChanged) {
+					this._piledChanged = false;
+					update();
+				}
+			}
+			
+			private function update():void {
+				var desktopGroup:DesktopGroup = getDesktopGroup();
+				// move
+				this.moveWindowTo( desktopGroup.x, desktopGroup.y );
+				// remove all
+				if (faceIconsContainer) {
+					faceIconsContainer.removeAllChildren();
+				}
+				// add all
+				_number = 0;
+				faceIcons = desktopGroup.piled
+								? new PiledFaceIcons()
+								: new UnpiledFaceIcons();
+				for each (var groupIcon:GroupIcon in desktopGroup.getGroupIcons()) {
+					this.addIcon( groupIcon);
+				}
+				faceIconsContainer.addChild( faceIcons as DisplayObject );
+				
+				// pile button
+				pileButton.piled = !!desktopGroup.piled;
+				number.visible = !!desktopGroup.piled;
 			}
 			
 			private function getDesktopGroup():DesktopGroup {
@@ -99,100 +116,51 @@
 			}
 			
 			public function updateStatus():void {
+				if (!faceIcons) return;
 				var desktopGroup:DesktopGroup = getDesktopGroup();
 				if (!desktopGroup) return;
-				for each (var groupIcon:GroupIcon in desktopGroup.getGroupIcons()) {
-					var faceIcon:FaceIcon = this.faceIconTable[ groupIcon.id ] as FaceIcon;
-					if (faceIcon) {
-						var user:IUser = groupIcon.getUser();
-						if (user) {
-							faceIcon.status = user.getIconCurrentStatus();
-						}
-					}
-				}
+				faceIcons.updateStatus(desktopGroup);
+			}
+			
+			//
+			// Pile
+			//
+			private function onPileButtonClick():void {
+				var desktopGroup:DesktopGroup = getDesktopGroup();
+				if (!desktopGroup) return;
+				desktopGroup.togglePiled();
 			}
 			
 			//
 			// Add FaceIcon
 			//
-			private function addAllIcon():void {
-				var desktopGroup:DesktopGroup = getDesktopGroup();
-				if (!desktopGroup) return;
-				var icons:Array = desktopGroup.getGroupIcons();
-				for each (var groupIcon:GroupIcon in icons) {
-					addIcon(groupIcon);
-				}
-			}
-			
 			public function addIcon(groupIcon:GroupIcon):void {
-				if (!groupIcon) return;
-				var faceIcon:FaceIcon = new FaceIcon();
-				var user:IUser = groupIcon.getUser();
-				faceIcon.init(user);
-				faceIconContainer.addChild(faceIcon);
-				faceIconTable[ groupIcon.id ] = faceIcon;
-				
-				faceIcon.addEventListener(
-					MouseEvent.MOUSE_DOWN,
-					onFaceIconMouseDown);
-				faceIcon.addEventListener(
-					MouseDragStartEvent.MOUSE_DRAG_START,
-					function(mouse:MouseDragStartEvent):void {
-						doDragFaceIcon(groupIcon.id, mouse);
-					});
-				faceIcon.addEventListener(
-					DragEvent.DRAG_COMPLETE,
-					onFaceIconDragComplete);
-			}
-			
-			private function onFaceIconMouseDown(mouse:MouseEvent):void {
-				mouse.stopPropagation();
+				if (groupIcon && faceIcons) {
+					faceIcons.addIcon(groupIcon);
+					_number++;
+				}
 			}
 			
 			//
 			// Delete FaceIcon
 			//
 			public function removeFaceIcon(groupIcon:GroupIcon):void {
-				var faceIcon:FaceIcon = faceIconTable[ groupIcon.id ] as FaceIcon;
-				if (!faceIcon) return;
-				faceIconContainer.removeChild( faceIcon );
-				delete faceIconTable[ groupIcon.id ];
-			}
-			
-			//
-			// Drag FaceIcon
-			//
-			private function doDragFaceIcon(groupIconId:Number, mouse:MouseEvent):void {
-				var groupIcon:GroupIcon = new GroupIcon();
-				if ( !groupIcon.load({id: groupIconId}) ) {
-					throw new Error("No such GroupIcon: groupIconId:" + groupIconId);
-					return;
+				if (groupIcon && faceIcons) {
+					faceIcons.removeIcon(groupIcon);
+					_number--;
 				}
-				var dragSource:DragSource = new DragSource();
-				dragSource.addData(
-					groupIcon,
-					DragFormat.GROUP_ICON);
-					
-				var faceIcon:FaceIcon = FaceIcon(mouse.currentTarget);
-				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
-				DesktopWindow.instance.show();
-			}
-			
-			private function onFaceIconDragComplete(event:DragEvent):void {
-				DesktopWindow.instance.hide();
 			}
 			
 			//
 			// Drag Group
 			//
 			private function onFrameMouseDown(mouse:MouseEvent):void {
-				var desktopGroup:DesktopGroup = getDesktopGroup();
-				if (!desktopGroup) return;
+				if (isNaN(_desktopGroupId)) return;
 				
 				var dragSource:DragSource = new DragSource();
 				dragSource.addData(
-					desktopGroup,
-					DragFormat.DESKTOP_GROUP);
+					_desktopGroupId,
+					DragFormat.DESKTOP_GROUP_ID);
 				dragSource.addData(
 					new DragMousePoint(mouse, this.nativeWindow),
 					DragFormat.DRAG_MOUSE_POINT);
@@ -208,23 +176,23 @@
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP )
-					|| event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				if (   event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )
+					|| event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					DragManager.acceptDragDrop(this);
 				}
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP )) {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )) {
 					// Move the group
 					onDesktopGroupDragDrop(event);
-				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					// Add icon to the group
 					onDesktopIconDragDrop(
 							event,
-							DesktopIcon(
-								event.dragSource.dataForFormat(
-									DragFormat.DESKTOP_ICON)));
+							event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_ICON_ID)
+									as Number);
 				}
 			}
 			
@@ -232,10 +200,11 @@
 			// Drop DesktopGroup
 			//
 			private function onDesktopGroupDragDrop(event:DragEvent):void {
-				var sourceDesktopGroup:DesktopGroup =
-						DesktopGroup(event.dragSource.dataForFormat(
-								DragFormat.DESKTOP_GROUP));
-				if (this._desktopGroupId == sourceDesktopGroup.id) {
+				var sourceDesktopGroupId:Number =
+						event.dragSource.dataForFormat(
+							DragFormat.DESKTOP_GROUP_ID)
+								as Number;
+				if (this._desktopGroupId == sourceDesktopGroupId) {
 					onMyselfDesktopGroupDragDrop(event);
 				} else {
 					//onAnotherDesktopGroupDragDrop(event);
@@ -261,7 +230,11 @@
 			// Drop DesktopIcon
 			//
 			private function onDesktopIconDragDrop(event:DragEvent,
-													sourceDesktopIcon:DesktopIcon):void {
+													sourceDesktopIconId:Number):void {
+				if (isNaN(sourceDesktopIconId)) return;
+				var sourceDesktopIcon:DesktopIcon = new DesktopIcon();
+				if (!sourceDesktopIcon.loadById( sourceDesktopIconId )) return; 
+				
 				var desktopGroup:DesktopGroup = getDesktopGroup();
 				if (!desktopGroup) return;
 				desktopGroup.addUser(
@@ -275,18 +248,18 @@
 	<mx:VBox
 		id="frame"
 
-		paddingTop="2"
+		paddingTop="3"
 		paddingBottom="2"
-		paddingLeft="2"
-		paddingRight="2"
+		paddingLeft="3"
+		paddingRight="3"
 		
-		backgroundColor="#FFFFFF"
-		backgroundAlpha="0.3"
+		backgroundColor="#000000"
+		backgroundAlpha="0.4"
 		
-		borderColor="#EEEEEE"
-		borderThickness="1"
+		borderColor="#333333"
+		borderThickness="0.1"
 		borderStyle="solid"
-		cornerRadius="8"
+		cornerRadius="10"
 		
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
@@ -294,13 +267,22 @@
 		mouseDown="onFrameMouseDown(event)"
 		dragComplete="onFrameDragComplete()"
 		>
-		<mx:Button
-			label="-"
-			width="30"
-			height="30"
-			/>
+		<mx:HBox horizontalGap="1">
+			<view:GroupPileButton
+				id="pileButton"
+				mouseDown="event.stopPropagation()"
+				click="onPileButtonClick()"
+				/>
+			<mx:Text
+				id="number"
+				text="{_number}"
+				selectable="false"
+				color="#EEEEEE"
+				fontSize="12"
+				/>
+		</mx:HBox>
 		<mx:HBox
-			id="faceIconContainer"
+			id="faceIconsContainer"
 			paddingTop="0"
 			paddingBottom="6"
 			paddingLeft="6"

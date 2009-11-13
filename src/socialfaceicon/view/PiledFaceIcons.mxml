@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas
+	implements="socialfaceicon.view.IFaceIcons"
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	backgroundAlpha="0"
+	
+	verticalScrollPolicy="off"
+	horizontalScrollPolicy="off"
+	xmlns:view="socialfaceicon.view.*"
+	>
+	<mx:Script>
+		<![CDATA[
+			import socialfaceicon.model.ImageCache;
+			import socialfaceicon.model.IUser;
+			import socialfaceicon.model.GroupIcon;
+			import socialfaceicon.model.DesktopGroup;
+			
+			private var iconCount:int = 0;
+			
+			[Bindable]
+			private var iconSource0:String = null;
+			[Bindable]
+			private var iconSource1:String = null;
+			[Bindable]
+			private var iconSource2:String = null;
+			
+			[Bindable]
+			private var _name:String = "";
+			[Bindable]
+			private var _status:String = "";
+
+			//
+			// Add
+			//
+			public function addIcon(groupIcon:GroupIcon):void {
+				if (!groupIcon) return;
+				var user:IUser = groupIcon.getUser();
+				if (!user) return;
+				
+				if (iconCount <= 2) {
+					if (iconCount == 0) {
+						this._name = user.iconName;
+						this._status = user.getIconCurrentStatus();
+					}
+					this["iconSource" + iconCount] = user.iconImageUrl;
+				}
+				iconCount++;
+			}
+			
+			//
+			// Remove Icon
+			//
+			public function removeIcon(groupIcon:GroupIcon):void {
+				// Can not remove icon
+			}
+			
+			//
+			// Status
+			//
+			public function updateStatus(desktopGroup:DesktopGroup):void {
+				if (iconCount <= 0) return;
+				
+				var groupIcons:Array = desktopGroup.getGroupIcons();
+				if (groupIcons && groupIcons.length > 0) {
+					var groupIcon:GroupIcon = groupIcons[0] as GroupIcon;
+					if (groupIcon) {
+						var user:IUser = groupIcon.getUser();
+						if (user) {
+							this._status = user.getIconCurrentStatus();
+						}
+					}
+				}
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox
+		id="frame"
+		
+	 	paddingTop="6"
+	 	paddingBottom="4"
+	 	paddingLeft="2"
+		paddingRight="2"
+		
+		horizontalAlign="center"
+		verticalGap="2"
+		
+		verticalScrollPolicy="off"
+		horizontalScrollPolicy="off"
+		>
+		<mx:Canvas>
+			<view:CachedImage
+				id="image2"
+				width="48"
+				height="48"
+				x="20"
+				y="10"
+				source="{iconSource2}"
+				/>
+			<view:CachedImage
+				id="image1"
+				width="48"
+				height="48"
+				x="10"
+				y="5"
+				source="{iconSource1}"
+				/>
+			<view:CachedImage
+				id="image0"
+				width="48"
+				height="48"
+				x="0"
+				y="0"
+				source="{iconSource0}"
+				/>
+		</mx:Canvas>
+		<view:FaceIconText id="nameText" text="{_name}" lineNumber="1"/>
+		<view:FaceIconText id="statusText" text="{_status}" lineNumber="2"/>
+	</mx:VBox>
+</mx:Canvas>

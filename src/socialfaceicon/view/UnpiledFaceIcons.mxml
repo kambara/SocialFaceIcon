@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox
+	implements="socialfaceicon.view.IFaceIcons"
+	xmlns:mx="http://www.adobe.com/2006/mxml">
+	<mx:Script>
+		<![CDATA[
+			import mx.managers.DragManager;
+			import socialfaceicon.model.DragFormat;
+			import mx.core.DragSource;
+			import mx.events.DragEvent;
+			import socialfaceicon.model.IUser;
+			import socialfaceicon.events.MouseDragStartEvent;
+			import socialfaceicon.model.GroupIcon;
+			import socialfaceicon.model.DesktopGroup;
+			
+			private var faceIconTable:Object = {};
+			
+			//
+			// Add/Remove Icon
+			//
+			public function addIcon(groupIcon:GroupIcon):void {
+				if (!groupIcon) return;
+				var faceIcon:FaceIcon = new FaceIcon();
+				var user:IUser = groupIcon.getUser();
+				faceIcon.init(user);
+				addChild(faceIcon);
+				faceIconTable[ groupIcon.id ] = faceIcon;
+				
+				faceIcon.addEventListener(
+					MouseEvent.MOUSE_DOWN,
+					onFaceIconMouseDown);
+				faceIcon.addEventListener(
+					MouseDragStartEvent.MOUSE_DRAG_START,
+					function(mouse:MouseDragStartEvent):void {
+						doDragFaceIcon(groupIcon.id, mouse);
+					});
+				faceIcon.addEventListener(
+					DragEvent.DRAG_COMPLETE,
+					onFaceIconDragComplete);
+			}
+			
+			private function onFaceIconMouseDown(mouse:MouseEvent):void {
+				mouse.stopPropagation();
+			}
+			
+			//
+			// Remove Icon
+			//
+			public function removeIcon(groupIcon:GroupIcon):void {
+				var faceIcon:FaceIcon = faceIconTable[ groupIcon.id ] as FaceIcon;
+				if (!faceIcon) return;
+				removeChild( faceIcon );
+				delete faceIconTable[ groupIcon.id ];
+			}
+			
+			//
+			// Status
+			//
+			public function updateStatus(desktopGroup:DesktopGroup):void {
+				for each (var groupIcon:GroupIcon in desktopGroup.getGroupIcons()) {
+					var faceIcon:FaceIcon = this.faceIconTable[ groupIcon.id ] as FaceIcon;
+					if (faceIcon) {
+						var user:IUser = groupIcon.getUser();
+						if (user) {
+							faceIcon.status = user.getIconCurrentStatus();
+						}
+					}
+				}
+			}
+			
+			//
+			// Drag FaceIcon
+			//
+			private function doDragFaceIcon(groupIconId:Number, mouse:MouseEvent):void {
+				var dragSource:DragSource = new DragSource();
+				dragSource.addData(
+					groupIconId,
+					DragFormat.GROUP_ICON_ID);
+					
+				var faceIcon:FaceIcon = FaceIcon(mouse.currentTarget);
+				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
+				DesktopWindow.instance.show();
+			}
+			
+			private function onFaceIconDragComplete(event:DragEvent):void {
+				DesktopWindow.instance.hide();
+				trace("UnpiledFaceIcons: drag complete");
+			}
+		]]>
+	</mx:Script>
+</mx:HBox>

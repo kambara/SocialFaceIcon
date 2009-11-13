@@ -3,10 +3,10 @@
 	layout="absolute"
 	width="500"
 	height="400"
-	title="Friends"
-	type="utility"
+	title="Friends List - Social Face Icon"
 	backgroundColor="#EEEEEE"
 	alwaysInFront="true"
+	maximizable="false"
 	
 	closing="onClosing(event)"
 	>

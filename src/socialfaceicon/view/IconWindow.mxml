@@ -130,43 +130,49 @@
 				
 				var dragSource:DragSource = new DragSource();
 				dragSource.addData(
-					desktopIcon,
-					DragFormat.DESKTOP_ICON);
+					_desktopIconId,
+					DragFormat.DESKTOP_ICON_ID);
 				dragSource.addData(
 					new DragMousePoint(mouse, this.nativeWindow),
 					DragFormat.DRAG_MOUSE_POINT);
 				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
 				DesktopWindow.instance.show();
+				trace("IconWindow: drag start: "
+						+ DragManager.getFeedback()
+						+ " "
+						+ DragManager.isDragging);
 			}
 			
 			private function onFaceIconDragComplete(event:DragEvent):void {
 				DesktopWindow.instance.hide();
+				trace("IconWindow: drag complete");
 			}
 			
 			//
 			// Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					DragManager.acceptDragDrop(this);
 				}
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					onDesktopIconDragDrop(event);
 				}
 			}
 			
 			private function onDesktopIconDragDrop(event:DragEvent):void {
-				var sourceDesktopIcon:DesktopIcon =
-						DesktopIcon(event.dragSource.dataForFormat(
-								DragFormat.DESKTOP_ICON));
-								
-				if (this._desktopIconId == sourceDesktopIcon.id) {
+				var sourceDesktopIconId:Number =
+						event.dragSource.dataForFormat(
+							DragFormat.DESKTOP_ICON_ID)
+								as Number;
+				
+				if (this._desktopIconId == sourceDesktopIconId) {
 					onMyselfDesktopIconDragDrop(event);
 				} else {
-					onAnotherDesktopIconDragDrop(event, sourceDesktopIcon);
+					onAnotherDesktopIconDragDrop(event, sourceDesktopIconId);
 				}
 			}
 			
@@ -186,7 +192,11 @@
 			}
 			
 			private function onAnotherDesktopIconDragDrop(event:DragEvent,
-														sourceDesktopIcon:DesktopIcon):void {
+														sourceDesktopIconId:Number):void {
+				if (isNaN(sourceDesktopIconId)) return;
+				var sourceDesktopIcon:DesktopIcon = new DesktopIcon();
+				if (!sourceDesktopIcon.loadById( sourceDesktopIconId )) return; 
+				
 				var desktopIcon:DesktopIcon = getDesktopIcon();
 				if (!desktopIcon) return;
 				// New Group

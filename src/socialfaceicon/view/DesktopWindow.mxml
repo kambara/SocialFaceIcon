@@ -16,6 +16,7 @@
 	 
 	 dragEnter="onDragEnter(event)"
 	 dragDrop="onDragDrop(event)"
+	 click="onClick()"
 	 >
 	<mx:Script>
 		<![CDATA[
@@ -63,14 +64,21 @@
 				this.nativeWindow.y = Screen.mainScreen.visibleBounds.y;
 			}
 			
+			private function onClick():void {
+				hide();
+				setTimeout(function():void {
+					_instance.orderToBack();
+				}, 500);
+			}
+			
 			//
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
 				if (   event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
-					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON)
-					|| event.dragSource.hasFormat(DragFormat.DESKTOP_GROUP)
-					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_GROUP_ID)
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON_ID)
 					|| event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID) )
 				{
 					DragManager.acceptDragDrop(
@@ -81,24 +89,24 @@
 			private function onDragDrop(event:DragEvent):void {
 				if (event.dragSource.hasFormat( DragFormat.LIST_ITEMS )) {
 					onFriendsListItemsDragDrop(event);
-				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON )) {
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
 					onDesktopIconDragDrop(
 							event,
-							DesktopIcon(
-								event.dragSource.dataForFormat(
-									DragFormat.DESKTOP_ICON)));
-				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP )) {
+							event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_ICON_ID)
+									as Number);
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )) {
 					onDesktopGroupDragDrop(
 							event,
-							DesktopGroup(
-								event.dragSource.dataForFormat(
-									DragFormat.DESKTOP_GROUP)));
-				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON )) {
+							event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_GROUP_ID)
+									as Number);
+				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON_ID )) {
 					onGroupIconDragDrop(
 							event,
-							GroupIcon(
-								event.dragSource.dataForFormat(
-									DragFormat.GROUP_ICON)));
+							event.dragSource.dataForFormat(
+								DragFormat.GROUP_ICON_ID)
+									as Number);
 				} else if (event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID)) {
 					onDockIconDragDrop(
 							event,
@@ -124,7 +132,11 @@
 			//
 			// Move DesktopIcon
 			//
-			private function onDesktopIconDragDrop(event:DragEvent, desktopIcon:DesktopIcon):void {
+			private function onDesktopIconDragDrop(event:DragEvent, desktopIconId:Number):void {
+				if (isNaN(desktopIconId)) return;
+				var desktopIcon:DesktopIcon = new DesktopIcon();
+				if (!desktopIcon.loadById( desktopIconId )) return; 
+				
 				var d:Point = DragMousePoint.fromDragSource(
 									event.dragSource
 								).getDiffInScreen(
@@ -139,7 +151,10 @@
 			//
 			// Move DesktopGroup
 			//
-			private function onDesktopGroupDragDrop(event:DragEvent, desktopGroup:DesktopGroup):void {
+			private function onDesktopGroupDragDrop(event:DragEvent, desktopGroupId:Number):void {
+				var desktopGroup:DesktopGroup = new DesktopGroup();
+				if (!desktopGroup.loadById( desktopGroupId )) return;
+				
 				var d:Point = DragMousePoint.fromDragSource(
 									event.dragSource
 								).getDiffInScreen(
@@ -154,7 +169,11 @@
 			//
 			// Drag Icon from Group
 			//
-			private function onGroupIconDragDrop(event:DragEvent, groupIcon:GroupIcon):void {
+			private function onGroupIconDragDrop(event:DragEvent, groupIconId:Number):void {
+				if (isNaN(groupIconId)) return;
+				var groupIcon:GroupIcon = new GroupIcon();
+				if (!groupIcon.loadById( groupIconId )) return;
+				
 				var user:IUser = groupIcon.getUser();
 				DesktopIcon.addAndOpen(
 					user.iconType,

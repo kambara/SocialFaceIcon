@@ -4,7 +4,7 @@ package socialfaceicon.model
 	
 	public class DB
 	{
-		private static const VERSION:String = "alpha1-1";
+		private static const VERSION:String = "alpha1-2";
 		
 		private static const TEXT:String     = "TEXT";
 		private static const INTEGER:String  = "INTEGER";
@@ -91,7 +91,7 @@ package socialfaceicon.model
 					firstIconId: [INTEGER, NOT_NULL],
 					x:      [INTEGER, NOT_NULL],
 					y:      [INTEGER, NOT_NULL],
-					folded: [INTEGER, NOT_NULL]
+					piled:  [INTEGER, NOT_NULL]
 					}),
 				table("group_icons", {
 					id:      [INTEGER, PRIMARY],

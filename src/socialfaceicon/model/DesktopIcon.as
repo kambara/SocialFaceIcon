@@ -26,8 +26,8 @@ package socialfaceicon.model
 		}
 		
 		public function moveTo(_x:Number, _y:Number):void {
-			this.x = _x;
-			this.y = _y;
+			this.x = Math.round(_x);
+			this.y = Math.round(_y);
 			this.update({
 				id: this.id
 			}, null);
