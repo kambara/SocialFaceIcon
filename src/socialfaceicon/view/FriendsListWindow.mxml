@@ -3,9 +3,8 @@
 	layout="absolute"
 	width="500"
 	height="400"
-	title="Friends List - Social Face Icon"
+	title="Friends - Social Face Icon"
 	backgroundColor="#EEEEEE"
-	alwaysInFront="true"
 	maximizable="false"
 	
 	closing="onClosing(event)"
@@ -14,7 +13,6 @@
 		<![CDATA[
 			import flash.utils.setTimeout;
 			import socialfaceicon.model.TwitUser;
-			import twitter.api.TwitterSearch;
 			import socialfaceicon.model.threads.UpdateTwitFriendsThread;
 			import socialfaceicon.model.TwitSession;
 			import socialfaceicon.model.TwitFriend;
@@ -53,7 +51,6 @@
 				TwitSession.start(
 						Setting.twitterUsername,
 						Setting.twitterPassword);
-				loadingTwitterFriends = true;
 				var t:UpdateTwitFriendsThread =
 						new UpdateTwitFriendsThread(Setting.twitterUsername);
 				t.addEventListener(
@@ -63,6 +60,9 @@
 						showTwitterFriends();
 					});
 				t.start();
+				
+				loadingTwitterFriends = true;
+				status = "Now Loading Twitter Friends. It takes several minutes.";
 			}
 			
 			private function set loadingTwitterFriends(value:Boolean):void {
@@ -72,7 +72,14 @@
 			
 			public function showTwitterFriends():void {
 				var users:Array = TwitFriend.getUsers( TwitSession.username );
-				twitterDataList = users;
+				if (users && users.length) {
+					twitterDataList = users;
+					showDraggableStatus();
+				}
+			}
+			
+			private function showDraggableStatus():void {
+				this.status = "Drag icons onto the Desktop";
 			}
 			
 			//

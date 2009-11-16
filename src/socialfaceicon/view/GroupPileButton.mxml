@@ -16,7 +16,7 @@
 			private var fillOverColor:uint = 0x6666FF;
 			private var fillDownColor:uint = 0x3333CC;
 			
-			private var lineColor:uint = 0xEEEEEE;
+			private var lineColor:uint = 0xDDDDDD;
 			private var lineLength:int = 10;
 			private var lineThickness:int = 2;
 			private var center:Number = 9;

@@ -83,43 +83,6 @@
 				this.invalidateDisplayList();
 			}
 			
-			/*
-			private function loadImage(url:String):void {
-				if (imgCache) return;
-				imgCache = new ImageCache();
-				imgCache.addEventListener(
-					Event.COMPLETE,
-					onImageLoad);
-				imgCache.addEventListener(
-					IOErrorEvent.IO_ERROR,
-					onImageIOError);
-				imgCache.loadImage(url);
-			}
-			
-			private function onImageLoad(event:Event):void {
-				image.source = imgCache.bitmap;
-				image.filters = [new DropShadowFilter(
-					1,  // distance
-					60, // angle
-					0x000000,
-					1,  // alpha
-					3,  // blurX
-					3,  // blurY
-					2,  // strength
-					2   // quality
-				)]
-				imgCache = null;
-			}
-			
-			private function onImageIOError(event:IOErrorEvent):void {
-				trace(([
-					this.className,
-					event.type
-				]).join(": "));
-				imgCache = null;
-			}
-			*/
-			
 			//
 			// Mouse Drag Start
 			//
@@ -188,7 +151,9 @@
 			// Click & Select
 			//
 			private function onClick(mouse:Event):void {
-				select();
+				if (!this.isSelected()) {
+					select();
+				}
 			}
 			
 			private function isSelected():Boolean {
@@ -197,9 +162,7 @@
 			}
 			
 			private function select():void {
-				if (FaceIcon.selectedFaceIcon) {
-					FaceIcon.selectedFaceIcon.unselect();
-				}
+				FaceIcon.unselect();
 				FaceIcon.selectedFaceIcon = this;
 				highlight();
 				expand();
@@ -209,6 +172,12 @@
 				FaceIcon.selectedFaceIcon = null;
 				offlight();
 				unexpand();
+			}
+			
+			public static function unselect():void {
+				if (FaceIcon.selectedFaceIcon) {
+					FaceIcon.selectedFaceIcon.unselect();
+				}
 			}
 			
 			private function highlight():void {

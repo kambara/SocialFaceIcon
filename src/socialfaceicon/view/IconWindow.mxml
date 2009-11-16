@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Window
-	 xmlns:mx="http://www.adobe.com/2006/mxml"
-	 xmlns:ns1="socialfaceicon.view.*"
-	 layout="absolute"
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:ns1="socialfaceicon.view.*"
+	layout="absolute"
 	 
-	 backgroundAlpha="0"
-	 borderStyle="none"
-	 showTitleBar="false"
-	 showGripper="false"
-	 showStatusBar="false"
-	 type="lightweight"
-	 systemChrome="none"
-	 transparent="true"
+	backgroundAlpha="0"
+	borderStyle="none"
+	showTitleBar="false"
+	showGripper="false"
+	showStatusBar="false"
+	type="lightweight"
+	systemChrome="none"
+	transparent="true"
 	 
 	verticalScrollPolicy="off"
 	horizontalScrollPolicy="off"
 	 
-	 initialize="onInitialize()"
-	 dragEnter="onDragEnter(event)"
-	 dragDrop="onDragDrop(event)"
-	 >
+	initialize="onInitialize()"
+	dragEnter="onDragEnter(event)"
+	dragDrop="onDragDrop(event)"
+	>
 	<mx:Script>
 		<![CDATA[
 			import socialfaceicon.events.MouseDragStartEvent;

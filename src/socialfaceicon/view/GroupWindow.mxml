@@ -277,8 +277,9 @@
 				id="number"
 				text="{_number}"
 				selectable="false"
-				color="#EEEEEE"
+				color="#CCCCCC"
 				fontSize="12"
+				fontWeight="bold"
 				/>
 		</mx:HBox>
 		<mx:HBox

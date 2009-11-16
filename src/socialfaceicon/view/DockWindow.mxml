@@ -29,6 +29,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import org.libspark.betweenas3.easing.Cubic;
+			import org.libspark.betweenas3.BetweenAS3;
 			import flash.utils.setTimeout;
 			import mx.events.ResizeEvent;
 			import socialfaceicon.events.MouseDragStartEvent;
@@ -70,13 +72,17 @@
 			
 			private function onFrameResize():void {
 				setTimeout(function():void {
-					background.width = frame.width + 1;
-					background.height = frame.height + 8;
+					BetweenAS3.tween(
+						background, {
+							width: frame.width + 1,
+							height: frame.height + 8
+						}, null, 0.2, Cubic.easeOut).play();
 				}, 400);
 			}
 			
 			private function onResize():void {
 				if (!this.nativeWindow) return;
+				// move to the edge of the screen
 				var bounds:Rectangle = Screen.mainScreen.visibleBounds;
 				nativeWindow.x = bounds.left + (bounds.width - nativeWindow.width)/2;
 				nativeWindow.y = bounds.bottom - nativeWindow.height;
@@ -90,7 +96,8 @@
 					friendsWindow = new FriendsListWindow();
 					friendsWindow.open();
 				} else {
-					friendsWindow.visible = !friendsWindow.visible;
+					friendsWindow.visible = true;
+					friendsWindow.activate();
 				}
 			}
 			

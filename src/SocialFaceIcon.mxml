@@ -6,9 +6,12 @@
 	initialize="onInitialize()"
 	closing="onClosing()"
 	visible="false"
+	applicationActivate="onApplicationActive()"
+	applicationDeactivate="onApplicationDeactive()"
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.view.FaceIcon;
 			import socialfaceicon.model.HumanDockIcon;
 			import flash.utils.setTimeout;
 			import mx.core.Window;
@@ -26,10 +29,20 @@
 			import socialfaceicon.view.DockWindow;
 			import socialfaceicon.view.DesktopWindow;
 			
+			[Embed(source="socialfaceicon/assets/icons/16.png")]
+			private var Icon16:Class;
+			[Embed(source="socialfaceicon/assets/icons/32.png")]
+			private var Icon32:Class;
+			[Embed(source="socialfaceicon/assets/icons/48.png")]
+			private var Icon48:Class;
+			[Embed(source="socialfaceicon/assets/icons/128.png")]
+			private var Icon128:Class;
+			
 			private function onInitialize():void {
 				Thread.initialize(new EnterFrameThreadExecutor());
 				DB.createTables();
 				initTwitter();
+				initSystemTrayIcon();
 				
 				DesktopWindow.instance.hide();
 				DesktopIcon.openAll();
@@ -56,8 +69,37 @@
 				}
 			}
 			
+			private function initSystemTrayIcon():void {
+				if (!NativeApplication.supportsSystemTrayIcon)
+					return;
+				
+				var menuItemExit:NativeMenuItem = new NativeMenuItem("Exit");
+				menuItemExit.addEventListener(
+					Event.SELECT,
+					function():void {
+						Application.application.exit();
+					});
+				var nativeMenu:NativeMenu = new NativeMenu();
+				nativeMenu.addItem(menuItemExit);
+				
+				var trayIcon:SystemTrayIcon = nativeApplication.icon as SystemTrayIcon
+				trayIcon.menu = nativeMenu;
+				trayIcon.bitmaps = [new Icon16(),
+									new Icon32(),
+									new Icon48(),
+									new Icon128()];
+			}
+			
+			private function onApplicationActive():void {
+				this.frameRate = 60
+			}
+			
+			private function onApplicationDeactive():void {
+				FaceIcon.unselect();
+				this.frameRate = 1;
+			}
+			
 			private function onClosing():void {
-				////if (dockWindow) dockWindow.close();
 				if (DesktopWindow.instance) {
 					DesktopWindow.instance.close();
 				}
