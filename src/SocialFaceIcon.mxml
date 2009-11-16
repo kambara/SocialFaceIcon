@@ -29,13 +29,13 @@
 			import socialfaceicon.view.DockWindow;
 			import socialfaceicon.view.DesktopWindow;
 			
-			[Embed(source="socialfaceicon/assets/icons/16.png")]
+			[Embed(source="socialfaceicon/assets/icons-embed/16.png")]
 			private var Icon16:Class;
-			[Embed(source="socialfaceicon/assets/icons/32.png")]
+			[Embed(source="socialfaceicon/assets/icons-embed/32.png")]
 			private var Icon32:Class;
-			[Embed(source="socialfaceicon/assets/icons/48.png")]
+			[Embed(source="socialfaceicon/assets/icons-embed/48.png")]
 			private var Icon48:Class;
-			[Embed(source="socialfaceicon/assets/icons/128.png")]
+			[Embed(source="socialfaceicon/assets/icons-embed/128.png")]
 			private var Icon128:Class;
 			
 			private function onInitialize():void {
