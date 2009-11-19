@@ -12,6 +12,9 @@
 			import mx.events.FlexEvent;
 			import socialfaceicon.model.ImageCache;
 			
+			[Embed(source="socialfaceicon/assets/face-plain.png")]
+			private var DefaultIconImage:Class;
+			
 			private function onInitialize():void {
 				addEventListener(
 					FlexEvent.DATA_CHANGE,
@@ -20,6 +23,12 @@
 			
 			private function onDataChange(event:FlexEvent):void {
 				image.source = null;
+				if (!data.iconImageUrl) {
+					image.source = DefaultIconImage;
+					
+					return;
+				}
+				if (!data.iconImageUrl) return;
 				var imgCache:ImageCache = new ImageCache();
 				imgCache.addEventListener(
 					Event.COMPLETE,
@@ -50,6 +59,7 @@
 		scaleContent="true"
 		verticalAlign="middle"
 		autoLoad="true"
+		smoothBitmapContent="true"
 		/>
 	<mx:Label
 		text="{data.iconName}"

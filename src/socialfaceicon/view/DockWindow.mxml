@@ -26,9 +26,14 @@
 	
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
+	
+	rollOver="onRollOver()"
+	rollOut="onRollOut()"
 	>
 	<mx:Script>
 		<![CDATA[
+			import flash.utils.clearTimeout;
+			import socialfaceicon.view.friendslist.FriendsListWindow;
 			import org.libspark.betweenas3.easing.Cubic;
 			import org.libspark.betweenas3.BetweenAS3;
 			import flash.utils.setTimeout;
@@ -71,6 +76,7 @@
 			}
 			
 			private function onFrameResize():void {
+				// frame -> (wait) -> background -> Window -> move
 				setTimeout(function():void {
 					BetweenAS3.tween(
 						background, {
@@ -86,6 +92,29 @@
 				var bounds:Rectangle = Screen.mainScreen.visibleBounds;
 				nativeWindow.x = bounds.left + (bounds.width - nativeWindow.width)/2;
 				nativeWindow.y = bounds.bottom - nativeWindow.height;
+			}
+			
+			private var pullOutTimeoutId:int;
+			
+			private function onRollOver():void {
+				clearTimeout(pullOutTimeoutId);
+				BetweenAS3.tween(this, {
+					y: 0
+				}, null, 0.2, Cubic.easeOut).play();
+			}
+			
+			private function onRollOut():void {
+				pullOutTimeoutId = setTimeout(pullOut, 1500);
+			}
+			
+			private function pullOut():void {
+				var _y:Number = nativeWindow.active
+									? 0
+									: frame.height - 12
+				BetweenAS3.tween(
+					this, { y: _y }, null,
+					0.2, Cubic.easeOut
+				).play();
 			}
 			
 			//

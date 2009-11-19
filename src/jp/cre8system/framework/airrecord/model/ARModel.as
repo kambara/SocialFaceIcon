@@ -118,7 +118,7 @@ package jp.cre8system.framework.airrecord.model
 			return obj;
 		}
 		
-		public function saveAll(models:Array):void {
+		public function saveAll(models:Array, insertOnly:Boolean=false):void {
 			try {
 				var existTable:Object = findIdTableByARModelIds( models );
 			} catch (err:Error) {
@@ -127,19 +127,26 @@ package jp.cre8system.framework.airrecord.model
 			try {
 				begin();
 				for each (var model:ARModel in models) {
-					if (existTable[ model["id"] ]) {
-						model.update({ id: model["id"] });
+					if (existTable[model["id"]]) {
+						if (!insertOnly) {
+							model.update({ id: model["id"] });
+						}
 					} else {
 						model.insert();
 					}
 				}
 				commit();
 			} catch (err:Error) {
-				trace(this.className + ": saveAll: " + err.message);
+				trace("ARModel: "
+						+ (insertOnly ? "insertAll" : "saveAll")
+						+ ": " 
+						+ err.getStackTrace());
 			}
 		}
 		
 		public function insertAll(models:Array):void {
+			saveAll(models, true);
+			/*
 			try {
 				var existTable:Object = findIdTableByARModelIds( models );
 			} catch (err:Error) {
@@ -156,6 +163,7 @@ package jp.cre8system.framework.airrecord.model
 			} catch (err:Error) {
 				trace(this.className + ": insertAll: " + err.message);
 			}
+			*/
 		}
 
 		public function generateList(condition:* = null, order:String = "", limit:String = ""):Array

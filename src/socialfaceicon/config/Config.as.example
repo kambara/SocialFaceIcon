@@ -1,0 +1,7 @@
+package socialfaceicon.config
+{
+	public class Config
+	{
+		public static const FACEBOOK_API_KEY:String = "";
+	}
+}

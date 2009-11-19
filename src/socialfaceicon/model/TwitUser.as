@@ -44,16 +44,6 @@ package socialfaceicon.model
 			return user;
 		}
 		
-		/*
-		public function save():void {
-			if ( (new TwitUser()).load({id: id}) ) {
-				update({id: id}, null);
-			} else {
-				insert();
-			}
-		}
-		*/
-		
 		private function getCurrentTwitStatus():TwitStatus {
 			var twitStatus:TwitStatus = new TwitStatus();
 			if (twitStatus.load(

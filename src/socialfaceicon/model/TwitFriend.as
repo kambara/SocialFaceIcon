@@ -17,7 +17,7 @@ package socialfaceicon.model
 			this.friendUserId = friendUserId;
 		}
 		
-		public static function getUserIds(name:String):Array {
+		private static function getUserIds(name:String):Array {
 			var friends:Array = (new TwitFriend()).find( {screenName: name} );
 			if (!friends || friends.length==0) {
 				return [];

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:ns1="socialfaceicon.view.*"
+	xmlns:ns2="socialfaceicon.view.friendslist.*"
+	layout="absolute"
+	width="500"
+	height="400"
+	title="Friends - Social Face Icon"
+	backgroundColor="#EEEEEE"
+	maximizable="false"
+	
+	closing="onClosing(event)"
+	>
+	<mx:Script>
+		<![CDATA[
+			private function onClosing(event:Event):void {
+				event.preventDefault();
+				this.visible = false;
+			}
+		]]>
+	</mx:Script>
+	<mx:TabNavigator left="0" right="0" bottom="0" top="10" fontSize="12">
+		<ns2:TwitFriendsList label="Twitter" width="100%" height="100%" />
+		<ns2:FBookFriendsList label="Facebook" width="100%" height="100%" />
+	</mx:TabNavigator>
+</mx:Window>

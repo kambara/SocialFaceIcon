@@ -4,7 +4,7 @@ package socialfaceicon.model
 	
 	public class DB
 	{
-		private static const VERSION:String = "alpha1-2";
+		private static const VERSION:String = "alpha1-3";
 		
 		private static const TEXT:String     = "TEXT";
 		private static const INTEGER:String  = "INTEGER";
@@ -32,11 +32,11 @@ package socialfaceicon.model
 				// TwitterScript Reference
 				// - http://sappari.org/misc/twitterscript-r19-asdoc/
 				
-				table( "twitter_friends", {
+				table("twitter_friends", {
 					screenName:   [TEXT,    NOT_NULL],
 					friendUserId: [INTEGER, NOT_NULL]
 					}),
-				table( "twitter_users", {
+				table("twitter_users", {
 					id:          [INTEGER, NOT_NULL, UNIQUE], // Twitter User ID
 					screenName:  [TEXT,    NOT_NULL, UNIQUE],
 					name:        [TEXT],
@@ -45,13 +45,43 @@ package socialfaceicon.model
 					url:         [TEXT],
 					profileImageUrl: [TEXT, NOT_NULL]
 					}),
-				table( "twitter_statuses", {
+				table("twitter_statuses", {
 					id:        [INTEGER, NOT_NULL, UNIQUE], // Twitter Status ID
 					twitterUserId: [INTEGER, NOT_NULL],
 					text:      [TEXT,    NOT_NULL],
 					createdAt: [INTEGER, NOT_NULL]
 					}),
-				index( "twitter_statuses", ["twitterUserId"] ),
+				index("twitter_statuses", ["twitterUserId"] ),
+				
+				//
+				// Facebook API
+				// http://wiki.developers.facebook.com/index.php/API
+				// AS3 Library
+				// http://facebook-actionscript-api.googlecode.com/svn/release/current/docs/index.html
+				//
+				table("facebook_friends", {
+					uid:          [INTEGER, NOT_NULL],
+					friendUserId: [INTEGER, NOT_NULL]
+					}),
+				// Users.getInfo
+				// http://wiki.developers.facebook.com/index.php/Users.getInfo
+				table("facebook_users", {
+					id:         [INTEGER, NOT_NULL, UNIQUE], // Facebook User ID (uid)
+					name:       [TEXT, NOT_NULL],
+					profileUrl: [TEXT, NOT_NULL],
+					picSquare:  [TEXT], // 50x50
+					pic:        [TEXT], // 100x300
+					picBig:     [TEXT], // 200x600
+					picSmall:   [TEXT]  // 50x150
+					}),
+				// Status.get
+				// http://wiki.developers.facebook.com/index.php/Status.get
+				table("facebook_statuses", {
+					id:      [INTEGER, PRIMARY], // NOT Facebook Status ID (status_id) 
+					uid:     [INTEGER, NOT_NULL],
+					message: [TEXT,    NOT_NULL],
+					time:    [INTEGER, NOT_NULL]
+					}),
 				
 				// Friendfeed API
 				// - http://friendfeed.com/api/documentation

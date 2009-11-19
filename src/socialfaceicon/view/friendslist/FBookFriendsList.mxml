@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	fontSize="12"
+	initialize="onInitialize()"
+	>
+	<mx:Script>
+		<![CDATA[
+			import socialfaceicon.view.DesktopWindow;
+			import socialfaceicon.model.facebook.FBookFriend;
+			import com.facebook.errors.FacebookError;
+			import socialfaceicon.model.facebook.threads.UpdateFBookFriendsThread;
+			import socialfaceicon.model.facebook.threads.FBookFriendsThread;
+			import socialfaceicon.model.facebook.FBookSession;
+			import com.facebook.data.users.UserCollection;
+			import com.facebook.data.users.FacebookUserCollection;
+			import com.facebook.data.friends.GetFriendsData;
+			import com.facebook.commands.friends.GetFriends;
+			import socialfaceicon.config.Config;
+			import com.facebook.utils.FacebookSessionUtil;
+			import mx.binding.utils.BindingUtils;
+			import com.facebook.data.users.FacebookUser;
+			import com.facebook.data.users.GetInfoData;
+			import com.facebook.data.users.GetInfoFieldValues;
+			import com.facebook.commands.users.GetInfo;
+			import com.facebook.net.FacebookCall;
+			import com.facebook.session.DesktopSession;
+			import com.facebook.Facebook;
+			import com.facebook.events.FacebookEvent;
+			import com.facebook.utils.DesktopSessionHelper;
+			
+			private var session:FBookSession;
+			[Bindable]
+			private var friendDataList:Array;
+			[Bindable]
+			private var isConnected:Boolean = false;
+			
+			private function onInitialize():void {
+				loginButton.enabled = false;
+				loadingLabel.visible = false;
+				
+				session = new FBookSession();
+				session.addEventListener(FacebookEvent.CONNECT, onSessionConnect);
+				session.addEventListener(FacebookEvent.ERROR, onSessionError);
+				session.addEventListener(FacebookEvent.VERIFYING_SESSION, function():void {
+					loginButton.enabled = !isConnected;
+				});
+				session.verifySession();
+			}
+			
+			private function onFacebookLoginButtonClick():void {
+				session.login();
+			}
+			
+			private function onFacebookLogoutButtonClick():void {
+				session.logout();
+				isConnected = false;
+				friendDataList = [];
+			}
+			
+			private function onSessionConnect(event:FacebookEvent):void {
+				if (!event.success) return;
+				isConnected = true;
+				
+				loadingLabel.visible = true;
+				var t:UpdateFBookFriendsThread = new UpdateFBookFriendsThread();
+				t.addEventListener(
+					UpdateFBookFriendsThread.FINISH,
+					function():void {
+						loadingLabel.visible = false;
+						showFriends();
+					});
+				t.start();
+			}
+			
+			private function onSessionError(event:FacebookEvent):void {
+				trace(this.className
+						+ " "
+						+ event.error.errorMsg);
+			}
+			
+			private function showFriends():void {
+				if (!session || !session.sessionData) return;
+				friendDataList = FBookFriend.getUsers(
+										parseInt(session.sessionData.uid));
+			}
+			
+			/*
+			private function updateLoginButtonEnabled(sessionLoaded:Boolean):void {
+				loginButton.enabled = (sessionLoaded && !isConnected);
+			}
+			*/
+			
+			//
+			// Drag & Drop
+			//
+			private function onDragStart():void {
+				DesktopWindow.instance.show();
+			}
+			
+			private function onDragComplete():void {
+				DesktopWindow.instance.hide();
+			}
+		]]>
+	</mx:Script>
+	<mx:VBox width="100%" height="100%" verticalGap="10">
+		<mx:HBox id="buttons" paddingLeft="10" verticalAlign="middle">
+			<mx:Button id="loginButton" label="Login to Facebook" click="onFacebookLoginButtonClick()" enabled="{!isConnected}" />
+			<mx:Button label="Logout" click="onFacebookLogoutButtonClick()" enabled="{isConnected}"/>
+			<mx:Label  id="loadingLabel" text="Loading Friends..." fontWeight="bold" />
+		</mx:HBox>
+	<mx:TileList
+		width="100%"
+		height="100%"
+		borderStyle="inset"
+		dragEnabled="true"
+		dataProvider="{friendDataList}"
+		itemRenderer="socialfaceicon.view.friendslist.FriendsListIcon"
+		dragStart="onDragStart()"
+		dragComplete="onDragComplete()"
+		 backgroundColor="#EEEEEE" borderColor="#EEEEEE"/>
+	</mx:VBox>
+</mx:Canvas>

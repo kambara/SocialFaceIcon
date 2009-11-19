@@ -68,9 +68,10 @@
 					var desktopIcon:DesktopIcon = getDesktopIcon();
 					if (desktopIcon) {
 						var user:IUser = desktopIcon.getUser();
-						this.faceIcon.init( user );
+						if (user) {
+							this.faceIcon.init( user );
+						}
 						this.moveWindowTo( desktopIcon.x, desktopIcon.y );
-						////initContextMenu();
 					}
 				}
 			}

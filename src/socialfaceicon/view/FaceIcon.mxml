@@ -28,6 +28,9 @@
 			import mx.managers.DragManager;
 			import socialfaceicon.model.IUser;
 			
+			[Embed(source="socialfaceicon/assets/face-plain.png")]
+			private var DefaultIconImage:Class;
+			
 			[Bindable]
 			private var _iconName:String;
 			private var _iconNameChanged:Boolean = false;
@@ -45,14 +48,11 @@
 			
 			public function init(user:IUser):FaceIcon
 			{
-				if (user.iconName) {
-					this._iconName = user.iconName;
-					this._iconNameChanged = true;
-				}
-				if (user.iconImageUrl) {
-					this._iconImageUrl = user.iconImageUrl;
-					this._iconImageUrlChanged = true;
-				}
+				this._iconName = user.iconName;
+				this._iconNameChanged = true;
+				this._iconImageUrl = user.iconImageUrl;
+				this._iconImageUrlChanged = true;
+				
 				this.status = user.getIconCurrentStatus();
 				this.iconUserUrl = user.iconUserUrl;
 				return this;
@@ -72,7 +72,7 @@
 				}
 				if (this._iconImageUrlChanged) {
 					this._iconImageUrlChanged = false;
-					this.image.source = this._iconImageUrl;
+					this.image.source = this._iconImageUrl || DefaultIconImage;
 				}
 			}
 			
@@ -132,6 +132,7 @@
 			// Mouse Pause
 			//
 			private function onRollOver(mouse:Event):void {
+				clearTimeout(mousePauseTimeoutId);
 				mousePauseTimeoutId =
 					setTimeout(onMousePause, 1500);
 			}
@@ -143,7 +144,9 @@
 			private function onRollOut(mouse:Event):void {
 				clearTimeout( mousePauseTimeoutId );
 				if (FaceIcon.selectedFaceIcon != this) {
-					this.statusText.lineNumber = 2;
+					mousePauseTimeoutId = setTimeout(function():void {
+						statusText.lineNumber = 2;
+					}, 1000);
 				}
 			}
 			
@@ -228,7 +231,7 @@
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
 		>
-		<view:CachedImage id="image" width="48" height="48"/>
+		<view:CachedImage id="image" width="48" height="48" smoothBitmapContent="true" />
 		<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
 		<view:FaceIconText id="statusText" text="" lineNumber="2"/>
 	</mx:VBox>

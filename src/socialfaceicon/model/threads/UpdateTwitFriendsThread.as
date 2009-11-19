@@ -52,22 +52,22 @@ package socialfaceicon.model.threads
 		
 		private function onFriendsStatusLoad():void {
 			if (twitFriends.users.length == 0) {
-				trace("UpdateTwitFriends: Saving");
 				saveAllFriends();
 				IconStatus.update();
-				return;
+			} else {
+				allUsers = allUsers.concat(twitFriends.users);
+				allStatuses = allStatuses.concat(twitFriends.statuses);
+				page++;
+				sleep(10 * 1000);
+				next(loadFriendsStatus);
 			}
-			allUsers = allUsers.concat(twitFriends.users);
-			allStatuses = allStatuses.concat(twitFriends.statuses);
-			page++;
-			sleep(10 * 1000);
-			next(loadFriendsStatus);
 		}
 		
 		//
 		// Save friends
 		//
 		private function saveAllFriends():void {
+			trace("UpdateTwitFriends: Saving");
 			(new TwitUser()).saveAll( allUsers );
 			TwitFriend.updateAll(username, allUsers);
 			(new TwitStatus()).insertAll( allStatuses );

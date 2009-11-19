@@ -33,13 +33,12 @@ package socialfaceicon.model.threads
 		}
 		
 		private function onLoad():void {
-			IconStatus.update();
 			sleep(interval);
 			next(run);
 		}
 		
 		private function onError(err:Error, t:Thread):void {
-			trace(t+": "+err.message);
+			trace(t+": "+err.getStackTrace());
 			sleep(interval);
 			next(run);
 		}

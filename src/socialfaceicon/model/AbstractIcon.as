@@ -2,9 +2,7 @@ package socialfaceicon.model
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
-	import socialfaceicon.model.IUser;
-	import socialfaceicon.model.IconType;
-	import socialfaceicon.model.TwitUser;
+	import socialfaceicon.model.facebook.FBookUser;
 
 	public class AbstractIcon extends ARModel
 	{
@@ -30,6 +28,9 @@ package socialfaceicon.model
 						return twitUser;
 					break;
 				case IconType.FACEBOOK:
+					var fbookUser:FBookUser = new FBookUser();
+					if (fbookUser.loadById( userId ))
+						return fbookUser;
 					break;
 			}
 			return null;
