@@ -12,6 +12,9 @@ package socialfaceicon.model
 		public var url:String;
 		public var profileImageUrl:String;
 		
+		[Embed(source="socialfaceicon/assets/twitter-icon.png")]
+		private var TwitterIconImage:Class;
+		
 		public function TwitUser(id:Number = NaN,
 									screenName:String = null,
 									name:String = null,
@@ -63,6 +66,9 @@ package socialfaceicon.model
 		}
 		public function get iconType():Number {
 			return IconType.TWITTER;
+		}
+		public function get iconTypeImage():Class {
+			return this.TwitterIconImage;
 		}
 		public function getIconCurrentStatus():String {
 			var s:TwitStatus = this.getCurrentTwitStatus();

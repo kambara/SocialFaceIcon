@@ -17,6 +17,7 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import mx.formatters.SwitchSymbolFormatter;
 			import flash.utils.clearTimeout;
 			import flash.utils.setTimeout;
 			import socialfaceicon.events.MouseDragStartEvent;
@@ -30,6 +31,14 @@
 			
 			[Embed(source="socialfaceicon/assets/face-plain.png")]
 			private var DefaultIconImage:Class;
+			/*
+			[Embed(source="socialfaceicon/assets/twitter-icon.png")]
+			private var TwitterIconImage:Class;
+			[Embed(source="socialfaceicon/assets/friendfeed-icon.png")]
+			private var FacebookIconImage:Class;
+			[Embed(source="socialfaceicon/assets/friendfeed-icon.png")]
+			private var FriendfeedIconImage:Class;
+			*/
 			
 			[Bindable]
 			private var _iconName:String;
@@ -38,6 +47,8 @@
 			private var _iconImageUrlChanged:Boolean = false;
 			private var _iconStatus:String;
 			private var _iconStatusChanged:Boolean = false;
+			private var _iconTypeImage:Class;
+			private var _iconTypeImageChanged:Boolean = false;
 			//private var imgCache:ImageCache;
 			
 			private var iconUserUrl:String;
@@ -52,9 +63,12 @@
 				this._iconNameChanged = true;
 				this._iconImageUrl = user.iconImageUrl;
 				this._iconImageUrlChanged = true;
+				this._iconTypeImage = user.iconTypeImage;
+				this._iconTypeImageChanged = true;
 				
 				this.status = user.getIconCurrentStatus();
 				this.iconUserUrl = user.iconUserUrl;
+				
 				return this;
 			}
 			
@@ -73,6 +87,10 @@
 				if (this._iconImageUrlChanged) {
 					this._iconImageUrlChanged = false;
 					this.image.source = this._iconImageUrl || DefaultIconImage;
+				}
+				if (this._iconTypeImageChanged) {
+					this._iconTypeImageChanged = false;
+					this.iconTypeImage.source = this._iconTypeImage;
 				}
 			}
 			
@@ -231,7 +249,19 @@
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
 		>
-		<view:CachedImage id="image" width="48" height="48" smoothBitmapContent="true" />
+		<mx:Canvas>
+			<view:CachedImage id="image"
+							  width="48"
+							  height="48"
+							  x="8"
+							  y="0"
+							  smoothBitmapContent="true"
+							  />
+			<mx:Image id="iconTypeImage"
+					  x="0"
+					  y="{image.height - iconTypeImage.height + 8}"
+					  />
+		</mx:Canvas>
 		<view:FaceIconText id="nameText" text="Name" lineNumber="1"/>
 		<view:FaceIconText id="statusText" text="" lineNumber="2"/>
 	</mx:VBox>

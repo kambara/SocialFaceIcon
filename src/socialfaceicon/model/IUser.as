@@ -4,6 +4,7 @@ package socialfaceicon.model
 	{
 		function get iconUserId():Number;
 		function get iconType():Number;
+		function get iconTypeImage():Class;
 		
 		function getIconCurrentStatus():String;
 		function get iconUserUrl():String;

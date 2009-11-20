@@ -15,6 +15,9 @@ package socialfaceicon.model.facebook
 		public var picBig:String
 		public var picSmall:String;
 		
+		[Embed(source="socialfaceicon/assets/facebook-icon.png")]
+		private var FacebookIconImage:Class;
+		
 		public function FBookUser(id:Number = NaN,
 									name:String = null,
 									profileUrl:String = null,
@@ -54,6 +57,9 @@ package socialfaceicon.model.facebook
 		}
 		public function get iconType():Number {
 			return IconType.FACEBOOK;
+		}
+		public function get iconTypeImage():Class {
+			return this.FacebookIconImage;
 		}
 		public function getIconCurrentStatus():String {
 			var s:FBookStatus = this.getCurrentStatus();
