@@ -1,5 +1,6 @@
 package socialfaceicon.model.facebook.threads
 {
+	import com.facebook.Facebook;
 	import com.facebook.commands.friends.GetFriends;
 	import com.facebook.commands.users.GetInfo;
 	import com.facebook.data.friends.GetFriendsData;
@@ -12,49 +13,25 @@ package socialfaceicon.model.facebook.threads
 	
 	import org.libspark.thread.Thread;
 	
-	import socialfaceicon.model.facebook.FBookSession;
 	import socialfaceicon.model.facebook.FBookStatus;
 	import socialfaceicon.model.facebook.FBookUser;
 
 	public class FBookFriendsThread extends Thread
 	{
-		private var session:FBookSession;
-		private var _userCollection:FacebookUserCollection;
+		private var facebook:Facebook;
 		private var _fbookUsers:Array;
 		private var _fbookStatuses:Array;
 		
-		public function FBookFriendsThread()
+		public function FBookFriendsThread(facebook:Facebook)
 		{
 			super();
+			this.facebook = facebook;
+			this._fbookUsers = [];
+			this._fbookStatuses = [];
 		}
 		
 		protected override function run():void {
-			trace("FBookFriendsThread: run");
-			this._fbookUsers = [];
-			this._fbookStatuses = [];
-			
-			session = new FBookSession();
-			event(session, FacebookEvent.ERROR, onError);
-			event(session, FacebookEvent.CONNECT, onConnect);
-			event(session, FacebookEvent.VERIFYING_SESSION, onVerifying);
-			session.verifySession();
-		}
-		
-		private function onError(evt:FacebookEvent):void {
-			trace("error");
-			throw new Error("session error");
-		}
-		
-		private function onVerifying(evt:FacebookEvent):void {
-			trace("verifying");
-			//next(null);
-			throw new Error("verify error");
-		}
-		
-		private function onConnect(evt:FacebookEvent):void {
-			trace("onConnect");
-			if (!evt.success) return;
-			var call:FacebookCall = session.facebook.post(new GetFriends());
+			var call:FacebookCall = facebook.post(new GetFriends());
 			event(call, FacebookEvent.COMPLETE, onGetFriendsComplete);
 		}
 		
@@ -65,20 +42,20 @@ package socialfaceicon.model.facebook.threads
 								function(friend:FacebookUser, index:int, ary:Array):String {
 									return friend.uid;
 								});
-			var call:FacebookCall =
-						session.facebook.post(
-							new GetInfo(
-									uids,
-									[GetInfoFieldValues.ALL_VALUES]));
+			var call:FacebookCall = facebook.post(
+										new GetInfo(
+												uids,
+												[GetInfoFieldValues.ALL_VALUES]));
 			event(call, FacebookEvent.COMPLETE, onGetInfoComplete);
 		}
 		
 		private function onGetInfoComplete(evt:FacebookEvent):void {
 			if (!evt.success) return;
-			_userCollection = (evt.data as GetInfoData).userCollection;
+			var userCollection:FacebookUserCollection =
+					(evt.data as GetInfoData).userCollection;
 			
-			for (var i:int=0; i < _userCollection.length; i++) {
-				addFBookUser(_userCollection.getItemAt(i) as FacebookUser);
+			for (var i:int=0; i < userCollection.length; i++) {
+				addFBookUser(userCollection.getItemAt(i) as FacebookUser);
 			}
 		}
 		
@@ -103,23 +80,12 @@ package socialfaceicon.model.facebook.threads
 			}
 		}
 		
-		public function get userCollection():FacebookUserCollection {
-			return _userCollection;
-		}
-		
 		public function get fbookUsers():Array {
 			return _fbookUsers;
 		}
 		
 		public function get fbookStatuses():Array {
 			return _fbookStatuses;
-		}
-		
-		public function get uid():Number {
-			if (!session || !session.sessionData) {
-				return NaN;
-			}
-			return parseInt(session.sessionData.uid);
 		}
 		
 		protected override function finalize():void {

@@ -27,18 +27,20 @@ package socialfaceicon.model.threads
 				next(onLoad);
 				error(Error, onError);
 			} else {
-				sleep(interval);
-				next(run);
+				next(restart);
 			}
 		}
 		
 		private function onLoad():void {
-			sleep(interval);
-			next(run);
+			next(restart);
 		}
 		
 		private function onError(err:Error, t:Thread):void {
 			trace(t+": "+err.getStackTrace());
+			next(restart);
+		}
+		
+		private function restart():void {
 			sleep(interval);
 			next(run);
 		}

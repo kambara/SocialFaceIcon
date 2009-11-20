@@ -7,37 +7,36 @@ package socialfaceicon.model.facebook.threads
 	
 	import socialfaceicon.model.IconStatus;
 	import socialfaceicon.model.facebook.FBookFriend;
+	import socialfaceicon.model.facebook.FBookSession;
 	import socialfaceicon.model.facebook.FBookStatus;
 	import socialfaceicon.model.facebook.FBookUser;
 
 	public class UpdateFBookFriendsThread extends EventDispatcherThread
 	{
 		public static const FINISH:String = "finish";
+		private var session:FBookSession;
 		private var fbookFriends:FBookFriendsThread;
 		
-		public function UpdateFBookFriendsThread()
+		public function UpdateFBookFriendsThread(session:FBookSession)
 		{
 			super();
+			this.session = session;
 		}
 		
 		protected override function run():void {
-			fbookFriends = new FBookFriendsThread();
+			trace(this.className + ": run");
+			fbookFriends = new FBookFriendsThread(session.facebook);
 			fbookFriends.start();
-			fbookFriends.join(30 * 1000);
+			fbookFriends.join();
 			next(onFBookFriendsLoad);
 			error(Error, onFBookFriendsError);
 		}
 		
 		private function onFBookFriendsLoad():void {
-			if (!fbookFriends.uid) {
-				trace("UpdateFBookFriends: No session");
-				// TODO: login ???
-				return;
-			}
 			trace("UpdateFBookFriends: Saving");
 			(new FBookUser()).saveAll(fbookFriends.fbookUsers);
 			FBookFriend.updateAll(
-							fbookFriends.uid,
+							parseInt(session.sessionData.uid),
 							fbookFriends.fbookUsers);
 			(new FBookStatus()).saveAll(fbookFriends.fbookStatuses);
 			

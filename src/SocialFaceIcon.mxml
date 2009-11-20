@@ -57,12 +57,12 @@
 				}, 5 * 1000);
 				
 				setTimeout(function():void {
-					(new CrawlTwitFriendsTimelineThread()).start();
-				}, 2 * 60 * 1000);
+					(new CrawlFBookFriendsThread()).start();
+				}, 30 * 1000);
 				
 				setTimeout(function():void {
-					(new CrawlFBookFriendsThread()).start();
-				}, 3 * 1000)
+					(new CrawlTwitFriendsTimelineThread()).start();
+				}, 2 * 60 * 1000);
 			}
 			
 			private function initTwitter():void {

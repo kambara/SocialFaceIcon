@@ -25,7 +25,6 @@
 				image.source = null;
 				if (!data.iconImageUrl) {
 					image.source = DefaultIconImage;
-					
 					return;
 				}
 				if (!data.iconImageUrl) return;

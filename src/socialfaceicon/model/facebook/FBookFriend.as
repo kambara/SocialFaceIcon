@@ -32,7 +32,7 @@ package socialfaceicon.model.facebook
 				}
 				fbookFriend.commit();
 			} catch (err:Error) {
-				trace("TwitFriend: updateAll: " + err.message);
+				trace("FBookFriend: updateAll: " + err.message);
 			}
 		}
 		

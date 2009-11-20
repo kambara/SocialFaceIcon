@@ -63,7 +63,8 @@
 				isConnected = true;
 				
 				loadingLabel.visible = true;
-				var t:UpdateFBookFriendsThread = new UpdateFBookFriendsThread();
+				var t:UpdateFBookFriendsThread =
+						new UpdateFBookFriendsThread(session);
 				t.addEventListener(
 					UpdateFBookFriendsThread.FINISH,
 					function():void {
