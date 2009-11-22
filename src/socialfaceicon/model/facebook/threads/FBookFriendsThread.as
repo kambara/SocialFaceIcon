@@ -73,7 +73,7 @@ package socialfaceicon.model.facebook.threads
 			if (facebookUser.status && facebookUser.status.message) {
 				_fbookStatuses.push(
 						new FBookStatus(
-								NaN,
+								null,
 								parseInt(facebookUser.uid),
 								facebookUser.status.message,
 								facebookUser.status.time.getTime()));

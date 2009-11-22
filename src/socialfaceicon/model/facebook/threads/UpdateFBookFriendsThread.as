@@ -24,7 +24,6 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		protected override function run():void {
-			trace(this.className + ": run");
 			fbookFriends = new FBookFriendsThread(session.facebook);
 			fbookFriends.start();
 			fbookFriends.join();

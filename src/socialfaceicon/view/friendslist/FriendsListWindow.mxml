@@ -9,6 +9,7 @@
 	title="Friends - Social Face Icon"
 	backgroundColor="#EEEEEE"
 	maximizable="false"
+	showStatusBar="false"
 	
 	closing="onClosing(event)"
 	>
@@ -23,5 +24,6 @@
 	<mx:TabNavigator left="0" right="0" bottom="0" top="10" fontSize="12">
 		<ns2:TwitFriendsList label="Twitter" width="100%" height="100%" />
 		<ns2:FBookFriendsList label="Facebook" width="100%" height="100%" />
+		<ns2:FFeedFriendsList label="Friendfeed" width="100%" height="100%" />
 	</mx:TabNavigator>
 </mx:Window>

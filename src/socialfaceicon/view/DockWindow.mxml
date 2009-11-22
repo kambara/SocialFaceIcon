@@ -29,9 +29,12 @@
 	
 	rollOver="onRollOver()"
 	rollOut="onRollOut()"
+	deactivate="onRollOut()"
 	>
 	<mx:Script>
 		<![CDATA[
+			import org.libspark.betweenas3.events.TweenEvent;
+			import org.libspark.betweenas3.tweens.ITween;
 			import flash.utils.clearTimeout;
 			import socialfaceicon.view.friendslist.FriendsListWindow;
 			import org.libspark.betweenas3.easing.Cubic;
@@ -78,6 +81,7 @@
 			private function onFrameResize():void {
 				// frame -> (wait) -> background -> Window -> move
 				setTimeout(function():void {
+					// resize background
 					BetweenAS3.tween(
 						background, {
 							width: frame.width + 1,
@@ -88,32 +92,43 @@
 			
 			private function onResize():void {
 				if (!this.nativeWindow) return;
+				
 				// move to the edge of the screen
 				var bounds:Rectangle = Screen.mainScreen.visibleBounds;
 				nativeWindow.x = bounds.left + (bounds.width - nativeWindow.width)/2;
 				nativeWindow.y = bounds.bottom - nativeWindow.height;
+				if (this.y > nativeWindow.height - 10) {
+					this.y = nativeWindow.height - 10;
+				}
 			}
 			
 			private var pullOutTimeoutId:int;
 			
 			private function onRollOver():void {
 				clearTimeout(pullOutTimeoutId);
-				BetweenAS3.tween(this, {
-					y: 0
-				}, null, 0.2, Cubic.easeOut).play();
+				slideIn();
 			}
 			
 			private function onRollOut():void {
-				pullOutTimeoutId = setTimeout(pullOut, 1500);
+				pullOutTimeoutId = setTimeout(slideOut, 1500);
 			}
 			
-			private function pullOut():void {
+			private function slideIn():void {
+				BetweenAS3.tween(
+					this, {
+						y: 0
+					}, null, 0.2, Cubic.easeOut
+				).play();
+			}
+			
+			private function slideOut():void {
 				var _y:Number = nativeWindow.active
 									? 0
-									: frame.height - 12
+									: frame.height - 10;
 				BetweenAS3.tween(
-					this, { y: _y }, null,
-					0.2, Cubic.easeOut
+					this, {
+						y: _y
+					}, null, 0.2, Cubic.easeOut
 				).play();
 			}
 			
@@ -207,6 +222,7 @@
 				{
 					DragManager.acceptDragDrop(
 							DockWindow(event.currentTarget));
+					slideIn();
 				}
 			}
 			
@@ -272,19 +288,18 @@
 				width="1"
 				backgroundColor="#555555"
 				/>
-			<mx:VBox>
-				<mx:LinkButton
-					id="friendsButton"
-					icon="{UsersImage}"
-					label="Friends"
-					labelPlacement="bottom"
-					color="#EEEEEE"
-					fontWeight="normal"
-					fontSize="12"
-					
-					click="onFriendsButtonClick()"
-					/>
-			</mx:VBox>
+			
+			<mx:LinkButton
+				id="friendsButton"
+				icon="{UsersImage}"
+				label="Friends"
+				labelPlacement="bottom"
+				color="#EEEEEE"
+				fontWeight="normal"
+				fontSize="12"
+				
+				click="onFriendsButtonClick()"
+				/>
 		</mx:HBox>
 	</mx:Canvas>
 </mx:Window>

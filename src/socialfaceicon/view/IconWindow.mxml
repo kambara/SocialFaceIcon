@@ -138,15 +138,17 @@
 					DragFormat.DRAG_MOUSE_POINT);
 				DragManager.doDrag(faceIcon, dragSource, mouse, faceIcon);
 				DesktopWindow.instance.show();
+				/*
 				trace("IconWindow: drag start: "
 						+ DragManager.getFeedback()
 						+ " "
 						+ DragManager.isDragging);
+						*/
 			}
 			
 			private function onFaceIconDragComplete(event:DragEvent):void {
 				DesktopWindow.instance.hide();
-				trace("IconWindow: drag complete");
+				//trace("IconWindow: drag complete");
 			}
 			
 			//

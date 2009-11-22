@@ -157,6 +157,16 @@
 			private function onFrameMouseDown(mouse:MouseEvent):void {
 				if (isNaN(_desktopGroupId)) return;
 				
+				frame.addEventListener(MouseEvent.MOUSE_MOVE, onFrameMouseMove);
+				frame.addEventListener(MouseEvent.MOUSE_UP, onFrameMouseUp);
+			}
+			
+			private function onFrameMouseMove(mouse:MouseEvent):void {
+				cancelDragStart();
+				onDragStart(mouse);
+			}
+			
+			private function onDragStart(mouse:MouseEvent):void {
 				var dragSource:DragSource = new DragSource();
 				dragSource.addData(
 					_desktopGroupId,
@@ -166,6 +176,15 @@
 					DragFormat.DRAG_MOUSE_POINT);
 				DragManager.doDrag(this.frame, dragSource, mouse, this);
 				DesktopWindow.instance.show();
+			}
+			
+			private function onFrameMouseUp(mouse:MouseEvent):void {
+				cancelDragStart();
+			}
+			
+			private function cancelDragStart():void {
+				frame.removeEventListener(MouseEvent.MOUSE_MOVE, onFrameMouseMove);
+				frame.removeEventListener(MouseEvent.MOUSE_UP, onFrameMouseUp);
 			}
 			
 			private function onFrameDragComplete():void {

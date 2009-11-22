@@ -2,7 +2,7 @@
 <mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
 	 layout="absolute"
 	 title="Desktop"
-	 backgroundAlpha="0.2"
+	 backgroundAlpha="0.1"
 	 backgroundColor="#6666FF"
 	 borderStyle="none"
 	 cornerRadius="0"

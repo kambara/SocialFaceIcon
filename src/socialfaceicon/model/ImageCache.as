@@ -42,11 +42,11 @@ package socialfaceicon.model
 		}
 		
 		public function loadImage(url:String):void {
-			url = encodeURI(url);
+			this.url = encodeURI(url);
 			if ( load({url: url}) ) {
 				dispatchEvent(new Event(Event.COMPLETE));
 			} else {
-				downloadImage(url);
+				downloadImage();
 			}
 		}
 		
@@ -60,7 +60,7 @@ package socialfaceicon.model
 			return bmd;
 		}
 		
-		private function downloadImage(url:String):void {
+		private function downloadImage():void {
 			if (url.slice(-4).toLowerCase() == ".bmp") {
 				dispatchEvent(
 					new IOErrorEvent(IOErrorEvent.IO_ERROR));
@@ -84,7 +84,7 @@ package socialfaceicon.model
 								0, 0,
 								_bitmap.width,
 								_bitmap.height));
-			this.url    = imgLoader.contentLoaderInfo.url;
+			//this.url    = imgLoader.contentLoaderInfo.url;
 			this.width  = _bitmap.width;
 			this.height = _bitmap.height;
 			this.bytes  = byteArray;
@@ -103,7 +103,8 @@ package socialfaceicon.model
 				trace(([
 					"ImageCache",
 					"insert",
-					err.message
+					err.message,
+					url
 				]).join(": "));
 			}
 			dispatchEvent(event);

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas
+<friendslist:AbstractFriendsList
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	fontSize="12"
 	initialize="onInitialize()"
-	>
+	xmlns:friendslist="socialfaceicon.view.friendslist.*">
 	<mx:Script>
 		<![CDATA[
 			import socialfaceicon.view.DesktopWindow;
@@ -31,7 +31,7 @@
 			
 			private var session:FBookSession;
 			[Bindable]
-			private var friendDataList:Array;
+			private var friendsDataList:Array;
 			[Bindable]
 			private var isConnected:Boolean = false;
 			
@@ -48,14 +48,14 @@
 				session.verifySession();
 			}
 			
-			private function onFacebookLoginButtonClick():void {
+			private function onLoginButtonClick():void {
 				session.login();
 			}
 			
-			private function onFacebookLogoutButtonClick():void {
+			private function onLogoutButtonClick():void {
 				session.logout();
 				isConnected = false;
-				friendDataList = [];
+				friendsDataList = [];
 			}
 			
 			private function onSessionConnect(event:FacebookEvent):void {
@@ -82,32 +82,15 @@
 			
 			private function showFriends():void {
 				if (!session || !session.sessionData) return;
-				friendDataList = FBookFriend.getUsers(
+				friendsDataList = FBookFriend.getUsers(
 										parseInt(session.sessionData.uid));
-			}
-			
-			/*
-			private function updateLoginButtonEnabled(sessionLoaded:Boolean):void {
-				loginButton.enabled = (sessionLoaded && !isConnected);
-			}
-			*/
-			
-			//
-			// Drag & Drop
-			//
-			private function onDragStart():void {
-				DesktopWindow.instance.show();
-			}
-			
-			private function onDragComplete():void {
-				DesktopWindow.instance.hide();
 			}
 		]]>
 	</mx:Script>
 	<mx:VBox width="100%" height="100%" verticalGap="10">
 		<mx:HBox id="buttons" paddingLeft="10" verticalAlign="middle">
-			<mx:Button id="loginButton" label="Login to Facebook" click="onFacebookLoginButtonClick()" enabled="{!isConnected}" />
-			<mx:Button label="Logout" click="onFacebookLogoutButtonClick()" enabled="{isConnected}"/>
+			<mx:Button id="loginButton" label="Login to Facebook" click="onLoginButtonClick()" enabled="{!isConnected}" />
+			<mx:Button label="Logout" click="onLogoutButtonClick()" enabled="{isConnected}"/>
 			<mx:Label  id="loadingLabel" text="Loading Friends..." fontWeight="bold" />
 		</mx:HBox>
 	<mx:TileList
@@ -115,10 +98,10 @@
 		height="100%"
 		borderStyle="inset"
 		dragEnabled="true"
-		dataProvider="{friendDataList}"
+		dataProvider="{friendsDataList}"
 		itemRenderer="socialfaceicon.view.friendslist.FriendsListIcon"
 		dragStart="onDragStart()"
 		dragComplete="onDragComplete()"
-		 backgroundColor="#EEEEEE" borderColor="#EEEEEE"/>
+		backgroundColor="#EEEEEE" borderColor="#EEEEEE"/>
 	</mx:VBox>
-</mx:Canvas>
+</friendslist:AbstractFriendsList>

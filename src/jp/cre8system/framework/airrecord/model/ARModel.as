@@ -99,10 +99,19 @@ package jp.cre8system.framework.airrecord.model
 			if (!models || models.length == 0) return [];
 			var condAry:Array = [];
 			for each (var model:Object in models) {
-				if (model.hasOwnProperty("id")
-					&& model["id"] is Number
-					&& !isNaN(model["id"])) {
-					condAry.push("id = " + model["id"]);
+				if (model.hasOwnProperty("id")) {
+					if (model["id"] is Number
+						&& !isNaN(model["id"]))
+					{
+						condAry.push("id = " + model["id"]);
+					}
+					else if (model["id"] is String
+							 && model["id"] != "")
+					{
+						var str:String =
+								(model["id"] as String).replace(/\'/g, "''"); // '
+						condAry.push("id = '" + str + "'");
+					}
 				}
 			}
 			if (condAry.length == 0) return [];
@@ -146,24 +155,6 @@ package jp.cre8system.framework.airrecord.model
 		
 		public function insertAll(models:Array):void {
 			saveAll(models, true);
-			/*
-			try {
-				var existTable:Object = findIdTableByARModelIds( models );
-			} catch (err:Error) {
-				return;
-			}
-			try {
-				begin();
-				for each (var model:ARModel in models) {
-					if (!existTable[ model["id"] ]) {
-						model.insert();
-					}
-				}
-				commit();
-			} catch (err:Error) {
-				trace(this.className + ": insertAll: " + err.message);
-			}
-			*/
 		}
 
 		public function generateList(condition:* = null, order:String = "", limit:String = ""):Array

@@ -6,7 +6,7 @@ package socialfaceicon.model
 		
 		public function GroupIcon(id:Number = NaN,
 									type:Number = NaN,
-									userId:Number = NaN,
+									userId:* = null,
 									nextId:Number = NaN)
 		{
 			super(id, type, userId);

@@ -1,12 +1,12 @@
-package socialfaceicon.model.threads
+package socialfaceicon.model.twitter.threads
 {
 	import mx.utils.StringUtil;
 	
 	import org.libspark.thread.Thread;
 	import org.libspark.thread.threads.net.URLLoaderThread;
 	
-	import socialfaceicon.model.TwitSession;
-	import socialfaceicon.model.TwitStatus;
+	import socialfaceicon.model.twitter.TwitSession;
+	import socialfaceicon.model.twitter.TwitStatus;
 
 	/**
 	 * Twitter API: statuses/friends_timeline

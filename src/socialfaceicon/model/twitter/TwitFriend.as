@@ -1,4 +1,4 @@
-package socialfaceicon.model
+package socialfaceicon.model.twitter
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
 

@@ -24,7 +24,7 @@ package socialfaceicon.model
 		
 		public function HumanDockIcon(id:Number=NaN,
 									type:Number=NaN,
-									userId:Number=NaN,
+									userId:*=null,
 									nextId:Number=NaN,
 									isFirst:Number=NaN)
 		{

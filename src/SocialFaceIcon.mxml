@@ -11,6 +11,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.friendfeed.FFeedSession;
+			import socialfaceicon.model.friendfeed.threads.FFeedFriendsThread;
 			import socialfaceicon.model.facebook.threads.CrawlFBookFriendsThread;
 			import socialfaceicon.model.facebook.threads.FBookFriendsThread;
 			import socialfaceicon.view.FaceIcon;
@@ -21,11 +23,11 @@
 			import org.libspark.thread.EnterFrameThreadExecutor;
 			import org.libspark.thread.Thread;
 			import socialfaceicon.model.DesktopGroup;
-			import socialfaceicon.model.threads.CrawlTwitFriendsThread;
-			import socialfaceicon.model.threads.CrawlTwitFriendsTimelineThread;
-			import socialfaceicon.model.threads.TwitFriendsTimelineThread;
+			import socialfaceicon.model.twitter.threads.CrawlTwitFriendsThread;
+			import socialfaceicon.model.twitter.threads.CrawlTwitFriendsTimelineThread;
+			import socialfaceicon.model.twitter.threads.TwitFriendsTimelineThread;
 			import socialfaceicon.model.DesktopIcon;
-			import socialfaceicon.model.TwitSession;
+			import socialfaceicon.model.twitter.TwitSession;
 			import socialfaceicon.model.Setting;
 			import socialfaceicon.model.DB;
 			import socialfaceicon.view.DockWindow;
@@ -44,6 +46,7 @@
 				Thread.initialize(new EnterFrameThreadExecutor());
 				DB.createTables();
 				initTwitter();
+				initFriendfeed();
 				initSystemTrayIcon();
 				
 				DesktopWindow.instance.hide();
@@ -63,6 +66,8 @@
 				setTimeout(function():void {
 					(new CrawlTwitFriendsTimelineThread()).start();
 				}, 2 * 60 * 1000);
+				
+				
 			}
 			
 			private function initTwitter():void {
@@ -72,6 +77,16 @@
 					TwitSession.start(
 							Setting.twitterUsername,
 							Setting.twitterPassword);
+				}
+			}
+			
+			private function initFriendfeed():void {
+				if (Setting.friendfeedUsername
+					&& Setting.friendfeedRemoteKey)
+				{
+					FFeedSession.start(
+							Setting.friendfeedUsername,
+							Setting.friendfeedRemoteKey);
 				}
 			}
 			

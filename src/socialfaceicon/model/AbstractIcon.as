@@ -3,16 +3,18 @@ package socialfaceicon.model
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
 	import socialfaceicon.model.facebook.FBookUser;
+	import socialfaceicon.model.friendfeed.FFeedUser;
+	import socialfaceicon.model.twitter.TwitUser;
 
 	public class AbstractIcon extends ARModel
 	{
 		public var id:Number;
 		public var type:Number;
-		public var userId:Number;
+		public var userId:*;
 		
 		public function AbstractIcon(id:Number = NaN,
 									 type:Number = NaN,
-									 userId:Number = NaN)
+									 userId:* = null)
 		{
 			super();
 			this.id = id;
@@ -31,6 +33,11 @@ package socialfaceicon.model
 					var fbookUser:FBookUser = new FBookUser();
 					if (fbookUser.loadById( userId ))
 						return fbookUser;
+					break;
+				case IconType.FRIENDFEED:
+					var ffeedUser:FFeedUser = new FFeedUser();
+					if (ffeedUser.loadById( userId ))
+						return ffeedUser;
 					break;
 			}
 			return null;

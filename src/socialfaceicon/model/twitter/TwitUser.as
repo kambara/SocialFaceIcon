@@ -1,6 +1,9 @@
-package socialfaceicon.model
+package socialfaceicon.model.twitter
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
+	
+	import socialfaceicon.model.IUser;
+	import socialfaceicon.model.IconType;
 
 	public class TwitUser extends ARModel implements IUser
 	{
@@ -61,7 +64,7 @@ package socialfaceicon.model
 		//
 		// implements IUser
 		//
-		public function get iconUserId():Number {
+		public function get iconUserId():* {
 			return this.id;
 		}
 		public function get iconType():Number {

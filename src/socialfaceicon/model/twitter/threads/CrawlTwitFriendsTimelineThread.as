@@ -1,8 +1,9 @@
-package socialfaceicon.model.threads
+package socialfaceicon.model.twitter.threads
 {
 	import org.libspark.thread.Thread;
 	
 	import socialfaceicon.model.IconStatus;
+	import socialfaceicon.model.twitter.TwitSession;
 
 	public class CrawlTwitFriendsTimelineThread extends Thread
 	{
@@ -17,22 +18,29 @@ package socialfaceicon.model.threads
 		
 		protected override function run():void {
 			trace("==== CrawlTwitFriendsTimeline ====");
-			friendsTimeline = new TwitFriendsTimelineThread(200);
-			friendsTimeline.start();
-			friendsTimeline.join();
-			next(onLoad);
-			error(Error, onFriendsTimelineError);
+			if (TwitSession.username) {
+				friendsTimeline = new TwitFriendsTimelineThread(200);
+				friendsTimeline.start();
+				friendsTimeline.join();
+				next(onLoad);
+				error(Error, onFriendsTimelineError);
+			} else {
+				next(restart);
+			}
 		}
 		
 		private function onLoad():void {
 			trace("CrawlTwitFriendsTimeline: Finish");
 			IconStatus.update();
-			sleep(interval);
-			next(run);
+			next(restart);
 		}
 		
 		private function onFriendsTimelineError(err:Error, t:Thread):void {
 			trace(t+": "+err.message);
+			next(restart);
+		}
+		
+		private function restart():void {
 			sleep(interval);
 			next(run);
 		}

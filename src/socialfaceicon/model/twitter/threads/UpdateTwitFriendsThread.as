@@ -1,4 +1,4 @@
-package socialfaceicon.model.threads
+package socialfaceicon.model.twitter.threads
 {
 	import flash.events.Event;
 	
@@ -6,9 +6,9 @@ package socialfaceicon.model.threads
 	import org.libspark.thread.utils.EventDispatcherThread;
 	
 	import socialfaceicon.model.IconStatus;
-	import socialfaceicon.model.TwitFriend;
-	import socialfaceicon.model.TwitStatus;
-	import socialfaceicon.model.TwitUser;
+	import socialfaceicon.model.twitter.TwitFriend;
+	import socialfaceicon.model.twitter.TwitStatus;
+	import socialfaceicon.model.twitter.TwitUser;
 
 	public class UpdateTwitFriendsThread extends EventDispatcherThread
 	{

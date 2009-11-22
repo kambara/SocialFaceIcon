@@ -1,36 +1,40 @@
-package socialfaceicon.model
+package socialfaceicon.model.friendfeed
 {
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
 	
 	import mx.utils.Base64Encoder;
 	
-	public class TwitSession
+	public class FFeedSession
 	{
-		private static var _username:String;
-		private static var _password:String;
-		private static var _authHeader:URLRequestHeader;
+		public static var _username:String;
+		public static var _password:String;
+		public static var _authHeader:URLRequestHeader;
+		
+		public function FFeedSession()
+		{
+		}
 		
 		public static function get username():String {
-			return TwitSession._username;
+			return _username;
 		}
 		
 		public static function get password():String {
-			return TwitSession._password;
+			return _password;
 		}
 		
 		public static function start(username:String, password:String):void {
-			TwitSession._username = username;
-			TwitSession._password = password;
-			TwitSession._authHeader = createAuthHeader();
+			_username = username;
+			_password = password;
+			_authHeader = createAuthHeader();
 		}
 		
 		private static function createAuthHeader():URLRequestHeader {
-			if (!TwitSession.username || !TwitSession.password) {
+			if (!username || !password) {
 				return null;
 			}
 			var encoder:Base64Encoder = new Base64Encoder();
-			encoder.encode(TwitSession.username + ":" + TwitSession.password);
+			encoder.encode(username + ":" + password);
 			return new URLRequestHeader(
 						"Authorization",
 						"Basic " + encoder.toString());
@@ -38,8 +42,8 @@ package socialfaceicon.model
 		
 		public static function createRequest(url:String):URLRequest {
 			var r:URLRequest = new URLRequest(url);
-			if (TwitSession._authHeader) {
-				r.requestHeaders = [TwitSession._authHeader];
+			if (_authHeader) {
+				r.requestHeaders = [_authHeader];
 			}
 			return r;
 		}

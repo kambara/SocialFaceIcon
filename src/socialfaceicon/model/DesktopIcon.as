@@ -11,7 +11,7 @@ package socialfaceicon.model
 		
 		public function DesktopIcon(id:Number = NaN,
 									type:Number = NaN,
-									userId:Number = NaN,
+									userId:* = null,
 									x:Number = 0,
 									y:Number = 0)
 		{
@@ -56,7 +56,7 @@ package socialfaceicon.model
 		}
 		
 		public static function addAndOpen(type:Number,
-									userId:Number,
+									userId:*,
 									x:Number,
 									y:Number):void
 		{

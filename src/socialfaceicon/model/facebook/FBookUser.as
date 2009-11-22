@@ -52,7 +52,7 @@ package socialfaceicon.model.facebook
 		//
 		// implements IUser
 		//
-		public function get iconUserId():Number {
+		public function get iconUserId():* {
 			return this.id;
 		}
 		public function get iconType():Number {

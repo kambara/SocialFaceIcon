@@ -48,6 +48,7 @@
 					event.type,
 					data.iconImageUrl
 				]).join(": "));
+				image.source = DefaultIconImage;
 			}
 		]]>
 	</mx:Script>

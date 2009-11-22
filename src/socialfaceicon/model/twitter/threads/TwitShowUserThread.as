@@ -1,4 +1,4 @@
-package socialfaceicon.model.threads
+package socialfaceicon.model.twitter.threads
 {
 	import flash.errors.IOError;
 	
@@ -7,7 +7,7 @@ package socialfaceicon.model.threads
 	import org.libspark.thread.Thread;
 	import org.libspark.thread.threads.net.URLLoaderThread;
 	
-	import socialfaceicon.model.TwitSession;
+	import socialfaceicon.model.twitter.TwitSession;
 	
 	import twitter.api.data.TwitterUser;
 

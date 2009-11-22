@@ -1,44 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<friendslist:AbstractFriendsList
-	xmlns:mx="http://www.adobe.com/2006/mxml"
-	initialize="onInitialize()"
-	fontSize="12"
-	xmlns:friendslist="socialfaceicon.view.friendslist.*">
+<friendslist:AbstractFriendsList 
+		   xmlns:mx="http://www.adobe.com/2006/mxml"
+		   initialize="onInitialize()"
+		   fontSize="12" xmlns:friendslist="socialfaceicon.view.friendslist.*">
 	<mx:Script>
 		<![CDATA[
-			import flash.utils.setTimeout;
-			import socialfaceicon.view.DesktopWindow;
-			import socialfaceicon.model.twitter.TwitUser;
-			import socialfaceicon.model.twitter.threads.UpdateTwitFriendsThread;
-			import socialfaceicon.model.twitter.TwitSession;
-			import socialfaceicon.model.twitter.TwitFriend;
+			import socialfaceicon.model.friendfeed.FFeedFriend;
+			import socialfaceicon.model.friendfeed.threads.UpdateFFeedFriendsThread;
+			import socialfaceicon.model.friendfeed.FFeedSession;
+			import flash.net.navigateToURL;
 			import socialfaceicon.model.Setting;
-			
 			[Bindable]
 			private var friendsDataList:Array;
 			
 			private function onInitialize():void {
-				loadingLabel.visible = false;
-				var username:String = Setting.twitterUsername;
-				var password:String = Setting.twitterPassword;
+				loadingFriends = false;
+				
+				var username:String = Setting.friendfeedUsername
+				var remoteKey:String = Setting.friendfeedRemoteKey;
 				if (username) {
 					usernameTextInput.text = username;
-					passwordTextInput.text = password || "";
+					remoteKeyTextInput.text = remoteKey || "";
 					showFriends();
 				}
 			}
 			
 			private function onLoginButtonClick():void {
 				friendsDataList = [];
-				Setting.twitterUsername = usernameTextInput.text;
-				Setting.twitterPassword = passwordTextInput.text;
-				TwitSession.start(
-						Setting.twitterUsername,
-						Setting.twitterPassword);
-				var t:UpdateTwitFriendsThread =
-						new UpdateTwitFriendsThread(Setting.twitterUsername);
+				Setting.friendfeedUsername = usernameTextInput.text;
+				Setting.friendfeedRemoteKey = remoteKeyTextInput.text;
+				FFeedSession.start(
+						Setting.friendfeedUsername,
+						Setting.friendfeedRemoteKey);
+				var t:UpdateFFeedFriendsThread =
+						new UpdateFFeedFriendsThread(Setting.friendfeedUsername);
 				t.addEventListener(
-					UpdateTwitFriendsThread.FINISH,
+					UpdateFFeedFriendsThread.FINISH,
 					function():void {
 						loadingFriends = false;
 						showFriends();
@@ -49,26 +46,39 @@
 			}
 			
 			private function set loadingFriends(value:Boolean):void {
-				twitterLoginButton.enabled = !value;
+				loginButton.enabled = !value;
 				loadingLabel.visible = value;
 			}
 			
 			private function showFriends():void {
-				var users:Array = TwitFriend.getUsers( TwitSession.username );
+				var users:Array = FFeedFriend.getUsers( FFeedSession.username );
 				if (users && users.length) {
 					friendsDataList = users;
 				}
 			}
+			
+			private function onRemoteKeyLinkClick():void {
+				navigateToURL(new URLRequest("http://friendfeed.com/remotekey"));
+			}
 		]]>
 	</mx:Script>
 	<mx:VBox width="100%" height="100%" verticalGap="10">
+	
 		<mx:Grid paddingLeft="10" verticalGap="3">
 			<mx:GridRow width="100%" height="100%">
 				<mx:GridItem width="100%" height="100%">
 					<mx:Label text="Username" fontWeight="normal" color="#999999"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:Label text="Password" fontWeight="normal" color="#999999"/>
+					<mx:LinkButton label="RemoteKey"
+								   textDecoration="underline"
+								   color="#6666FF"
+								   paddingTop="0"
+								   paddingBottom="0"
+								   paddingLeft="0"
+								   paddingRight="0"
+								   click="onRemoteKeyLinkClick()"
+								   />
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
 				</mx:GridItem>
@@ -78,13 +88,13 @@
 					<mx:TextInput width="100" id="usernameTextInput"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%">
-					<mx:TextInput width="100" displayAsPassword="true" id="passwordTextInput"/>
+					<mx:TextInput width="100" displayAsPassword="true" id="remoteKeyTextInput"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
 					<mx:Button
 						 label="Login"
 						 click="onLoginButtonClick()"
-						 id="twitterLoginButton"/>
+						 id="loginButton"/>
 					<mx:Label text="Loading Friends..." fontWeight="bold" id="loadingLabel" visible="true"/>
 				</mx:GridItem>
 			</mx:GridRow>
@@ -99,6 +109,6 @@
 			dragStart="onDragStart()"
 			dragComplete="onDragComplete()"
 			
-			 borderColor="#EEEEEE"/>
+			borderColor="#EEEEEE"/>
 	</mx:VBox>
 </friendslist:AbstractFriendsList>

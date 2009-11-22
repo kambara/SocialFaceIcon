@@ -253,7 +253,7 @@
 			<view:CachedImage id="image"
 							  width="48"
 							  height="48"
-							  x="8"
+							  x="5"
 							  y="0"
 							  smoothBitmapContent="true"
 							  />

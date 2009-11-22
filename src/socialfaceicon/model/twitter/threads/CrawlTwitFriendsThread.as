@@ -1,10 +1,9 @@
-package socialfaceicon.model.threads
+package socialfaceicon.model.twitter.threads
 {
 	import org.libspark.thread.Thread;
 	
-	import socialfaceicon.model.DesktopIcon;
-	import socialfaceicon.model.IconStatus;
 	import socialfaceicon.model.Setting;
+	import socialfaceicon.model.twitter.TwitSession;
 
 	public class CrawlTwitFriendsThread extends Thread
 	{
@@ -18,7 +17,7 @@ package socialfaceicon.model.threads
 		
 		protected override function run():void {
 			trace("==== CrawlTwitFriends ====");
-			if (Setting.twitterUsername) {
+			if (TwitSession.username) {
 				var t:UpdateTwitFriendsThread =
 						new UpdateTwitFriendsThread(
 								Setting.twitterUsername );
