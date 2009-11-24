@@ -43,11 +43,13 @@
 			}
 			
 			private function onImageIOError(event:IOErrorEvent):void {
+				/*
 				trace(([
 					"FriendsListIcon",
 					event.type,
 					data.iconImageUrl
 				]).join(": "));
+				*/
 				image.source = DefaultIconImage;
 			}
 		]]>

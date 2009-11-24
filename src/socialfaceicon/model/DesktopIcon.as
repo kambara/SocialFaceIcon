@@ -83,7 +83,7 @@ package socialfaceicon.model
 						iconObj.userId,
 						iconObj.x,
 						iconObj.y
-					)).open();
+						)).open();
 			}
 		}
 		

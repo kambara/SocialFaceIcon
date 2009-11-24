@@ -17,6 +17,10 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.friendfeed.threads.FFeedUserEntriesThread;
+			import socialfaceicon.model.friendfeed.FFeedUser;
+			import socialfaceicon.model.friendfeed.FFeedEntry;
+			import socialfaceicon.model.IconType;
 			import mx.formatters.SwitchSymbolFormatter;
 			import flash.utils.clearTimeout;
 			import flash.utils.setTimeout;
@@ -31,14 +35,6 @@
 			
 			[Embed(source="socialfaceicon/assets/face-plain.png")]
 			private var DefaultIconImage:Class;
-			/*
-			[Embed(source="socialfaceicon/assets/twitter-icon.png")]
-			private var TwitterIconImage:Class;
-			[Embed(source="socialfaceicon/assets/friendfeed-icon.png")]
-			private var FacebookIconImage:Class;
-			[Embed(source="socialfaceicon/assets/friendfeed-icon.png")]
-			private var FriendfeedIconImage:Class;
-			*/
 			
 			[Bindable]
 			private var _iconName:String;
@@ -66,8 +62,13 @@
 				this._iconTypeImage = user.iconTypeImage;
 				this._iconTypeImageChanged = true;
 				
-				this.status = user.getIconCurrentStatus();
 				this.iconUserUrl = user.iconUserUrl;
+				this.status = user.getIconCurrentStatus();
+				
+				if (!_iconStatus && user.iconType == IconType.FRIENDFEED) {
+					//(user as FFeedUser)
+					//new FFeedUserEntriesThread(
+				}
 				
 				return this;
 			}

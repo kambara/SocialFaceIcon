@@ -1,5 +1,7 @@
 package socialfaceicon.model.friendfeed
 {
+	import flash.net.URLLoader;
+	
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
 	import socialfaceicon.model.IUser;
@@ -7,9 +9,7 @@ package socialfaceicon.model.friendfeed
 
 	public class FFeedUser extends ARModel implements IUser
 	{
-		public var id:Number; // TODO: 数値にしたい。
-								// もしくはtypeIdを文字列にする。
-								// もしくはsaveAllするときのキーを指定できるようにして、idはprimaryに。 -> これで
+		public var id:Number;
 		public var idName:String;
 		public var name:String;
 		
@@ -58,9 +58,23 @@ package socialfaceicon.model.friendfeed
 			} catch (err:Error) {
 				trace("FFeedUser: "
 						+ (insertOnly ? "insertAll" : "saveAll")
-						+ ": " 
+						+ ": "
 						+ err.getStackTrace());
 			}
+		}
+		
+		public function updateEntries():void {
+			
+		}
+		
+		private function getCurrentEntry():FFeedEntry {
+			var ffeedEntry:FFeedEntry = new FFeedEntry();
+			if (ffeedEntry.load({userId: this.id},
+								"date DESC"))
+			{
+				return ffeedEntry;
+			}
+			return null;
 		}
 		
 		//
@@ -76,14 +90,11 @@ package socialfaceicon.model.friendfeed
 			return this.FriendfeedIconImage;
 		}
 		public function getIconCurrentStatus():String {
-			/*
-			var s:FBookStatus = this.getCurrentStatus();
-			return s ? s.message : null;
-			*/
-			return "????";
+			var e:FFeedEntry = this.getCurrentEntry();
+			return e ? e.body : null;
 		}
 		public function get iconUserUrl():String {
-			return "http://friendfeed.com/" + this.id;
+			return "http://friendfeed.com/" + this.idName;
 		}
 		
 		[Bindable]

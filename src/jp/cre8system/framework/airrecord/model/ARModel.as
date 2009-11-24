@@ -119,20 +119,6 @@ package jp.cre8system.framework.airrecord.model
 							+ " = "
 							+ getValue(model[keyName]));
 					}
-					/*
-					if (model[keyName] is Number
-						&& !isNaN(model[keyName]))
-					{
-						condAry.push("id = " + model["id"]);
-					}
-					else if (model["id"] is String
-							 && model["id"] != "")
-					{
-						var str:String =
-								(model["id"] as String).replace(/\'/g, "''"); // '
-						condAry.push("id = '" + str + "'");
-					}
-					*/
 				}
 			}
 			if (condAry.length == 0) return [];
@@ -149,7 +135,6 @@ package jp.cre8system.framework.airrecord.model
 		}
 		
 		public function saveAll(models:Array, keyName:String, insertOnly:Boolean=false):void {
-			// keyName is id or idName
 			try {
 				var existTable:Object = makeExistModelsTable( models, keyName );
 			} catch (err:Error) {

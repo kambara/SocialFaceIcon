@@ -4,14 +4,14 @@ package socialfaceicon.model.friendfeed
 
 	public class FFeedEntry extends ARModel
 	{
-		public var id:Number;
-		public var userId:Number;
+		public var id:String;
+		public var userIdName:String;
 		public var body:String;
 		public var url:String;
 		public var date:Number;
-					
-		public function FFeedEntry(id:Number = NaN,
-								   userId:Number = NaN,
+		
+		public function FFeedEntry(id:String = null,
+								   userIdName:String = null,
 								   body:String = null,
 								   url:String = null,
 								   date:Number = NaN)
@@ -19,11 +19,12 @@ package socialfaceicon.model.friendfeed
 			super();
 			this.__table = "friendfeed_entries";
 			this.id = id;
-			this.userId = userId;
+			this.userIdName = userIdName;
 			this.body = body;
 			this.url = url;
 			this.date = date;
 		}
+		
 		
 	}
 }

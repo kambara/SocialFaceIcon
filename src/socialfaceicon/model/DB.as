@@ -111,12 +111,13 @@ package socialfaceicon.model
 				index("friendfeed_users", ["id"]),
 				// entry
 				// http://friendfeed.com/api/documentation#read_entry
+				// example: http://friendfeed-api.com/v2/feed/home
 				table("friendfeed_entries", {
-					id:     [TEXT,    NOT_NULL, UNIQUE], // friendfeed entry id
-					userId: [INTEGER, NOT_NULL],
-					body:   [TEXT],
-					url:    [TEXT],
-					date:   [INTEGER, NOT_NULL]
+					id:         [TEXT, NOT_NULL, UNIQUE], // friendfeed entry id
+					userIdName: [TEXT, NOT_NULL],
+					body:       [TEXT],
+					url:        [TEXT],
+					date:       [INTEGER, NOT_NULL]
 					}),
 				index("friendfeed_entries", ["id"]),
 				index("friendfeed_entries", ["userId"]),

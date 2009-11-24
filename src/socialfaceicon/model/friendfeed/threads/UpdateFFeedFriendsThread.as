@@ -35,7 +35,7 @@ package socialfaceicon.model.friendfeed.threads
 			FFeedFriend.updateAll(
 							idName,
 							ffeedFriends.ffeedUsers);
-			// TODO: save entry
+			// TODO: load all friends' entry, then save entry.
 			//(new FFeedEntry()).saveAll(.fbookStatuses);
 			
 			// update view status
