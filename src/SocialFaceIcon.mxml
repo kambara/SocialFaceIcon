@@ -89,7 +89,7 @@
 			}
 			
 			private function checkThreads():void {
-				trace("-- check threads --");
+				trace("-- Check threads --");
 				if (twitFriends.state == ThreadState.TERMINATED) {
 					trace("!!! restore: twitFriends");
 					twitFriends = new CrawlTwitFriendsThread();

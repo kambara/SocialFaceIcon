@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:HBox
+<code:FlowContainer
 	implements="socialfaceicon.view.IFaceIcons"
-	xmlns:mx="http://www.adobe.com/2006/mxml">
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	xmlns:code="http://code.google.com/p/flexlib/"
+	maxWidth="530"
+	horizontalGap="0"
+	verticalGap="0"
+	>
 	<mx:Script>
 		<![CDATA[
 			import mx.managers.DragManager;
@@ -88,4 +93,4 @@
 			}
 		]]>
 	</mx:Script>
-</mx:HBox>
+</code:FlowContainer>

@@ -2,10 +2,10 @@
 <mx:Window xmlns:mx="http://www.adobe.com/2006/mxml"
 	layout="absolute"
 	
-	width="{frame.width}"
-	height="{frame.height}"
 	verticalScrollPolicy="off"
 	horizontalScrollPolicy="off"
+	width="{frame.width}"
+	height="{frame.height}"
 	
 	resizable="false"
 	showStatusBar="false"
@@ -20,9 +20,12 @@
 	
 	dragEnter="onDragEnter(event)"
 	dragDrop="onDragDrop(event)"
-	xmlns:view="socialfaceicon.view.*">
+	xmlns:view="socialfaceicon.view.*"
+	resize="onResize()"
+	>
 	<mx:Script>
 		<![CDATA[
+			import flash.utils.setTimeout;
 			import socialfaceicon.events.MouseDragStartEvent;
 			import mx.events.FlexEvent;
 			import socialfaceicon.model.DesktopIcon;
@@ -89,13 +92,20 @@
 								? new PiledFaceIcons()
 								: new UnpiledFaceIcons();
 				for each (var groupIcon:GroupIcon in desktopGroup.getGroupIcons()) {
-					this.addIcon( groupIcon);
+					this.addIcon( groupIcon );
 				}
 				faceIconsContainer.addChild( faceIcons as DisplayObject );
 				
 				// pile button
 				pileButton.piled = !!desktopGroup.piled;
 				number.visible = !!desktopGroup.piled;
+			}
+			
+			private function onResize():void {
+				if (this.nativeWindow) {
+					this.nativeWindow.width = width;
+					this.nativeWindow.height = height;
+				}
 			}
 			
 			private function getDesktopGroup():DesktopGroup {
