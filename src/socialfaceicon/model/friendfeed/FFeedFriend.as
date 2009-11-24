@@ -4,54 +4,64 @@ package socialfaceicon.model.friendfeed
 
 	public class FFeedFriend extends ARModel
 	{
-		public var userId:String;
-		public var friendUserId:String;
+		public var idName:String;
+		public var friendIdName:String;
 					
-		public function FFeedFriend(userId:String = null, friendUserId:String = null)
+		public function FFeedFriend(idName:String = null,
+									friendIdName:String = null)
 		{
 			super();
 			this.__table = "friendfeed_friends";
-			this.userId = userId;
-			this.friendUserId = friendUserId;
+			this.idName = idName;
+			this.friendIdName = friendIdName;
 		}
 		
-		private static function getUserIds(userId:String):Array {
-			var friends:Array = (new FFeedFriend()).find( {userId: userId} );
+		private static function getUserIdNames(idName:String):Array {
+			var friends:Array = (new FFeedFriend()).find( {idName: idName} );
 			if (!friends || friends.length==0) {
 				return [];
 			}
 			return friends.map(
 					function(f:Object, index:int, ary:Array):String {
-						return f.friendUserId;
+						return f.friendIdName;
+					})
+			/*
+			var cond:String = friends.map(
+					function(f:Object, index:int, ary:Array):String {
+						return "idName = '" + f.friendIdName + "'";
+					}).join(" OR ");
+			return (new FFeedUser()).find(cond).map(
+					function(u:Object, index:int, ary:Array):Number {
+						return u.id
 					});
+					*/
 		}
 		
-		public static function getUsers(name:String):Array {
+		public static function getUsers(idName:String):Array {
 			var users:Array = [];
-			for each (var id:String in getUserIds(name)) {
+			for each (var idName:String in getUserIdNames(idName)) {
 				var user:FFeedUser = new FFeedUser();
-				if (user.loadById(id)) {
+				if (user.load({idName: idName})) {
 					users.push(user);
 				}
 			}
 			return users;
 		}
 		
-		public static function updateAll(userId:String, friendUsers:Array):void {
+		public static function updateAll(idName:String, friendUsers:Array):void {
 			// Delete all friends
 			var ffeedFriend:FFeedFriend = new FFeedFriend();
 			ffeedFriend.del({
-				userId: userId
+				idName: idName
 			});
 			if (!friendUsers || friendUsers.length == 0) return;
-			
 			// Insert all friends
 			try {
-				ffeedFriend.begin();
+				//ffeedFriend.begin();
 				for each (var user:FFeedUser in friendUsers) {
-					(new FFeedFriend(userId, user.id)).insert();
+					(new FFeedFriend(idName, user.idName)).insert();
 				}
-				ffeedFriend.commit();
+				//ffeedFriend.commit();
 			} catch (err:Error) {
 				trace("FFeedFriend: updateAll: " + err.message);
 			}

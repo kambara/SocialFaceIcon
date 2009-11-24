@@ -33,11 +33,11 @@ package socialfaceicon.model.facebook.threads
 		
 		private function onFBookFriendsLoad():void {
 			trace("UpdateFBookFriends: Saving");
-			(new FBookUser()).saveAll(fbookFriends.fbookUsers);
+			(new FBookUser()).saveAll(fbookFriends.fbookUsers, "id");
 			FBookFriend.updateAll(
 							parseInt(session.sessionData.uid),
 							fbookFriends.fbookUsers);
-			(new FBookStatus()).saveAll(fbookFriends.fbookStatuses);
+			(new FBookStatus()).saveAll(fbookFriends.fbookStatuses, "id");
 			
 			// update view status
 			IconStatus.update();

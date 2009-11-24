@@ -66,8 +66,6 @@
 				setTimeout(function():void {
 					(new CrawlTwitFriendsTimelineThread()).start();
 				}, 2 * 60 * 1000);
-				
-				
 			}
 			
 			private function initTwitter():void {

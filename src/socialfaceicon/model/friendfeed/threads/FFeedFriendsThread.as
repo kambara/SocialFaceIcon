@@ -13,12 +13,12 @@ package socialfaceicon.model.friendfeed.threads
 		private var _users:Array;
 		private var loader:URLLoaderThread;
 		
-		public function FFeedFriendsThread(username:String)
+		public function FFeedFriendsThread(idName:String)
 		{
 			super();
 			var url:String = StringUtil.substitute(
 								"http://friendfeed-api.com/v2/feedinfo/{0}?format=xml",
-								username);
+								idName);
 			this.loader = new URLLoaderThread(FFeedSession.createRequest(url));
 		}
 		
@@ -33,7 +33,7 @@ package socialfaceicon.model.friendfeed.threads
 			var xml:XML = new XML(loader.loader.data);
 			for each (var x:XML in xml.subscription) {
 				if (x.type == "user") {
-					_users.push(new FFeedUser(x.id, x.name));
+					_users.push(new FFeedUser(NaN, x.id, x.name));
 				}
 			}
 		}

@@ -28,7 +28,8 @@ package socialfaceicon.model.facebook.threads
 			trace("==== CrawlFBookFriends ====");
 			isConnected = false;
 			
-			if ((new FBookFriend()).find().length > 0) {
+			var friends:Array = (new FBookFriend()).find();
+			if (friends && friends.length > 0) {
 				session = new FBookSession();
 				event(session, FacebookEvent.CONNECT, onConnect);
 				session.verifySession();
@@ -36,7 +37,7 @@ package socialfaceicon.model.facebook.threads
 				next(checkTimeout);
 			} else {
 				// No account
-				trace("never logged in");
+				trace("CrawlFBookFriends: never logged in");
 				next(restart);
 			}
 		}

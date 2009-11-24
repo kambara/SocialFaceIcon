@@ -4,7 +4,7 @@ package socialfaceicon.model
 	
 	public class DB
 	{
-		private static const VERSION:String = "alpha2";
+		private static const VERSION:String = "alpha6";
 		
 		private static const TEXT:String     = "TEXT";
 		private static const INTEGER:String  = "INTEGER";
@@ -96,23 +96,24 @@ package socialfaceicon.model
 				// - http://friendfeed.com/api/documentation#types
 				// - http://code.google.com/p/friendfeed-as3/
 				table("friendfeed_friends", {
-					userId:       [TEXT, NOT_NULL],
-					friendUserId: [TEXT, NOT_NULL]
+					idName:       [TEXT, NOT_NULL],
+					friendIdName: [TEXT, NOT_NULL]
 					}),
-				index("friendfeed_friends", ["userId"]),
+				index("friendfeed_friends", ["idName"]),
 				// feedinfo -> subscriptions
 				// http://friendfeed.com/api/documentation#read_feedinfo
 				// http://friendfeed.com/api/documentation#read_picture
 				table("friendfeed_users", {
-					id:   [TEXT, NOT_NULL, UNIQUE], // friendfeed user id
-					name: [TEXT, NOT_NULL]
+					id:     [INTEGER, PRIMARY],
+					idName: [TEXT, NOT_NULL, UNIQUE], // friendfeed user id
+					name:   [TEXT, NOT_NULL]
 					}),
 				index("friendfeed_users", ["id"]),
 				// entry
 				// http://friendfeed.com/api/documentation#read_entry
 				table("friendfeed_entries", {
-					id:     [TEXT, NOT_NULL, UNIQUE], // friendfeed entry id
-					userId: [TEXT, NOT_NULL],
+					id:     [TEXT,    NOT_NULL, UNIQUE], // friendfeed entry id
+					userId: [INTEGER, NOT_NULL],
 					body:   [TEXT],
 					url:    [TEXT],
 					date:   [INTEGER, NOT_NULL]

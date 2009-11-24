@@ -26,6 +26,7 @@ package socialfaceicon.model.twitter.threads
 				next(onLoad);
 				error(Error, onError);
 			} else {
+				trace("CrawlTwitFriends: No username");
 				next(restart);
 			}
 		}

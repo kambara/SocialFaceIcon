@@ -68,9 +68,9 @@ package socialfaceicon.model.twitter.threads
 		//
 		private function saveAllFriends():void {
 			trace("UpdateTwitFriends: Saving");
-			(new TwitUser()).saveAll( allUsers );
+			(new TwitUser()).saveAll( allUsers, "id" );
 			TwitFriend.updateAll(username, allUsers);
-			(new TwitStatus()).insertAll( allStatuses );
+			(new TwitStatus()).insertAll( allStatuses, "id" );
 		}
 		
 		private function onFriendsStatusError(err:Error, t:Thread):void {

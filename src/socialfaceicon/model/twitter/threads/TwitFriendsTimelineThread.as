@@ -32,14 +32,14 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function onLoad():void {
+			trace("TwitFriendsTimeline: Saving");
 			var xml:XML = new XML(loader.loader.data);
 			var statuses:Array = [];
 			for each (var x:XML in xml.children()) {
-				//saveStatus(x);
 				statuses.push(
 					TwitStatus.newFromStatusXml(x, x.user[0].id) );
 			}
-			(new TwitStatus()).insertAll( statuses );
+			(new TwitStatus()).insertAll( statuses, "id" );
 		}
 		
 		private function saveStatus(xml:XML):void {

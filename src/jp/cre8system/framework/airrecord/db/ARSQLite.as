@@ -116,7 +116,7 @@ package jp.cre8system.framework.airrecord.db
 			for (var key:String in obj)
 			{
 				queries.push(this.createCondition(key, obj[key]));
-			}  
+			}
 			var ret:String = queries.join(" AND ");
 			if (ret)
 			{

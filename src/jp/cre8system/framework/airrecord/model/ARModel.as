@@ -95,13 +95,33 @@ package jp.cre8system.framework.airrecord.model
 			return load({id: value.toString()});
 		}
 		
-		public function findByARModelIds(models:Array):Array {
+		public function getValue(value:*):String
+		{
+			if (value == null
+				|| (value is Number && isNaN(value))) {
+				return 'NULL';
+			}
+			if (value is String) {
+				value = (value as String).replace(/\'/g, "''"); // '
+				return "'" + value + "'";
+			}
+			return value;
+		}
+		
+		public function findExistModels(models:Array, keyName:String):Array {
 			if (!models || models.length == 0) return [];
 			var condAry:Array = [];
 			for each (var model:Object in models) {
-				if (model.hasOwnProperty("id")) {
-					if (model["id"] is Number
-						&& !isNaN(model["id"]))
+				if (model.hasOwnProperty(keyName)) {
+					if (model[keyName]) {
+						condAry.push(
+							keyName
+							+ " = "
+							+ getValue(model[keyName]));
+					}
+					/*
+					if (model[keyName] is Number
+						&& !isNaN(model[keyName]))
 					{
 						condAry.push("id = " + model["id"]);
 					}
@@ -112,33 +132,37 @@ package jp.cre8system.framework.airrecord.model
 								(model["id"] as String).replace(/\'/g, "''"); // '
 						condAry.push("id = '" + str + "'");
 					}
+					*/
 				}
 			}
 			if (condAry.length == 0) return [];
 			return find( condAry.join(" OR ") );
 		}
 		
-		public function findIdTableByARModelIds(models:Array):Object {
-			var existModels:Array = findByARModelIds(models);
+		public function makeExistModelsTable(models:Array, keyName:String):Object {
+			var existModels:Array = findExistModels(models, keyName);
 			var obj:Object = {};
-			for each (var m:Object in existModels) {
-				obj[m.id] = m;
+			for each (var modelObj:Object in existModels) {
+				obj[ modelObj[keyName] ] = true;
 			}
 			return obj;
 		}
 		
-		public function saveAll(models:Array, insertOnly:Boolean=false):void {
+		public function saveAll(models:Array, keyName:String, insertOnly:Boolean=false):void {
+			// keyName is id or idName
 			try {
-				var existTable:Object = findIdTableByARModelIds( models );
+				var existTable:Object = makeExistModelsTable( models, keyName );
 			} catch (err:Error) {
 				return;
 			}
 			try {
 				begin();
 				for each (var model:ARModel in models) {
-					if (existTable[model["id"]]) {
+					if (existTable[model[keyName]]) {
 						if (!insertOnly) {
-							model.update({ id: model["id"] });
+							var cond:Object = {};
+							cond[keyName] = model[keyName];
+							model.update(cond);
 						}
 					} else {
 						model.insert();
@@ -153,8 +177,8 @@ package jp.cre8system.framework.airrecord.model
 			}
 		}
 		
-		public function insertAll(models:Array):void {
-			saveAll(models, true);
+		public function insertAll(models:Array, keyName:String):void {
+			saveAll(models, keyName, true);
 		}
 
 		public function generateList(condition:* = null, order:String = "", limit:String = ""):Array
