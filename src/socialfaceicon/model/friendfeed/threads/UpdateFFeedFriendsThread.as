@@ -12,17 +12,17 @@ package socialfaceicon.model.friendfeed.threads
 	public class UpdateFFeedFriendsThread extends EventDispatcherThread
 	{
 		public static const FINISH:String = "finish";
-		private var idName:String;
+		private var userId:String;
 		private var ffeedFriends:FFeedFriendsThread;
 		
-		public function UpdateFFeedFriendsThread(idName:String)
+		public function UpdateFFeedFriendsThread(userId:String)
 		{
 			super();
-			this.idName = idName;
+			this.userId = userId;
 		}
 		
 		protected override function run():void {
-			ffeedFriends = new FFeedFriendsThread(this.idName);
+			ffeedFriends = new FFeedFriendsThread(this.userId);
 			ffeedFriends.start();
 			ffeedFriends.join();
 			next(onFFeedFriendsLoad);
@@ -31,9 +31,9 @@ package socialfaceicon.model.friendfeed.threads
 		
 		private function onFFeedFriendsLoad():void {
 			trace("UpdateFFeedFriends: Saving");
-			(new FFeedUser()).saveAll(ffeedFriends.ffeedUsers, "idName");
+			(new FFeedUser()).saveAll( ffeedFriends.ffeedUsers );
 			FFeedFriend.updateAll(
-							idName,
+							this.userId,
 							ffeedFriends.ffeedUsers);
 			// TODO: load all friends' entry, then save entry.
 			//(new FFeedEntry()).saveAll(.fbookStatuses);

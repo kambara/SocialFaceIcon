@@ -2,7 +2,7 @@ package socialfaceicon.model
 {
 	public interface IUser
 	{
-		function get iconUserId():*;
+		function get iconUserId():String;
 		function get iconType():Number;
 		function get iconTypeImage():Class;
 		

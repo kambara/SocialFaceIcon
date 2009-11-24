@@ -67,7 +67,7 @@
 				
 				if (!_iconStatus && user.iconType == IconType.FRIENDFEED) {
 					//(user as FFeedUser)
-					//new FFeedUserEntriesThread(
+					(new FFeedUserEntriesThread(user.iconUserId)).start();
 				}
 				
 				return this;

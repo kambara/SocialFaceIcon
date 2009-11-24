@@ -10,7 +10,7 @@ package socialfaceicon.model.twitter
 	public class TwitStatus extends ARModel
 	{
 		public var id:Number;
-		public var twitterUserId:Number;
+		public var userId:String;
 		public var text:String;
 		public var createdAt:Number;
 		
@@ -19,23 +19,23 @@ package socialfaceicon.model.twitter
 			"Jul","Aug","Sep","Oct","Nov","Dec"];
 		
 		public function TwitStatus(id:Number = NaN,
-									twitterUserId:Number = NaN,
-									text:String = null,
-									createdAt:Number = NaN)
+								   userId:String = null,
+								   text:String = null,
+								   createdAt:Number = NaN)
 		{
 			super();
 			this.__table = "twitter_statuses";
 			
 			this.id = id;
-			this.twitterUserId = twitterUserId;
+			this.userId = userId;
 			this.text = text;
 			this.createdAt = createdAt;
 		}
 		
-		public static function newFromStatusXml(xml:XML, twitterUserId:Number):TwitStatus {
+		public static function newFromStatusXml(xml:XML, userId:String):TwitStatus {
 			return new TwitStatus(
 						xml.id,
-						twitterUserId,
+						userId,
 						xml.text,
 						makeDate(xml.created_at).getTime());
 		}

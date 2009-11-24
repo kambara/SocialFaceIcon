@@ -108,16 +108,13 @@ package jp.cre8system.framework.airrecord.model
 			return value;
 		}
 		
-		public function findExistModels(models:Array, keyName:String):Array {
+		public function findExistModels(models:Array):Array {
 			if (!models || models.length == 0) return [];
 			var condAry:Array = [];
 			for each (var model:Object in models) {
-				if (model.hasOwnProperty(keyName)) {
-					if (model[keyName]) {
-						condAry.push(
-							keyName
-							+ " = "
-							+ getValue(model[keyName]));
+				if (model.hasOwnProperty("id")) {
+					if (model.id) {
+						condAry.push("id = " + getValue(model.id));
 					}
 				}
 			}
@@ -125,29 +122,29 @@ package jp.cre8system.framework.airrecord.model
 			return find( condAry.join(" OR ") );
 		}
 		
-		public function makeExistModelsTable(models:Array, keyName:String):Object {
-			var existModels:Array = findExistModels(models, keyName);
+		public function makeExistModelsTable(models:Array):Object {
+			var existModels:Array = findExistModels(models);
 			var obj:Object = {};
 			for each (var modelObj:Object in existModels) {
-				obj[ modelObj[keyName] ] = true;
+				obj[ modelObj.id ] = true;
 			}
 			return obj;
 		}
 		
-		public function saveAll(models:Array, keyName:String, insertOnly:Boolean=false):void {
+		public function saveAll(models:Array, insertOnly:Boolean=false):void {
 			try {
-				var existTable:Object = makeExistModelsTable( models, keyName );
+				var existTable:Object = makeExistModelsTable(models);
 			} catch (err:Error) {
 				return;
 			}
 			try {
 				begin();
 				for each (var model:ARModel in models) {
-					if (existTable[model[keyName]]) {
+					if (existTable[model["id"]]) {
 						if (!insertOnly) {
-							var cond:Object = {};
-							cond[keyName] = model[keyName];
-							model.update(cond);
+							//var cond:Object = {};
+							//cond[keyName] = model[keyName];
+							model.update({id: model["id"]});
 						}
 					} else {
 						model.insert();
@@ -162,8 +159,8 @@ package jp.cre8system.framework.airrecord.model
 			}
 		}
 		
-		public function insertAll(models:Array, keyName:String):void {
-			saveAll(models, keyName, true);
+		public function insertAll(models:Array):void {
+			saveAll(models, true);
 		}
 
 		public function generateList(condition:* = null, order:String = "", limit:String = ""):Array

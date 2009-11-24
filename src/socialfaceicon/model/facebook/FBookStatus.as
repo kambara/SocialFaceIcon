@@ -5,12 +5,12 @@ package socialfaceicon.model.facebook
 	public class FBookStatus extends ARModel
 	{
 		public var id:String;
-		public var uid:Number;
+		public var userId:String;
 		public var message:String;
 		public var time:Number;
 		
 		public function FBookStatus(id:String = null,
-									uid:Number = NaN,
+									userId:String = null,
 									message:String = null,
 									time:Number = NaN)
 		{
@@ -18,10 +18,10 @@ package socialfaceicon.model.facebook
 			this.__table = "facebook_statuses";
 			if (id) {
 				this.id = id;
-			} else if (uid && time) {
-				this.id = uid + "-" + time;
+			} else if (userId && time) {
+				this.id = userId + "-" + time;
 			}
-			this.uid = uid;
+			this.userId = userId;
 			this.message = message;
 			this.time = time;
 		}

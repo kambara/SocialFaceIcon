@@ -5,19 +5,20 @@ package socialfaceicon.model.friendfeed.threads
 	import org.libspark.thread.Thread;
 	import org.libspark.thread.threads.net.URLLoaderThread;
 	
+	import socialfaceicon.model.friendfeed.FFeedEntry;
 	import socialfaceicon.model.friendfeed.FFeedSession;
-	import socialfaceicon.model.friendfeed.FFeedUser;
+	import socialfaceicon.utils.DateUtil;
 
-	public class FFeedFriendsThread extends Thread
+	public class FFeedUserEntriesThread extends Thread
 	{
-		private var _users:Array;
+		private var _entries:Array;
 		private var loader:URLLoaderThread;
 		
-		public function FFeedFriendsThread(userId:String)
+		public function FFeedUserEntriesThread(userId:String)
 		{
 			super();
 			var url:String = StringUtil.substitute(
-								"http://friendfeed-api.com/v2/feedinfo/{0}?format=xml",
+								"http://friendfeed-api.com/v2/feed/{0}?format=xml&raw=1",
 								userId);
 			this.loader = new URLLoaderThread(FFeedSession.createRequest(url));
 		}
@@ -29,17 +30,21 @@ package socialfaceicon.model.friendfeed.threads
 		}
 		
 		private function onLoad():void {
-			_users = [];
+			_entries = [];
 			var xml:XML = new XML(loader.loader.data);
-			for each (var x:XML in xml.subscription) {
-				if (x.type == "user") {
-					_users.push(new FFeedUser(x.id, x.name));
-				}
+			for each (var x:XML in xml.entry) {
+				_entries.push(
+					new FFeedEntry(
+							x.id,
+							x.from.id,
+							x.rawBody,
+							x.url,
+							DateUtil.strToDate(x.date).getTime()));
 			}
 		}
 		
-		public function get ffeedUsers():Array {
-			return _users;
+		public function get ffeedEntries():Array {
+			return _entries;
 		}
 	}
 }

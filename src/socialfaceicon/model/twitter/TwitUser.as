@@ -7,7 +7,7 @@ package socialfaceicon.model.twitter
 
 	public class TwitUser extends ARModel implements IUser
 	{
-		public var id:Number;
+		public var id:String;
 		public var screenName:String;
 		public var name:String;
 		public var location:String;
@@ -18,13 +18,13 @@ package socialfaceicon.model.twitter
 		[Embed(source="socialfaceicon/assets/twitter-icon.png")]
 		private var TwitterIconImage:Class;
 		
-		public function TwitUser(id:Number = NaN,
-									screenName:String = null,
-									name:String = null,
-									location:String = null,
-									description:String = null,
-									url:String = null,
-									profileImageUrl:String = null)
+		public function TwitUser(id:String = null,
+								 screenName:String = null,
+								 name:String = null,
+								 location:String = null,
+								 description:String = null,
+								 url:String = null,
+								 profileImageUrl:String = null)
 		{
 			super();
 			this.__table = "twitter_users";
@@ -52,10 +52,7 @@ package socialfaceicon.model.twitter
 		
 		private function getCurrentTwitStatus():TwitStatus {
 			var twitStatus:TwitStatus = new TwitStatus();
-			if (twitStatus.load(
-					{twitterUserId: this.id},
-					"createdAt DESC"))
-			{
+			if (twitStatus.load({userId: this.id}, "createdAt DESC")) {
 				return twitStatus;
 			}
 			return null;
@@ -64,7 +61,7 @@ package socialfaceicon.model.twitter
 		//
 		// implements IUser
 		//
-		public function get iconUserId():* {
+		public function get iconUserId():String {
 			return this.id;
 		}
 		public function get iconType():Number {

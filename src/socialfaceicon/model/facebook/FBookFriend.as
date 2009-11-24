@@ -4,23 +4,23 @@ package socialfaceicon.model.facebook
 
 	public class FBookFriend extends ARModel
 	{
-		public var uid:Number;
-		public var friendUserId:Number;
+		public var userId:String;
+		public var friendUserId:String;
 		
-		public function FBookFriend(uid:Number = NaN,
-									friendUserId:Number = NaN)
+		public function FBookFriend(userId:String = null,
+									friendUserId:String = null)
 		{
 			super();
 			this.__table = "facebook_friends";
-			this.uid = uid;
+			this.userId = userId;
 			this.friendUserId = friendUserId;
 		}
 		
-		public static function updateAll(uid:Number, friendUsers:Array):void {
+		public static function updateAll(userId:String, friendUsers:Array):void {
 			// Delete all friends
 			var fbookFriend:FBookFriend = new FBookFriend();
 			fbookFriend.del({
-				uid: uid
+				userId: userId
 			});
 			if (!friendUsers || friendUsers.length == 0) return;
 			
@@ -28,7 +28,7 @@ package socialfaceicon.model.facebook
 			try {
 				fbookFriend.begin();
 				for each (var user:FBookUser in friendUsers) {
-					(new FBookFriend(uid, user.id)).insert();
+					(new FBookFriend(userId, user.id)).insert();
 				}
 				fbookFriend.commit();
 			} catch (err:Error) {
@@ -36,8 +36,23 @@ package socialfaceicon.model.facebook
 			}
 		}
 		
-		private static function getUserIds(uid:Number):Array {
-			var friends:Array = (new FBookFriend()).find( {uid: uid} );
+		public static function getUsers(userId:String):Array {
+			var users:Array = [];
+			var friendObjects:Array = (new FBookFriend()).find({ userId: userId });
+			if (friendObjects) {
+				for each (var friendObj:Object in friendObjects) {
+					var user:FBookUser = new FBookUser();
+					if (user.loadById(friendObj.friendUserId)) {
+						users.push(user);
+					}
+				}
+			}
+			return users;
+		}
+		
+		/*
+		private static function getUserIds(userId:String):Array {
+			var friends:Array = (new FBookFriend()).find({userId: userId});
 			if (!friends) return [];
 			return friends.map(
 					function(f:Object, index:int, ary:Array):Number {
@@ -45,9 +60,9 @@ package socialfaceicon.model.facebook
 					});
 		}
 		
-		public static function getUsers(uid:Number):Array {
+		public static function getUsers(userId:String):Array {
 			var users:Array = [];
-			for each (var id:Number in getUserIds(uid)) {
+			for each (var id:String in getUserIds(userId)) {
 				var user:FBookUser = new FBookUser();
 				if (user.loadById(id)) {
 					users.push(user);
@@ -55,5 +70,6 @@ package socialfaceicon.model.facebook
 			}
 			return users;
 		}
+		*/
 	}
 }

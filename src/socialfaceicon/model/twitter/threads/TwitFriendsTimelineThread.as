@@ -39,7 +39,7 @@ package socialfaceicon.model.twitter.threads
 				statuses.push(
 					TwitStatus.newFromStatusXml(x, x.user[0].id) );
 			}
-			(new TwitStatus()).insertAll( statuses, "id" );
+			(new TwitStatus()).insertAll( statuses );
 		}
 		
 		private function saveStatus(xml:XML):void {

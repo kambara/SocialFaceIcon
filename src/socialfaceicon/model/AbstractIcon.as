@@ -10,11 +10,11 @@ package socialfaceicon.model
 	{
 		public var id:Number;
 		public var type:Number;
-		public var userId:*;
+		public var userId:String;
 		
 		public function AbstractIcon(id:Number = NaN,
 									 type:Number = NaN,
-									 userId:* = null)
+									 userId:String = null)
 		{
 			super();
 			this.id = id;

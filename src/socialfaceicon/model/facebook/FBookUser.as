@@ -7,7 +7,7 @@ package socialfaceicon.model.facebook
 
 	public class FBookUser extends ARModel implements IUser
 	{
-		public var id:Number;
+		public var id:String;
 		public var name:String;
 		public var profileUrl:String;
 		public var picSquare:String;
@@ -18,13 +18,13 @@ package socialfaceicon.model.facebook
 		[Embed(source="socialfaceicon/assets/facebook-icon.png")]
 		private var FacebookIconImage:Class;
 		
-		public function FBookUser(id:Number = NaN,
-									name:String = null,
-									profileUrl:String = null,
-									picSquare:String = null,
-									pic:String = null,
-									picBig:String = null,
-									picSmall:String = null)
+		public function FBookUser(id:String = null,
+								  name:String = null,
+								  profileUrl:String = null,
+								  picSquare:String = null,
+								  pic:String = null,
+								  picBig:String = null,
+								  picSmall:String = null)
 		{
 			super();
 			this.__table = "facebook_users";
@@ -40,10 +40,7 @@ package socialfaceicon.model.facebook
 		
 		private function getCurrentStatus():FBookStatus {
 			var fbookStatus:FBookStatus = new FBookStatus();
-			if (fbookStatus.load(
-						{uid: this.id},
-						"time DESC"))
-			{
+			if (fbookStatus.load({userId: this.id}, "time DESC")) {
 				return fbookStatus;
 			}
 			return null;
@@ -52,7 +49,7 @@ package socialfaceicon.model.facebook
 		//
 		// implements IUser
 		//
-		public function get iconUserId():* {
+		public function get iconUserId():String {
 			return this.id;
 		}
 		public function get iconType():Number {

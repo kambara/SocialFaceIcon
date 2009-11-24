@@ -83,7 +83,7 @@
 			private function showFriends():void {
 				if (!session || !session.sessionData) return;
 				friendsDataList = FBookFriend.getUsers(
-										parseInt(session.sessionData.uid));
+										session.sessionData.uid);
 			}
 		]]>
 	</mx:Script>

@@ -63,7 +63,7 @@ package socialfaceicon.model.facebook.threads
 			if (!facebookUser) return;
 			_fbookUsers.push(
 					new FBookUser(
-							parseInt(facebookUser.uid),
+							facebookUser.uid,
 							facebookUser.name,
 							facebookUser.profile_url,
 							facebookUser.pic_square,
@@ -74,7 +74,7 @@ package socialfaceicon.model.facebook.threads
 				_fbookStatuses.push(
 						new FBookStatus(
 								null,
-								parseInt(facebookUser.uid),
+								facebookUser.uid,
 								facebookUser.status.message,
 								facebookUser.status.time.getTime()));
 			}

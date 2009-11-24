@@ -4,7 +4,7 @@ package socialfaceicon.model
 	
 	public class DB
 	{
-		private static const VERSION:String = "alpha6";
+		private static const VERSION:String = "alpha7";
 		
 		private static const TEXT:String     = "TEXT";
 		private static const INTEGER:String  = "INTEGER";
@@ -32,30 +32,30 @@ package socialfaceicon.model
 				// TwitterScript Reference
 				// - http://sappari.org/misc/twitterscript-r19-asdoc/
 				table("twitter_friends", {
-					screenName:   [TEXT,    NOT_NULL],
-					friendUserId: [INTEGER, NOT_NULL]
+					screenName:   [TEXT, NOT_NULL],
+					friendUserId: [TEXT, NOT_NULL]
 					}),
 				index("twitter_friends", ["screenName"]),
 				
 				table("twitter_users", {
-					id:          [INTEGER, NOT_NULL, UNIQUE], // Twitter User ID
-					screenName:  [TEXT,    NOT_NULL, UNIQUE],
+					id:          [TEXT, NOT_NULL, UNIQUE], // Twitter User ID
+					screenName:  [TEXT, NOT_NULL],
 					name:        [TEXT],
 					location:    [TEXT],
 					description: [TEXT],
 					url:         [TEXT],
 					profileImageUrl: [TEXT, NOT_NULL]
 					}),
-				index("twitter_users", ["id"]),
+				index("twitter_users", ["id"], true),
 				
 				table("twitter_statuses", {
 					id:        [INTEGER, NOT_NULL, UNIQUE], // Twitter Status ID
-					twitterUserId: [INTEGER, NOT_NULL],
+					userId:    [TEXT,    NOT_NULL],
 					text:      [TEXT,    NOT_NULL],
 					createdAt: [INTEGER, NOT_NULL]
 					}),
-				index("twitter_statuses", ["id"]),
-				index("twitter_statuses", ["twitterUserId"]),
+				index("twitter_statuses", ["id"], true),
+				index("twitter_statuses", ["userId"]),
 				
 				//
 				// Facebook API
@@ -64,14 +64,14 @@ package socialfaceicon.model
 				// http://facebook-actionscript-api.googlecode.com/svn/release/current/docs/index.html
 				//
 				table("facebook_friends", {
-					uid:          [INTEGER, NOT_NULL],
-					friendUserId: [INTEGER, NOT_NULL]
+					userId:       [TEXT, NOT_NULL],
+					friendUserId: [TEXT, NOT_NULL]
 					}),
-				index("facebook_friends", ["uid"] ),
+				index("facebook_friends", ["userId"]),
 				// Users.getInfo
 				// http://wiki.developers.facebook.com/index.php/Users.getInfo
 				table("facebook_users", {
-					id:         [INTEGER, NOT_NULL, UNIQUE], // Facebook User ID (uid)
+					id:         [TEXT, NOT_NULL, UNIQUE], // Facebook User ID (uid)
 					name:       [TEXT, NOT_NULL],
 					profileUrl: [TEXT, NOT_NULL],
 					picSquare:  [TEXT], // 50x50
@@ -79,54 +79,53 @@ package socialfaceicon.model
 					picBig:     [TEXT], // 200x600
 					picSmall:   [TEXT]  // 50x150
 					}),
-				index("facebook_users", ["id"]),
+				index("facebook_users", ["id"], true),
 				// Status.get
 				// http://wiki.developers.facebook.com/index.php/Status.get
 				table("facebook_statuses", {
-					id:      [TEXT, UNIQUE], // NOT Facebook Status ID (status_id) -> uid-time 
-					uid:     [INTEGER, NOT_NULL],
+					id:      [TEXT,    NOT_NULL, UNIQUE], // NOT Facebook Status ID (status_id) -> uid-time
+					userId:  [TEXT,    NOT_NULL],
 					message: [TEXT,    NOT_NULL],
 					time:    [INTEGER, NOT_NULL]
 					}),
-				index("facebook_statuses", ["id"]),
-				index("facebook_statuses", ["uid"]),
+				index("facebook_statuses", ["id"], true),
+				index("facebook_statuses", ["userId"]),
 				
 				// Friendfeed API
 				// - http://friendfeed.com/api/documentation
 				// - http://friendfeed.com/api/documentation#types
 				// - http://code.google.com/p/friendfeed-as3/
 				table("friendfeed_friends", {
-					idName:       [TEXT, NOT_NULL],
-					friendIdName: [TEXT, NOT_NULL]
+					userId:       [TEXT, NOT_NULL],
+					friendUserId: [TEXT, NOT_NULL]
 					}),
-				index("friendfeed_friends", ["idName"]),
+				index("friendfeed_friends", ["userId"]),
 				// feedinfo -> subscriptions
 				// http://friendfeed.com/api/documentation#read_feedinfo
 				// http://friendfeed.com/api/documentation#read_picture
 				table("friendfeed_users", {
-					id:     [INTEGER, PRIMARY],
-					idName: [TEXT, NOT_NULL, UNIQUE], // friendfeed user id
+					id:     [TEXT, NOT_NULL, UNIQUE], // friendfeed user id
 					name:   [TEXT, NOT_NULL]
 					}),
-				index("friendfeed_users", ["id"]),
+				index("friendfeed_users", ["id"], true),
 				// entry
 				// http://friendfeed.com/api/documentation#read_entry
 				// example: http://friendfeed-api.com/v2/feed/home
 				table("friendfeed_entries", {
-					id:         [TEXT, NOT_NULL, UNIQUE], // friendfeed entry id
-					userIdName: [TEXT, NOT_NULL],
-					body:       [TEXT],
-					url:        [TEXT],
-					date:       [INTEGER, NOT_NULL]
+					id:     [TEXT, NOT_NULL, UNIQUE], // friendfeed entry id
+					userId: [TEXT, NOT_NULL],
+					body:   [TEXT],
+					url:    [TEXT],
+					date:   [INTEGER, NOT_NULL]
 					}),
-				index("friendfeed_entries", ["id"]),
+				index("friendfeed_entries", ["id"], true),
 				index("friendfeed_entries", ["userId"]),
 				
 				// Icons
 				table("desktop_icons", {
 					id:     [INTEGER, PRIMARY],
 					type:   [INTEGER, NOT_NULL],
-					userId: [INTEGER, NOT_NULL],
+					userId: [TEXT,    NOT_NULL],
 					x:      [INTEGER, NOT_NULL],
 					y:      [INTEGER, NOT_NULL]
 					}),
@@ -142,7 +141,7 @@ package socialfaceicon.model
 				table("group_icons", {
 					id:      [INTEGER, PRIMARY],
 					type:    [INTEGER, NOT_NULL],
-					userId:  [INTEGER, NOT_NULL],
+					userId:  [TEXT,    NOT_NULL],
 					nextId:  [INTEGER]
 					}),
 				
@@ -150,7 +149,7 @@ package socialfaceicon.model
 				table("dock_icons", {
 					id:      [INTEGER, PRIMARY],
 					type:    [INTEGER, NOT_NULL],
-					userId:  [INTEGER, NOT_NULL],
+					userId:  [TEXT,    NOT_NULL],
 					nextId:  [INTEGER],
 					isFirst: [INTEGER]
 					}),
