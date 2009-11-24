@@ -89,7 +89,7 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		protected override function finalize():void {
-			trace("FBookFriendsThread: Finish");
+			trace(this.className + ": Finish");
 		}
 	}
 }

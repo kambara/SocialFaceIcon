@@ -311,6 +311,4 @@
 			horizontalScrollPolicy="off"
 			/>
 	</mx:VBox>
-	
-		
 </mx:Window>

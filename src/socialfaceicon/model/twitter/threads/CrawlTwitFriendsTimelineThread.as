@@ -4,6 +4,7 @@ package socialfaceicon.model.twitter.threads
 	
 	import socialfaceicon.model.IconStatus;
 	import socialfaceicon.model.twitter.TwitSession;
+	import socialfaceicon.model.twitter.TwitStatus;
 
 	public class CrawlTwitFriendsTimelineThread extends Thread
 	{
@@ -17,31 +18,33 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		protected override function run():void {
-			trace("==== CrawlTwitFriendsTimeline ====");
+			trace("==== " + this.className + " ====");
 			if (TwitSession.username) {
 				friendsTimeline = new TwitFriendsTimelineThread(200);
 				friendsTimeline.start();
 				friendsTimeline.join();
 				next(onLoad);
-				error(Error, onFriendsTimelineError);
+				error(Error, onError);
 			} else {
-				trace("CrawlTwitFriendsTimeline: No username");
+				trace(this.className + ": No username");
 				next(restart);
 			}
 		}
 		
 		private function onLoad():void {
-			trace("CrawlTwitFriendsTimeline: Finish");
+			trace(this.className + ": Saving");
+			(new TwitStatus()).insertAll( friendsTimeline.statuses );
 			IconStatus.update();
 			next(restart);
 		}
 		
-		private function onFriendsTimelineError(err:Error, t:Thread):void {
-			trace(t+": "+err.message);
+		private function onError(err:Error, t:Thread):void {
+			trace(this.className + err.message);
 			next(restart);
 		}
 		
 		private function restart():void {
+			trace(this.className + ": restart");
 			sleep(interval);
 			next(run);
 		}

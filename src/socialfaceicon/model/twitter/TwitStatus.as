@@ -6,6 +6,8 @@
 package socialfaceicon.model.twitter
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
+	
+	import socialfaceicon.utils.DateUtil;
 
 	public class TwitStatus extends ARModel
 	{
@@ -14,9 +16,11 @@ package socialfaceicon.model.twitter
 		public var text:String;
 		public var createdAt:Number;
 		
+		/*
 		private static const MONTHS:Array = [
 			"Jan", "Feb", "Mar","Apr","May", "Jun",
 			"Jul","Aug","Sep","Oct","Nov","Dec"];
+			*/
 		
 		public function TwitStatus(id:Number = NaN,
 								   userId:String = null,
@@ -37,9 +41,10 @@ package socialfaceicon.model.twitter
 						xml.id,
 						userId,
 						xml.text,
-						makeDate(xml.created_at).getTime());
+						DateUtil.strToDate(xml.created_at).getTime());
 		}
 		
+		/*
 		private static function makeDate(created_at:String):Date
 		{
 			var time:Date = new Date();
@@ -75,5 +80,6 @@ package socialfaceicon.model.twitter
 			time.setUTCHours(hour, minutes, seconds);
 			return time;
 		}
+		*/
 	}
 }

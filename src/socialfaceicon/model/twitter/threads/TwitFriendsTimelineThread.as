@@ -15,6 +15,7 @@ package socialfaceicon.model.twitter.threads
 	public class TwitFriendsTimelineThread extends Thread
 	{
 		private var loader:URLLoaderThread;
+		private var _statuses:Array;
 		
 		public function TwitFriendsTimelineThread(count:uint = 20)
 		{
@@ -32,29 +33,17 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function onLoad():void {
-			trace("TwitFriendsTimeline: Saving");
+			trace(this.className + ": Saving");
+			_statuses = [];
 			var xml:XML = new XML(loader.loader.data);
-			var statuses:Array = [];
 			for each (var x:XML in xml.children()) {
-				statuses.push(
+				_statuses.push(
 					TwitStatus.newFromStatusXml(x, x.user[0].id) );
 			}
-			(new TwitStatus()).insertAll( statuses );
 		}
 		
-		private function saveStatus(xml:XML):void {
-			var status:TwitStatus = TwitStatus.newFromStatusXml(
-										xml,
-										xml.user[0].id);
-			try {
-				status.insert();
-				/*
-				trace("TwitFriendsTimelineThread: save: "
-						+ xml.user[0].screen_name
-						+ ": "
-						+ status.text);
-						*/
-			} catch(err:Error) {}
+		public function get statuses():Array {
+			return _statuses || [];
 		}
 	}
 }

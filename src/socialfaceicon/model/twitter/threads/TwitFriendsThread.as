@@ -60,11 +60,11 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		public function get users():Array {
-			return _users;
+			return _users || [];
 		}
 		
 		public function get statuses():Array {
-			return _statuses;
+			return _statuses || [];
 		}
 	}
 }

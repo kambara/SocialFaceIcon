@@ -17,6 +17,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.friendfeed.threads.UpdateFFeedAbstractEntriesThread;
+			import socialfaceicon.model.friendfeed.threads.UpdateFFeedUserEntriesThread;
 			import socialfaceicon.model.friendfeed.threads.FFeedUserEntriesThread;
 			import socialfaceicon.model.friendfeed.FFeedUser;
 			import socialfaceicon.model.friendfeed.FFeedEntry;
@@ -66,8 +68,14 @@
 				this.status = user.getIconCurrentStatus();
 				
 				if (!_iconStatus && user.iconType == IconType.FRIENDFEED) {
-					//(user as FFeedUser)
-					(new FFeedUserEntriesThread(user.iconUserId)).start();
+					var t:UpdateFFeedUserEntriesThread =
+							new UpdateFFeedUserEntriesThread(user.iconUserId);
+					t.addEventListener(
+							UpdateFFeedAbstractEntriesThread.FINISH,
+							function():void {
+								status = user.getIconCurrentStatus();
+							});
+					t.start();
 				}
 				
 				return this;

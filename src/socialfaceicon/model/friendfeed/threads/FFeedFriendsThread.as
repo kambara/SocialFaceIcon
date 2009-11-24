@@ -39,7 +39,7 @@ package socialfaceicon.model.friendfeed.threads
 		}
 		
 		public function get ffeedUsers():Array {
-			return _users;
+			return _users || [];
 		}
 	}
 }

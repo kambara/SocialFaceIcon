@@ -27,12 +27,12 @@ package socialfaceicon.model.facebook.threads
 			fbookFriends = new FBookFriendsThread(session.facebook);
 			fbookFriends.start();
 			fbookFriends.join();
-			next(onFBookFriendsLoad);
-			error(Error, onFBookFriendsError);
+			next(onLoad);
+			error(Error, onError);
 		}
 		
-		private function onFBookFriendsLoad():void {
-			trace("UpdateFBookFriends: Saving");
+		private function onLoad():void {
+			trace(this.className + ": Saving");
 			(new FBookUser()).saveAll(fbookFriends.fbookUsers);
 			FBookFriend.updateAll(
 							session.sessionData.uid,
@@ -43,13 +43,13 @@ package socialfaceicon.model.facebook.threads
 			IconStatus.update();
 		}
 		
-		private function onFBookFriendsError(err:Error, t:Thread):void {
-			trace(t + " onFbookFriendsError: " + err.getStackTrace());
+		private function onError(err:Error, t:Thread):void {
+			trace(this.className + ": " + err.getStackTrace());
 			next(null);
 		}
 		
 		protected override function finalize():void {
-			trace("UpdateFBookFriends: Finish");
+			trace(this.className + ": Finish");
 			dispatchEvent(new Event(UpdateFBookFriendsThread.FINISH));
 		}
 	}

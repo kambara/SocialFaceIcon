@@ -25,30 +25,34 @@ package socialfaceicon.model.friendfeed.threads
 			ffeedFriends = new FFeedFriendsThread(this.userId);
 			ffeedFriends.start();
 			ffeedFriends.join();
-			next(onFFeedFriendsLoad);
-			error(Error, onFFeedFriendsError);
+			next(onLoad);
+			error(Error, onError);
 		}
 		
-		private function onFFeedFriendsLoad():void {
-			trace("UpdateFFeedFriends: Saving");
+		private function onLoad():void {
+			trace(this.className + ": Saving");
 			(new FFeedUser()).saveAll( ffeedFriends.ffeedUsers );
 			FFeedFriend.updateAll(
 							this.userId,
 							ffeedFriends.ffeedUsers);
 			// TODO: load all friends' entry, then save entry.
-			//(new FFeedEntry()).saveAll(.fbookStatuses);
 			
 			// update view status
 			IconStatus.update();
 		}
 		
-		private function onFFeedFriendsError(err:Error, t:Thread):void {
-			trace(t + " onFFeedFriendsError: " + err.getStackTrace());
+		private function onError(err:Error, t:Thread):void {
+			trace([
+				t,
+				this.className,
+				"onError",
+				err.getStackTrace()
+				].join(": "));
 			next(null);
 		}
 		
 		protected override function finalize():void {
-			trace("UpdateFFeedFriends: Finish");
+			trace(this.className + ": Finish");
 			dispatchEvent(new Event(UpdateFFeedFriendsThread.FINISH));
 		}
 	}

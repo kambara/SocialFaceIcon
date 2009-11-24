@@ -80,7 +80,6 @@ package jp.cre8system.framework.airrecord.model
 			if (!result) return false;
 			for (var key:String in result) {
 				if (this.hasOwnProperty(key)) {
-					// this[key]がNumberでresult[key]がnullの場合、0が代入されてしまう。
 					if (this[key] is Number && result[key] == null) {
 						this[key] = NaN;
 					} else {
@@ -135,6 +134,7 @@ package jp.cre8system.framework.airrecord.model
 			try {
 				var existTable:Object = makeExistModelsTable(models);
 			} catch (err:Error) {
+				trace("ARModel: existTable: " + err.getStackTrace());
 				return;
 			}
 			try {
@@ -142,8 +142,6 @@ package jp.cre8system.framework.airrecord.model
 				for each (var model:ARModel in models) {
 					if (existTable[model["id"]]) {
 						if (!insertOnly) {
-							//var cond:Object = {};
-							//cond[keyName] = model[keyName];
 							model.update({id: model["id"]});
 						}
 					} else {

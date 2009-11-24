@@ -11,6 +11,11 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import org.libspark.thread.ThreadState;
+			import flash.utils.setInterval;
+			import socialfaceicon.model.friendfeed.threads.CrawlFFeedHomeEntriesThread;
+			import socialfaceicon.model.friendfeed.threads.UpdateFFeedHomeEntriesThread;
+			import socialfaceicon.model.friendfeed.threads.FFeedHomeEntriesThread;
 			import socialfaceicon.model.friendfeed.FFeedSession;
 			import socialfaceicon.model.friendfeed.threads.FFeedFriendsThread;
 			import socialfaceicon.model.facebook.threads.CrawlFBookFriendsThread;
@@ -42,6 +47,11 @@
 			[Embed(source="socialfaceicon/assets/icons-embed/128.png")]
 			private var Icon128:Class;
 			
+			private var twitFriends:CrawlTwitFriendsThread;
+			private var fbookFriends:CrawlFBookFriendsThread;
+			private var ffeedHomeEntries:CrawlFFeedHomeEntriesThread;
+			private var twitFriendsTimeline:CrawlTwitFriendsTimelineThread;
+			
 			private function onInitialize():void {
 				Thread.initialize(new EnterFrameThreadExecutor());
 				DB.createTables();
@@ -55,17 +65,51 @@
 				HumanDockIcon.openAll();
 				
 				// Start crawling
+				twitFriends = new CrawlTwitFriendsThread();
 				setTimeout(function():void {
-					(new CrawlTwitFriendsThread()).start();
+					twitFriends.start();
 				}, 5 * 1000);
 				
+				fbookFriends = new CrawlFBookFriendsThread();
 				setTimeout(function():void {
-					(new CrawlFBookFriendsThread()).start();
+					fbookFriends.start();
 				}, 30 * 1000);
 				
+				ffeedHomeEntries = new CrawlFFeedHomeEntriesThread();
 				setTimeout(function():void {
-					(new CrawlTwitFriendsTimelineThread()).start();
+					ffeedHomeEntries.start();
+				}, 1 * 60 * 1000);
+				
+				twitFriendsTimeline = new CrawlTwitFriendsTimelineThread();
+				setTimeout(function():void {
+					twitFriendsTimeline.start();
 				}, 2 * 60 * 1000);
+
+				setInterval(checkThreads, 5 * 60 * 1000);
+			}
+			
+			private function checkThreads():void {
+				trace("-- check threads --");
+				if (twitFriends.state == ThreadState.TERMINATED) {
+					trace("!!! restore: twitFriends");
+					twitFriends = new CrawlTwitFriendsThread();
+					twitFriends.start();
+				}
+				if (fbookFriends.state == ThreadState.TERMINATED) {
+					trace("!!! restore: fbookFriends");
+					fbookFriends = new CrawlFBookFriendsThread();
+					fbookFriends.start();
+				}
+				if (ffeedHomeEntries.state == ThreadState.TERMINATED) {
+					trace("!!! restore: ffeedHomeEntries");
+					ffeedHomeEntries = new CrawlFFeedHomeEntriesThread();
+					ffeedHomeEntries.start();
+				}
+				if (twitFriendsTimeline.state == ThreadState.TERMINATED) {
+					trace("!!! restore: twitFriendsTimeline");
+					twitFriendsTimeline = new CrawlTwitFriendsTimelineThread();
+					twitFriendsTimeline.start();
+				}
 			}
 			
 			private function initTwitter():void {

@@ -25,7 +25,7 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		protected override function run():void {
-			trace("==== CrawlFBookFriends ====");
+			trace("==== " + this.className + " ====");
 			isConnected = false;
 			
 			var friends:Array = (new FBookFriend()).find();
@@ -37,14 +37,14 @@ package socialfaceicon.model.facebook.threads
 				next(checkTimeout);
 			} else {
 				// No account
-				trace("CrawlFBookFriends: never logged in");
+				trace(this.className + ": Never logged in");
 				next(restart);
 			}
 		}
 		
 		private function checkTimeout():void {
 			if (!isConnected) {
-				trace("CrawlFBookFriends: timeout");
+				trace(this.className + ": Timeout");
 				var loader:URLLoaderThread =
 						new URLLoaderThread(
 								new URLRequest("http://www.facebook.com/"));
@@ -56,19 +56,19 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		private function onOnline():void {
-			trace("CrawlFBookFriends: online?");
+			trace(this.className + ": Online");
 			event(session, FacebookEvent.CONNECT, onConnect);
 			event(session, FacebookEvent.LOGIN_FAILURE, onLoginFailure);
 			session.login();
 		}
 		
 		private function onOffline(err:IOError, t:Thread):void {
-			trace("CrawlFBookFriends: offline?");
+			trace(this.className + ": Offline");
 			next(restart);
 		}
 		
 		private function onLoginFailure(evt:FacebookEvent):void {
-			trace("login failure");
+			trace(this.className + ": Login failure");
 			next(restart);
 		}
 		
@@ -82,7 +82,7 @@ package socialfaceicon.model.facebook.threads
 				next(onFBookFriendsLoad);
 				error(Error, onFBookFriendsError);
 			} else {
-				trace(this.className + ": failure connect");
+				trace(this.className + ": Connect failure");
 			}
 		}
 		
@@ -95,13 +95,13 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		private function restart():void {
-			trace("CrawlFBookFriends: restart");
+			trace(this.className + ": restart");
 			sleep(interval);
 			next(run);
 		}
 		
 		protected override function finalize():void {
-			trace("CrawlFBookFriends: Finish");
+			trace(this.className + ": Finish");
 			next(restart);
 		}
 	}

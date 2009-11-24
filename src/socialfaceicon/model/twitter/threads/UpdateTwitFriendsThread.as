@@ -35,22 +35,21 @@ package socialfaceicon.model.twitter.threads
 			allStatuses = [];
 			page = 1;
 			next(loadFriendsStatus);
-			error(Error, onFriendsStatusError);
 		}
 		
 		//
 		// FriendStatus
 		//
 		private function loadFriendsStatus():void {
-			trace("UpdateTwitFriends: Loading page " + this.page);
+			trace(this.className + ": Loading: page " + this.page);
 			twitFriends = new TwitFriendsThread(username, page);
 			twitFriends.start();
 			twitFriends.join();
-			next(onFriendsStatusLoad);
-			error(Error, onFriendsStatusError);
+			next(onLoad);
+			error(Error, onError);
 		}
 		
-		private function onFriendsStatusLoad():void {
+		private function onLoad():void {
 			if (twitFriends.users.length == 0) {
 				saveAllFriends();
 				IconStatus.update();
@@ -67,14 +66,14 @@ package socialfaceicon.model.twitter.threads
 		// Save friends
 		//
 		private function saveAllFriends():void {
-			trace("UpdateTwitFriends: Saving");
+			trace(this.className + ": Saving");
 			(new TwitUser()).saveAll( allUsers );
 			TwitFriend.updateAll(username, allUsers);
 			(new TwitStatus()).insertAll( allStatuses );
 		}
 		
-		private function onFriendsStatusError(err:Error, t:Thread):void {
-			trace(t + " onFriendsStatusError: " + err.message);
+		private function onError(err:Error, t:Thread):void {
+			trace(this.className + ": " + err.message);
 			chance--;
 			if (chance <= 0) {
 				next(null);
@@ -85,8 +84,8 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		protected override function finalize():void {
-			trace("UpdateTwitFriends: Finish:"
-					+ " user: "
+			trace(this.className
+					+ ": Finish: user: "
 					+ allUsers.length
 					+ ", status: "
 					+ allStatuses.length);

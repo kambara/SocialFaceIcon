@@ -1,25 +1,24 @@
-package socialfaceicon.model.twitter.threads
+package socialfaceicon.model.friendfeed.threads
 {
 	import org.libspark.thread.Thread;
 	
-	import socialfaceicon.model.twitter.TwitSession;
+	import socialfaceicon.model.friendfeed.FFeedSession;
 
-	public class CrawlTwitFriendsThread extends Thread
+	public class CrawlFFeedHomeEntriesThread extends Thread
 	{
 		private var interval:int;
 		
-		public function CrawlTwitFriendsThread()
+		public function CrawlFFeedHomeEntriesThread()
 		{
 			super();
-			interval = 30 * 60 * 1000;
+			interval = 2 * 60 * 1000;
 		}
 		
 		protected override function run():void {
 			trace("==== " + this.className + " ====");
-			if (TwitSession.username) {
-				var t:UpdateTwitFriendsThread =
-						new UpdateTwitFriendsThread(
-								TwitSession.username );
+			if (FFeedSession.username) {
+				var t:UpdateFFeedHomeEntriesThread =
+						new UpdateFFeedHomeEntriesThread();
 				t.start();
 				t.join();
 				next(restart);
@@ -31,7 +30,7 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function onError(err:Error, t:Thread):void {
-			trace(t+": "+err.getStackTrace());
+			trace(this.className + ": " + err.getStackTrace());
 			next(restart);
 		}
 		
