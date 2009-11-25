@@ -42,14 +42,15 @@
 			}
 			
 			private function onInitialize():void {
-				initContextMenu();
-				
 				faceIcon.addEventListener(
 						MouseDragStartEvent.MOUSE_DRAG_START,
 						onFaceIconMouseDragStart);
 				faceIcon.addEventListener(
 						DragEvent.DRAG_COMPLETE,
 						onFaceIconDragComplete);
+				faceIcon.addEventListener(
+						FaceIcon.DELETE,
+						onFaceIconDelete);
 			}
 			
 			private function set desktopIconId(iconId:Number):void {
@@ -86,17 +87,7 @@
 				return null;
 			}
 			
-			private function initContextMenu():void {
-				var menu:ContextMenu = new ContextMenu();
-				var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete");
-				menuItemDelete.addEventListener(
-					ContextMenuEvent.MENU_ITEM_SELECT,
-					onMenuItemDeleteSelect);
-				menu.addItem(menuItemDelete);
-				this.contextMenu = menu;
-			}
-			
-			private function onMenuItemDeleteSelect(event:ContextMenuEvent):void {
+			private function onFaceIconDelete(event:Event):void {
 				var desktopIcon:DesktopIcon = getDesktopIcon();
 				if (desktopIcon) {
 					desktopIcon.closeAndDelete();

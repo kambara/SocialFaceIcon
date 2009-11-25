@@ -35,6 +35,8 @@
 			import mx.managers.DragManager;
 			import socialfaceicon.model.IUser;
 			
+			public static const DELETE:String = "delete";
+			
 			[Embed(source="socialfaceicon/assets/face-plain.png")]
 			private var DefaultIconImage:Class;
 			
@@ -78,6 +80,7 @@
 					t.start();
 				}
 				
+				initContextMenu();
 				return this;
 			}
 			
@@ -108,6 +111,21 @@
 				this._iconStatusChanged = true;
 				this.invalidateProperties();
 				this.invalidateDisplayList();
+			}
+			
+			//
+			// Context Menu
+			//
+			private function initContextMenu():void {
+				var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete");
+				menuItemDelete.addEventListener(
+					ContextMenuEvent.MENU_ITEM_SELECT,
+					function():void {
+						dispatchEvent(new Event(FaceIcon.DELETE));
+					});
+				var menu:ContextMenu = new ContextMenu();
+				menu.addItem(menuItemDelete);
+				this.contextMenu = menu;
 			}
 			
 			//

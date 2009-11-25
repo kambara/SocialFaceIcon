@@ -42,10 +42,23 @@
 				faceIcon.addEventListener(
 					DragEvent.DRAG_COMPLETE,
 					onFaceIconDragComplete);
+				faceIcon.addEventListener(
+					FaceIcon.DELETE,
+					function():void {
+						onFaceIconDelete(groupIcon.id);
+					});
 			}
 			
 			private function onFaceIconMouseDown(mouse:MouseEvent):void {
 				mouse.stopPropagation();
+			}
+			
+			private function onFaceIconDelete(groupIconId:Number):void {
+				var groupIcon:GroupIcon = new GroupIcon();
+				if (!groupIcon.loadById(groupIconId)) return;
+				
+				var group:DesktopGroup = groupIcon.getDesktopGroup();
+				group.deleteGroupIconOrDisband( groupIcon );
 			}
 			
 			//

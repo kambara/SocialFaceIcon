@@ -8,8 +8,19 @@ package socialfaceicon.model
 	{
 		public var nextId:Number;
 		public var isFirst:Number;
-		
 		private static var dockWindow:DockWindow;
+		
+		public function HumanDockIcon(id:Number=NaN,
+									  type:Number=NaN,
+									  userId:*=null,
+									  nextId:Number=NaN,
+									  isFirst:Number=NaN)
+		{
+			super(id, type, userId);
+			this.__table = "dock_icons";
+			this.nextId = nextId;
+			this.isFirst = isFirst;
+		}
 		
 		public static function openAll():void {
 			dockWindow = new DockWindow();
@@ -20,18 +31,6 @@ package socialfaceicon.model
 					}
 				});
 			dockWindow.open();
-		}
-		
-		public function HumanDockIcon(id:Number=NaN,
-									type:Number=NaN,
-									userId:*=null,
-									nextId:Number=NaN,
-									isFirst:Number=NaN)
-		{
-			super(id, type, userId);
-			this.__table = "dock_icons";
-			this.nextId = nextId;
-			this.isFirst = isFirst;
 		}
 		
 		public static function updateViewStatus():void {

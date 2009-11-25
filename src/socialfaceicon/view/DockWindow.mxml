@@ -182,6 +182,11 @@
 				faceIcon.addEventListener(
 					DragEvent.DRAG_COMPLETE,
 					onFaceIconDragComplete);
+				faceIcon.addEventListener(
+					FaceIcon.DELETE,
+					function():void {
+						onFaceIconDelete(dockIcon.id);
+					});
 			}
 			
 			private function onFaceIconMouseDown(mouse:MouseEvent):void {
@@ -192,6 +197,13 @@
 				var faceIcon:FaceIcon = faceIconTable[ dockIcon.id ] as FaceIcon;
 				if (!faceIcon) return;
 				faceIconContainer.removeChild( faceIcon );
+			}
+			
+			private function onFaceIconDelete(dockIconId:Number):void {
+				var dockIcon:HumanDockIcon = new HumanDockIcon();
+				if (dockIcon.loadById(dockIconId)) {
+					dockIcon.closeAndDelete();
+				}
 			}
 			
 			//
