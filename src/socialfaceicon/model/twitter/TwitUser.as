@@ -74,6 +74,24 @@ package socialfaceicon.model.twitter
 			var s:TwitStatus = this.getCurrentTwitStatus();
 			return s ? s.text : null;
 		}
+		public function getIconStatuses(max:int):Array {
+			var statusObjects:Array = (new TwitStatus()).find(
+											{userId: this.id},
+											"createdAt DESC",
+											max.toString());
+			var statuses:Array = [];
+			for each (var sObj:Object in statusObjects) {
+				/*
+				statuses.push(
+					new FBookStatus(sObj.id,
+									sObj.userId,
+									sObj.message,
+									sObj.time));
+									*/
+				statuses.push(sObj.text);
+			}
+			return statuses;
+		}
 		public function get iconUserUrl():String {
 			return "http://twitter.com/" + this.screenName;
 		}

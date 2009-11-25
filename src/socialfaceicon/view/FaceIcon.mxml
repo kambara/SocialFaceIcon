@@ -69,6 +69,7 @@
 				this.iconUserUrl = user.iconUserUrl;
 				this.status = user.getIconCurrentStatus();
 				
+				// Load Friendfeed Entry if not
 				if (!_iconStatus && user.iconType == IconType.FRIENDFEED) {
 					var t:UpdateFFeedUserEntriesThread =
 							new UpdateFFeedUserEntriesThread(user.iconUserId);
@@ -80,7 +81,7 @@
 					t.start();
 				}
 				
-				initContextMenu();
+				initContextMenu(user);
 				return this;
 			}
 			
@@ -116,16 +117,39 @@
 			//
 			// Context Menu
 			//
-			private function initContextMenu():void {
-				var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete");
-				menuItemDelete.addEventListener(
-					ContextMenuEvent.MENU_ITEM_SELECT,
-					function():void {
-						dispatchEvent(new Event(FaceIcon.DELETE));
-					});
+			private function initContextMenu(user:IUser):void {
 				var menu:ContextMenu = new ContextMenu();
-				menu.addItem(menuItemDelete);
+				menu.addEventListener(
+					ContextMenuEvent.MENU_SELECT,
+					function():void {
+						menu.removeAllItems();
+						// Status
+						for each (var s:String in user.getIconStatuses(10)) {
+							var item:ContextMenuItem = new ContextMenuItem(s);
+							menu.addItem(item);
+						}
+						
+						// Delete
+						var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete", true);
+						menuItemDelete.addEventListener(
+							ContextMenuEvent.MENU_ITEM_SELECT,
+							function():void {
+								dispatchEvent(new Event(FaceIcon.DELETE));
+							});
+						menu.addItem(menuItemDelete);
+					});
 				this.contextMenu = menu;
+			}
+			
+			private function onContextMenuSelect(event:ContextMenuEvent):void {
+				var menu:ContextMenu = event.currentTarget as ContextMenu;
+				
+				
+				// Status
+				var item:ContextMenuItem = new ContextMenuItem("hoge");
+				menu.addItem(item);
+				
+				
 			}
 			
 			//

@@ -52,6 +52,24 @@ package socialfaceicon.model.friendfeed
 			var e:FFeedEntry = this.getCurrentEntry();
 			return e ? e.body : null;
 		}
+		public function getIconStatuses(max:int):Array {
+			var entryObjects:Array = (new FFeedEntry()).find(
+											{userId: this.id},
+											"date DESC",
+											max.toString());
+			var entries:Array = [];
+			for each (var eObj:Object in entryObjects) {
+				/*
+				statuses.push(
+					new FBookStatus(sObj.id,
+									sObj.userId,
+									sObj.message,
+									sObj.time));
+									*/
+				entries.push(eObj.body);
+			}
+			return entries;
+		}
 		public function get iconUserUrl():String {
 			return "http://friendfeed.com/" + this.id;
 		}

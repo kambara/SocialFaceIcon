@@ -62,6 +62,24 @@ package socialfaceicon.model.facebook
 			var s:FBookStatus = this.getCurrentStatus();
 			return s ? s.message : null;
 		}
+		public function getIconStatuses(max:int):Array {
+			var statusObjects:Array = (new FBookStatus()).find(
+											{userId: this.id},
+											"time DESC",
+											max.toString());
+			var statuses:Array = [];
+			for each (var sObj:Object in statusObjects) {
+				/*
+				statuses.push(
+					new FBookStatus(sObj.id,
+									sObj.userId,
+									sObj.message,
+									sObj.time));
+									*/
+				statuses.push(sObj.message);
+			}
+			return statuses;
+		}
 		public function get iconUserUrl():String {
 			return this.profileUrl;
 		}
