@@ -22,6 +22,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.HumanDockIcon;
+			import socialfaceicon.model.GroupIcon;
 			import socialfaceicon.events.MouseDragStartEvent;
 			import mx.events.FlexEvent;
 			import socialfaceicon.model.DragFormat;
@@ -146,23 +148,64 @@
 			// Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)) {
+				if (   event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON_ID)
+					|| event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID)) {
 					DragManager.acceptDragDrop(this);
 				}
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
-					onDesktopIconDragDrop(event);
+				if (event.dragSource.hasFormat( DragFormat.LIST_ITEMS )) {
+					onFriendsListItemsDragDrop(event);
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
+					onDesktopIconDragDrop(
+							event,
+							event.dragSource.dataForFormat(
+								DragFormat.DESKTOP_ICON_ID)
+									as Number);
+				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON_ID )) {
+					onGroupIconDragDrop(
+							event,
+							event.dragSource.dataForFormat(
+								DragFormat.GROUP_ICON_ID)
+									as Number);
+				} else if (event.dragSource.hasFormat(DragFormat.DOCK_ICON_ID)) {
+					onDockIconDragDrop(
+							event,
+							Number(event.dragSource.dataForFormat(
+								DragFormat.DOCK_ICON_ID)));
 				}
 			}
 			
-			private function onDesktopIconDragDrop(event:DragEvent):void {
-				var sourceDesktopIconId:Number =
-						event.dragSource.dataForFormat(
-							DragFormat.DESKTOP_ICON_ID)
-								as Number;
+			//
+			// Drop from Friends List
+			//
+			private function onFriendsListItemsDragDrop(event:DragEvent):void {
+				var dataArray:Array =
+						event.dragSource.dataForFormat(DragFormat.LIST_ITEMS) as Array;
+				var user:IUser = IUser(dataArray[0]);
 				
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				
+				// New Group
+				DesktopGroup.createAndOpen(
+						desktopIcon.getUser(),
+						user,
+						desktopIcon.x - 12,
+						desktopIcon.y - 50);
+				// Delete DesktopIcon
+				callLater(function():void { // for DragComplete Event Handler
+					desktopIcon.closeAndDelete();
+				});
+			}
+			
+			//
+			// Drop Desktop Icon
+			//
+			private function onDesktopIconDragDrop(event:DragEvent, sourceDesktopIconId:Number):void {
 				if (this._desktopIconId == sourceDesktopIconId) {
 					onMyselfDesktopIconDragDrop(event);
 				} else {
@@ -190,9 +233,9 @@
 				if (isNaN(sourceDesktopIconId)) return;
 				var sourceDesktopIcon:DesktopIcon = new DesktopIcon();
 				if (!sourceDesktopIcon.loadById( sourceDesktopIconId )) return; 
-				
 				var desktopIcon:DesktopIcon = getDesktopIcon();
 				if (!desktopIcon) return;
+				
 				// New Group
 				DesktopGroup.createAndOpen(
 						desktopIcon.getUser(),
@@ -206,7 +249,54 @@
 				});
 			}
 			
+			//
+			// Drop GroupIcon
+			//
+			private function onGroupIconDragDrop(event:DragEvent, groupIconId:Number):void {
+				if (isNaN(groupIconId)) return;
+				var groupIcon:GroupIcon = new GroupIcon();
+				if (!groupIcon.loadById( groupIconId )) return;
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				
+				// New Group
+				DesktopGroup.createAndOpen(
+						desktopIcon.getUser(),
+						groupIcon.getUser(),
+						desktopIcon.x - 12,
+						desktopIcon.y - 50);
+				
+				// Delete DesktopIcon and GroupIcon
+				var group:DesktopGroup = groupIcon.getDesktopGroup();
+				callLater(function():void {
+					desktopIcon.closeAndDelete();
+					group.deleteGroupIconOrDisband( groupIcon );
+				});
+			}
 			
+			//
+			// Drag Icon from Dock
+			//
+			private function onDockIconDragDrop(event:DragEvent, dockIconId:Number):void {
+				var dockIcon:HumanDockIcon = new HumanDockIcon();
+				if (!dockIcon.loadById( dockIconId )) return;
+				var user:IUser = dockIcon.getUser();
+				if (!user) return;
+				var desktopIcon:DesktopIcon = getDesktopIcon();
+				if (!desktopIcon) return;
+				
+				// New Group
+				DesktopGroup.createAndOpen(
+						desktopIcon.getUser(),
+						user,
+						desktopIcon.x - 12,
+						desktopIcon.y - 50);
+				
+				callLater(function():void {
+					desktopIcon.closeAndDelete();
+					dockIcon.closeAndDelete();
+				});
+			}
 		]]>
 	</mx:Script>
 	<ns1:FaceIcon
