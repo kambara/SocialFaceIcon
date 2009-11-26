@@ -310,12 +310,17 @@
 				if (isNaN(groupIconId)) return;
 				var sourceGroupIcon:GroupIcon = new GroupIcon();
 				if (!sourceGroupIcon.loadById( groupIconId )) return;
-				
 				var desktopGroup:DesktopGroup = getDesktopGroup();
 				if (!desktopGroup) return;
-				desktopGroup.addUser(sourceGroupIcon.getUser());
-				
 				var sourceGroup:DesktopGroup = sourceGroupIcon.getDesktopGroup();
+				
+				if (sourceGroup.id == desktopGroup.id) return;
+				
+				// Add
+				desktopGroup.addUser(sourceGroupIcon.getUser());
+				trace("Add!!!!!!!");
+				
+				// Delete
 				callLater(function():void {
 					sourceGroup.deleteGroupIconOrDisband( sourceGroupIcon );
 				});

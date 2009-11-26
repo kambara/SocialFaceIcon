@@ -11,6 +11,7 @@ package socialfaceicon.model
 		public var x:Number;
 		public var y:Number;
 		public var piled:Number;
+		public var maxWidth:Number;
 		
 		private static var groupWindowTable:Object = {}; // groups in view
 		
