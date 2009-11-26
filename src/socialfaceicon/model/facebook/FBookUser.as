@@ -69,14 +69,11 @@ package socialfaceicon.model.facebook
 											max.toString());
 			var statuses:Array = [];
 			for each (var sObj:Object in statusObjects) {
-				/*
 				statuses.push(
 					new FBookStatus(sObj.id,
 									sObj.userId,
 									sObj.message,
 									sObj.time));
-									*/
-				statuses.push(sObj.message);
 			}
 			return statuses;
 		}

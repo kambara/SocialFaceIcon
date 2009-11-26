@@ -19,7 +19,7 @@ package socialfaceicon.utils
 				// match 2008-12-07T16:24:24Z
 				var tp1:Array = dateStr.split(/[-T:Z]/g);
 				year = tp1[0];
-				month = tp1[1];
+				month = tp1[1] - 1;
 				date = tp1[2];
 				hour = tp1[3];
 				minutes = tp1[4];
@@ -41,6 +41,34 @@ package socialfaceicon.utils
 			time.setUTCFullYear(year, month, date);
 			time.setUTCHours(hour, minutes, seconds);
 			return time;
+		}
+		
+		public static function ago(time:Number):String {
+			var currentMsec:Number = (new Date()).getTime();
+			var dMsec:Number = (new Date()).getTime() - time;
+			var dSec:Number = Math.round(dMsec/1000);
+			if (dSec < 0) {
+				return null;
+			} else if (dSec < 60) { // ~60sec
+				return dSec + " sec";
+			} else if (dSec < 60 * 60) { // ~60min
+				return pluralize(Math.round(dSec/60),
+								 "minute");
+			} else if (dSec < 24 * 60 * 60) { // ~24hour
+				return pluralize(Math.round(dSec/(60 * 60)),
+								 "hour");
+			} else {
+				return pluralize(Math.round(dSec/(24 * 60 * 60)),
+								 "day");
+			}
+			return null;
+		}
+		
+		private static function pluralize(num:Number, unit:String):String {
+			if (num == 1) {
+				return num + " " + unit;
+			}
+			return num + " " + unit + "s";
 		}
 	}
 }

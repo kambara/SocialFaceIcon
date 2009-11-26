@@ -1,8 +1,10 @@
 package socialfaceicon.model.facebook.threads
 {
 	import com.facebook.Facebook;
+	import com.facebook.commands.fql.FqlQuery;
 	import com.facebook.commands.friends.GetFriends;
 	import com.facebook.commands.users.GetInfo;
+	import com.facebook.data.FacebookData;
 	import com.facebook.data.friends.GetFriendsData;
 	import com.facebook.data.users.FacebookUser;
 	import com.facebook.data.users.FacebookUserCollection;
@@ -10,6 +12,8 @@ package socialfaceicon.model.facebook.threads
 	import com.facebook.data.users.GetInfoFieldValues;
 	import com.facebook.events.FacebookEvent;
 	import com.facebook.net.FacebookCall;
+	
+	import mx.utils.StringUtil;
 	
 	import org.libspark.thread.Thread;
 	
@@ -55,11 +59,58 @@ package socialfaceicon.model.facebook.threads
 					(evt.data as GetInfoData).userCollection;
 			
 			for (var i:int=0; i < userCollection.length; i++) {
-				addFBookUser(userCollection.getItemAt(i) as FacebookUser);
+				addFBookUserAndNoIdStatus(userCollection.getItemAt(i) as FacebookUser);
+			}
+			next(loadStatusIds);
+		}
+		
+		private function loadStatusIds():void {
+			if (!_fbookStatuses || fbookStatuses.length == 0) return;
+			var cond:String =
+					_fbookStatuses.map(
+						function(s:FBookStatus, index:int, ary:Array):String {
+							return StringUtil.substitute(
+										"(uid={0} AND time={1})",
+										s.userId,
+										Math.round(s.time/1000));
+						}).join(" OR ");
+			var query:String = "SELECT status_id,uid,time FROM status WHERE " + cond;
+			var call:FacebookCall = facebook.post(new FqlQuery(query));
+			event(call, FacebookEvent.COMPLETE, onStatusIdComplete);
+		}
+		
+		private function onStatusIdComplete(event:FacebookEvent):void {
+			if (!event.success) return;
+			/*
+			statusTable =
+			{
+			  <uid>: {<time>: fbookStatus},
+			  <uid>: {<time>: , <time>: }
+			}
+			*/
+			var statusTable:Object = {};
+			for each (var fbookStatus:FBookStatus in fbookStatuses) {
+				if (!statusTable[fbookStatus.userId]) {
+					statusTable[fbookStatus.userId] = {};
+				}
+				var timeKey:String = (fbookStatus.time/1000).toString();
+				statusTable[fbookStatus.userId][timeKey] = fbookStatus;
+			}
+			
+			var fb:Namespace = new Namespace("http://api.facebook.com/1.0/");
+			var xml:XML = new XML((event.data as FacebookData).rawResult);
+			for each (var x:XML in xml..fb::user_status) {
+				var sid:String = x.fb::status_id;
+				var uid:String = x.fb::uid;
+				var time:String = x.fb::time;
+				var msg:String = x.fb::message;
+				if (sid && uid && time) {
+					FBookStatus(statusTable[uid][time]).id = sid;
+				}
 			}
 		}
 		
-		private function addFBookUser(facebookUser:FacebookUser):void {
+		private function addFBookUserAndNoIdStatus(facebookUser:FacebookUser):void {
 			if (!facebookUser) return;
 			_fbookUsers.push(
 					new FBookUser(

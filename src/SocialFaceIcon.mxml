@@ -5,6 +5,7 @@
 	height="100"
 	initialize="onInitialize()"
 	closing="onClosing()"
+	close="exit()"
 	visible="false"
 	applicationActivate="onApplicationActive()"
 	applicationDeactivate="onApplicationDeactive()"
@@ -71,9 +72,9 @@
 				}, 5 * 1000);
 				
 				fbookFriends = new CrawlFBookFriendsThread();
-				setTimeout(function():void {
+				//setTimeout(function():void {
 					fbookFriends.start();
-				}, 30 * 1000);
+				//}, 30 * 1000);
 				
 				ffeedHomeEntries = new CrawlFFeedHomeEntriesThread();
 				setTimeout(function():void {

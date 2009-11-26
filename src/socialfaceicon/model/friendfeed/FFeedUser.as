@@ -59,14 +59,12 @@ package socialfaceicon.model.friendfeed
 											max.toString());
 			var entries:Array = [];
 			for each (var eObj:Object in entryObjects) {
-				/*
-				statuses.push(
-					new FBookStatus(sObj.id,
-									sObj.userId,
-									sObj.message,
-									sObj.time));
-									*/
-				entries.push(eObj.body);
+				entries.push(
+					new FFeedEntry(eObj.id,
+								   eObj.userId,
+								   eObj.body,
+								   eObj.url,
+								   eObj.date));
 			}
 			return entries;
 		}

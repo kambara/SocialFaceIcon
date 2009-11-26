@@ -81,14 +81,11 @@ package socialfaceicon.model.twitter
 											max.toString());
 			var statuses:Array = [];
 			for each (var sObj:Object in statusObjects) {
-				/*
 				statuses.push(
-					new FBookStatus(sObj.id,
-									sObj.userId,
-									sObj.message,
-									sObj.time));
-									*/
-				statuses.push(sObj.text);
+					new TwitStatus(sObj.id,
+								   sObj.userId,
+								   sObj.text,
+								   sObj.createdAt));
 			}
 			return statuses;
 		}

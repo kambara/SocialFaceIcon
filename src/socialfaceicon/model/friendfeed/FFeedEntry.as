@@ -1,8 +1,10 @@
 package socialfaceicon.model.friendfeed
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
+	
+	import socialfaceicon.model.IStatus;
 
-	public class FFeedEntry extends ARModel
+	public class FFeedEntry extends ARModel implements IStatus
 	{
 		public var id:String;
 		public var userId:String;
@@ -23,6 +25,19 @@ package socialfaceicon.model.friendfeed
 			this.body = body;
 			this.url = url;
 			this.date = date;
+		}
+		
+		//
+		// implements IStatus
+		//
+		public function get statusMessage():String {
+			return this.body;
+		}
+		public function get statusTime():Number {
+			return this.date;
+		}
+		public function get statusUrl():String {
+			return this.url;
 		}
 	}
 }

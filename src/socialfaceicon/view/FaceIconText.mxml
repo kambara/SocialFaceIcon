@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Text
 	xmlns:mx="http://www.adobe.com/2006/mxml"
-	initialize="onInitialize()"
 	selectable="false"
 	textAlign="center"
 	width="100"
 	color="#FFFFFF"
-	fontSize="12"
+	
+	initialize="onInitialize()"
 	>
 	<mx:Script>
 		<![CDATA[
 			private var _lineNum:int = 0;
+			private var _lineNumChanged:Boolean = false;
 			
 			private function onInitialize():void {
 				if (Capabilities.os.indexOf("Windows") >= 0) {
@@ -30,7 +31,17 @@
 					3,  // strength
 					2   // quality
 				)];
-				updateHeight();
+				
+				_lineNumChanged = true;
+				invalidateProperties();
+			}
+			
+			protected override function commitProperties():void {
+				super.commitProperties();
+				if (_lineNumChanged) {
+					_lineNumChanged = false;
+					updateHeight();
+				}
 			}
 			
 			[Bindable]
@@ -40,7 +51,8 @@
 			
 			public function set lineNumber(value:int):void {
 				_lineNum = value || 0;
-				updateHeight();
+				_lineNumChanged = true;
+				invalidateProperties();
 			}
 			
 			private function setFontStyle(size:uint, family:String):void {
@@ -59,8 +71,8 @@
 				var margin:uint = 2;
 				this.height =
 					(metrics.ascent + metrics.descent) * _lineNum
-					+ metrics.leading*(_lineNum-1)
-					+ margin*2;
+					+ metrics.leading * (_lineNum-1)
+					+ margin * 2;
 			}
 		]]>
 	</mx:Script>

@@ -60,6 +60,8 @@ package socialfaceicon.model
 				//
 				// Facebook API
 				// http://wiki.developers.facebook.com/index.php/API
+				// Console
+				// http://developers.facebook.com/tools.php
 				// AS3 Library
 				// http://facebook-actionscript-api.googlecode.com/svn/release/current/docs/index.html
 				//

@@ -17,6 +17,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.utils.DateUtil;
+			import socialfaceicon.model.IStatus;
 			import socialfaceicon.model.friendfeed.threads.UpdateFFeedAbstractEntriesThread;
 			import socialfaceicon.model.friendfeed.threads.UpdateFFeedUserEntriesThread;
 			import socialfaceicon.model.friendfeed.threads.FFeedUserEntriesThread;
@@ -122,34 +124,44 @@
 				menu.addEventListener(
 					ContextMenuEvent.MENU_SELECT,
 					function():void {
-						menu.removeAllItems();
-						// Status
-						for each (var s:String in user.getIconStatuses(10)) {
-							var item:ContextMenuItem = new ContextMenuItem(s);
-							menu.addItem(item);
-						}
-						
-						// Delete
-						var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete", true);
-						menuItemDelete.addEventListener(
-							ContextMenuEvent.MENU_ITEM_SELECT,
-							function():void {
-								dispatchEvent(new Event(FaceIcon.DELETE));
-							});
-						menu.addItem(menuItemDelete);
+						updateMenu(menu, user);
 					});
 				this.contextMenu = menu;
 			}
 			
-			private function onContextMenuSelect(event:ContextMenuEvent):void {
-				var menu:ContextMenu = event.currentTarget as ContextMenu;
-				
-				
+			private function updateMenu(menu:ContextMenu, user:IUser):void {
+				menu.removeAllItems();
 				// Status
-				var item:ContextMenuItem = new ContextMenuItem("hoge");
-				menu.addItem(item);
-				
-				
+				for each (var status:IStatus in user.getIconStatuses(10)) {
+					menu.addItem(
+							createStatusMenuItem(
+									status.statusMessage,
+									status.statusUrl,
+									status.statusTime));
+				}
+				// Delete
+				var menuItemDelete:ContextMenuItem = new ContextMenuItem("Delete", true);
+				menuItemDelete.addEventListener(
+					ContextMenuEvent.MENU_ITEM_SELECT,
+					function():void {
+						dispatchEvent(new Event(FaceIcon.DELETE));
+					});
+				menu.addItem(menuItemDelete);
+			}
+			
+			private function createStatusMenuItem(msg:String, url:String, time:Number):ContextMenuItem {
+				var ago:String = DateUtil.ago(time) || "";
+				if (ago) {
+					ago = " (" + ago + " ago)"
+				}
+				var item:ContextMenuItem
+							= new ContextMenuItem(msg.substr(0, 50) + ago);
+				item.addEventListener(
+						ContextMenuEvent.MENU_ITEM_SELECT,
+						function():void {
+							navigateToURL(new URLRequest(url));
+						});
+				return item;
 			}
 			
 			//
