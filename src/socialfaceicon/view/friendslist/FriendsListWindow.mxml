@@ -9,7 +9,7 @@
 	title="Friends - Social Face Icon"
 	backgroundColor="#EEEEEE"
 	maximizable="false"
-	showStatusBar="false"
+	showStatusBar="true"
 	
 	closing="onClosing(event)"
 	>

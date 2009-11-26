@@ -205,14 +205,18 @@
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (   event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )
-					|| event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
+				if (   event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_GROUP_ID)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON_ID)) {
 					DragManager.acceptDragDrop(this);
 				}
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )) {
+				if (event.dragSource.hasFormat(DragFormat.LIST_ITEMS)) {
+					onFriendsListItemsDragDrop(event);
+				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_GROUP_ID )) {
 					// Move the group
 					onDesktopGroupDragDrop(event);
 				} else if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
@@ -222,7 +226,26 @@
 							event.dragSource.dataForFormat(
 								DragFormat.DESKTOP_ICON_ID)
 									as Number);
+				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON_ID )) {
+					onGroupIconDragDrop(
+							event,
+							event.dragSource.dataForFormat(
+								DragFormat.GROUP_ICON_ID)
+									as Number);
 				}
+			}
+			
+			//
+			// Drop Friends List
+			//
+			private function onFriendsListItemsDragDrop(event:DragEvent):void {
+				var dataArray:Array =
+						event.dragSource.dataForFormat(DragFormat.LIST_ITEMS) as Array;
+				var user:IUser = IUser(dataArray[0]);
+				
+				var desktopGroup:DesktopGroup = getDesktopGroup();
+				if (!desktopGroup) return;
+				desktopGroup.addUser(user);
 			}
 			
 			//
@@ -270,6 +293,24 @@
 						sourceDesktopIcon.getUser());
 				callLater(function():void { // for DragComplete Event Handler
 					sourceDesktopIcon.closeAndDelete();
+				});
+			}
+			
+			//
+			// Drag Icon from Group
+			//
+			private function onGroupIconDragDrop(event:DragEvent, groupIconId:Number):void {
+				if (isNaN(groupIconId)) return;
+				var sourceGroupIcon:GroupIcon = new GroupIcon();
+				if (!sourceGroupIcon.loadById( groupIconId )) return;
+				
+				var desktopGroup:DesktopGroup = getDesktopGroup();
+				if (!desktopGroup) return;
+				desktopGroup.addUser(sourceGroupIcon.getUser());
+				
+				var sourceGroup:DesktopGroup = sourceGroupIcon.getDesktopGroup();
+				callLater(function():void {
+					sourceGroup.deleteGroupIconOrDisband( sourceGroupIcon );
 				});
 			}
 		]]>

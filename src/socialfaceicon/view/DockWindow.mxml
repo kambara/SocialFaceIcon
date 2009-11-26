@@ -33,6 +33,8 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.DesktopGroup;
+			import socialfaceicon.model.GroupIcon;
 			import org.libspark.betweenas3.events.TweenEvent;
 			import org.libspark.betweenas3.tweens.ITween;
 			import flash.utils.clearTimeout;
@@ -228,9 +230,9 @@
 			// Drag & Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
-					/*|| event.dragSource.hasFormat(DragFormat.LIST_ITEMS)*/
-					/*|| event.dragSource.hasFormat(DragFormat.GROUP_ICON)*/)
+				if (   event.dragSource.hasFormat(DragFormat.LIST_ITEMS)
+					|| event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)
+					|| event.dragSource.hasFormat(DragFormat.GROUP_ICON_ID))
 				{
 					DragManager.acceptDragDrop(
 							DockWindow(event.currentTarget));
@@ -239,13 +241,32 @@
 			}
 			
 			private function onDragDrop(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
+				if (event.dragSource.hasFormat(DragFormat.LIST_ITEMS)) {
+					onFriendsListItemsDragDrop(event);
+				} else if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)) {
 					onDesktopIconDragDrop(
 							event,
 							event.dragSource.dataForFormat(
 								DragFormat.DESKTOP_ICON_ID)
 									as Number);
+				} else if (event.dragSource.hasFormat( DragFormat.GROUP_ICON_ID )) {
+					onGroupIconDragDrop(
+							event,
+							event.dragSource.dataForFormat(
+								DragFormat.GROUP_ICON_ID)
+									as Number);
 				}
+			}
+			
+			//
+			// Add Icon from FriendsList
+			//
+			private function onFriendsListItemsDragDrop(event:DragEvent):void {
+				var dataArray:Array =
+						event.dragSource.dataForFormat(DragFormat.LIST_ITEMS) as Array;
+				var user:IUser = IUser(dataArray[0]);
+				
+				HumanDockIcon.addUser( user );
 			}
 			
 			//
@@ -262,6 +283,22 @@
 				
 				callLater(function():void {
 					desktopIcon.closeAndDelete();
+				});
+			}
+			
+			//
+			// Drag Icon from Group
+			//
+			private function onGroupIconDragDrop(event:DragEvent, groupIconId:Number):void {
+				if (isNaN(groupIconId)) return;
+				var sourceGroupIcon:GroupIcon = new GroupIcon();
+				if (!sourceGroupIcon.loadById( groupIconId )) return;
+				
+				HumanDockIcon.addUser( sourceGroupIcon.getUser() );
+				
+				var sourceGroup:DesktopGroup = sourceGroupIcon.getDesktopGroup();
+				callLater(function():void {
+					sourceGroup.deleteGroupIconOrDisband( sourceGroupIcon );
 				});
 			}
 		]]>

@@ -146,7 +146,7 @@
 			// Drop
 			//
 			private function onDragEnter(event:DragEvent):void {
-				if (event.dragSource.hasFormat( DragFormat.DESKTOP_ICON_ID )) {
+				if (event.dragSource.hasFormat(DragFormat.DESKTOP_ICON_ID)) {
 					DragManager.acceptDragDrop(this);
 				}
 			}
