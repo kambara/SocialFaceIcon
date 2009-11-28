@@ -12,6 +12,7 @@
 	>
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.view.friendslist.FriendsListWindow;
 			import org.libspark.thread.ThreadState;
 			import flash.utils.setInterval;
 			import socialfaceicon.model.friendfeed.threads.CrawlFFeedHomeEntriesThread;
@@ -143,7 +144,15 @@
 					function():void {
 						Application.application.exit();
 					});
+				var menuItemFriends:NativeMenuItem = new NativeMenuItem("Friends");
+				menuItemFriends.addEventListener(
+					Event.SELECT,
+					function():void {
+						FriendsListWindow.show();
+					});
+				
 				var nativeMenu:NativeMenu = new NativeMenu();
+				nativeMenu.addItem(menuItemFriends);
 				nativeMenu.addItem(menuItemExit);
 				
 				var trayIcon:SystemTrayIcon = nativeApplication.icon as SystemTrayIcon
@@ -155,7 +164,8 @@
 			}
 			
 			private function onApplicationActive():void {
-				this.frameRate = 60
+				this.frameRate = 60;
+				
 			}
 			
 			private function onApplicationDeactive():void {

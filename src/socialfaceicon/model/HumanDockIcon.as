@@ -33,6 +33,11 @@ package socialfaceicon.model
 			dockWindow.open();
 		}
 		
+		public static function update():void {
+			dockWindow.close();
+			openAll();
+		}
+		
 		public static function updateViewStatus():void {
 			dockWindow.updateStatus();
 		}

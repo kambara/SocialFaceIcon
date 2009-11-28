@@ -4,8 +4,11 @@ package socialfaceicon.model
 
 	public class Setting extends ARModel
 	{
-		private static var TWITTER_USERNAME:String = "twitter_username";
-		private static var TWITTER_PASSWORD:String = "twitter_password";
+		private static const TWITTER_USERNAME:String = "twitter_username";
+		private static const TWITTER_PASSWORD:String = "twitter_password";
+		private static const FRIENDFEED_USERNAME:String = "friendfeed_username";
+		private static const FRIENDFEED_REMOTEKEY:String = "friendfeed_remotekey";
+		private static const DOCK_POSITION:String = "dock_position";
 		
 		public function Setting()
 		{
@@ -50,19 +53,30 @@ package socialfaceicon.model
 		// Friendfeed
 		//
 		public static function get friendfeedUsername():String {
-			return Setting.getValue("friendfeed_username");
+			return Setting.getValue(FRIENDFEED_USERNAME);
 		}
 		
 		public static function set friendfeedUsername(val:String):void {
-			Setting.setValue("friendfeed_username", val);
+			Setting.setValue(FRIENDFEED_USERNAME, val);
 		}
 		
 		public static function get friendfeedRemoteKey():String {
-			return Setting.getValue("friendfeed_remotekey");
+			return Setting.getValue(FRIENDFEED_REMOTEKEY);
 		}
 		
 		public static function set friendfeedRemoteKey(val:String):void {
-			Setting.setValue("friendfeed_remotekey", val);
+			Setting.setValue(FRIENDFEED_REMOTEKEY, val);
+		}
+		
+		//
+		// Dock Position
+		//
+		public static function get dockPosition():String {
+			return Setting.getValue(DOCK_POSITION);
+		}
+		
+		public static function set dockPosition(val:String):void {
+			Setting.setValue(DOCK_POSITION, val);
 		}
 	}
 }

@@ -7,7 +7,7 @@ Social Face Icon
 
 * Author
   Keisuke Kambara
-  http://sappari.org
+  http://sappari.org/
 
 * Lisence
   New BSD License
