@@ -83,6 +83,8 @@
 					function():void {
 						onResize();
 					});
+					
+				
 			}
 			
 			private function initPosition():void {
@@ -209,6 +211,33 @@
 				}
 			}
 			
+			private var isMac:Number = NaN;
+			private function fillHitZone():void {
+				if (isNaN(isMac)) {
+					isMac = Capabilities.os.indexOf("Mac");
+				}
+				if (isMac < 0) return;
+				
+				var g:Graphics = this.hitZone.graphics;
+				g.clear();
+				g.lineStyle(1, 0x000000, 1);
+				switch (this.position) {
+					case DockPosition.BOTTOM:
+						g.moveTo(0, 20-1);
+						g.lineTo(hitZone.width, 20-1);
+						break;
+					case DockPosition.LEFT:
+						var _x:Number = hitZone.width - 20;
+						g.moveTo(_x, 0);
+						g.lineTo(_x, hitZone.height);
+						break;
+					case DockPosition.RIGHT:
+						g.moveTo(bgContainer.x-1, 0);
+						g.lineTo(bgContainer.x-1, hitZone.height);
+						break;
+				}
+			}
+			
 			private function onResize():void {
 				if (!nativeWindow || nativeWindow.closed) return;
 				
@@ -246,6 +275,7 @@
 			}
 			
 			private function slideIn():void {
+				this.hitZone.graphics.clear();
 				this.hitZone.setStyle("backgroundAlpha", 0);
 				var to:Object = (this.position == DockPosition.BOTTOM)
 									? {y: 0}
@@ -277,9 +307,13 @@
 						to["x"] = bgContainer.width;
 						break;
 				}
-				BetweenAS3.tween(
+				var tw:ITween = BetweenAS3.tween(
 					this, to, null, 0.2, Cubic.easeOut
-				).play();
+				);
+				tw.addEventListener(TweenEvent.COMPLETE, function():void {
+					fillHitZone();
+				});
+				tw.play();
 			}
 			
 			//
@@ -455,7 +489,7 @@
 		backgroundColor="#FF0000"
 		backgroundAlpha="0"
 		
-		borderColor="#FF0000"
+		borderColor="#0000FF"
 		borderThickness="1"
 		borderStyle="none"
 		>
