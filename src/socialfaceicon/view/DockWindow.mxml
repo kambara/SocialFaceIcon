@@ -220,7 +220,7 @@
 				
 				var g:Graphics = this.hitZone.graphics;
 				g.clear();
-				g.lineStyle(1, 0x000000, 1);
+				g.lineStyle(1, 0x000000, 0.1);
 				switch (this.position) {
 					case DockPosition.BOTTOM:
 						g.moveTo(0, 20-1);
