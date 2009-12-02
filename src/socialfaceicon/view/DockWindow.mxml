@@ -274,7 +274,7 @@
 				pullOutTimeoutId = setTimeout(slideOut, 1500);
 			}
 			
-			private function slideIn():void {
+			public function slideIn():void {
 				this.hitZone.graphics.clear();
 				this.hitZone.setStyle("backgroundAlpha", 0);
 				var to:Object = (this.position == DockPosition.BOTTOM)

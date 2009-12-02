@@ -16,7 +16,8 @@ package socialfaceicon.model.twitter.threads
 		
 		private var username:String;
 		private var twitFriends:TwitFriendsThread;
-		private var page:uint = 1;
+		//private var page:uint = 1;
+		private var cursor:String = "-1";
 		private var chance:int = 3;
 		private var allUsers:Array;
 		private var allStatuses:Array;
@@ -33,7 +34,7 @@ package socialfaceicon.model.twitter.threads
 		protected override function run():void {
 			allUsers = [];
 			allStatuses = [];
-			page = 1;
+			cursor = "-1";
 			next(loadFriendsStatus);
 		}
 		
@@ -41,8 +42,8 @@ package socialfaceicon.model.twitter.threads
 		// FriendStatus
 		//
 		private function loadFriendsStatus():void {
-			trace(this.className + ": Loading: page " + this.page);
-			twitFriends = new TwitFriendsThread(username, page);
+			trace(this.className + ": Loading: cursor " + this.cursor);
+			twitFriends = new TwitFriendsThread(username, cursor);
 			twitFriends.start();
 			twitFriends.join();
 			next(onLoad);
@@ -50,14 +51,22 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function onLoad():void {
-			if (twitFriends.users.length == 0) {
+			//if (twitFriends.users.length == 0) {
+			if (twitFriends.users.length) {
+				allUsers = allUsers.concat(twitFriends.users);
+			}
+			if (twitFriends.statuses.length) {
+				allStatuses = allStatuses.concat(twitFriends.statuses);
+			}
+			
+			if (!twitFriends.nextCursor
+				|| twitFriends.nextCursor == "0") {
 				saveAllFriends();
 				IconStatus.update();
 			} else {
-				allUsers = allUsers.concat(twitFriends.users);
-				allStatuses = allStatuses.concat(twitFriends.statuses);
-				page++;
-				sleep(10 * 1000);
+				//page++;
+				cursor = twitFriends.nextCursor;
+				sleep(5 * 1000);
 				next(loadFriendsStatus);
 			}
 		}

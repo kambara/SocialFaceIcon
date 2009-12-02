@@ -223,8 +223,8 @@ package socialfaceicon.model
 			DesktopIcon.addAndOpen(
 							restGroupIcon.type,
 							restGroupIcon.userId,
-							this.x + 12,
-							this.y + 50);
+							this.x + 8,
+							this.y + 28);
 			// Delete group and icons
 			icon0.del({ id: icon0.id });
 			icon1.del({ id: icon1.id });

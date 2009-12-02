@@ -18,14 +18,15 @@ package socialfaceicon.model.twitter.threads
 		private var loader:URLLoaderThread;
 		private var _users:Array;
 		private var _statuses:Array;
+		private var _nextCursor:String;
 		
-		public function TwitFriendsThread(username:String, page:uint)
+		public function TwitFriendsThread(username:String, cursor:String)
 		{
 			super();
 			var url:String = StringUtil.substitute(
-					"http://twitter.com/statuses/friends/{0}.xml?page={1}",
+					"http://twitter.com/statuses/friends/{0}.xml?cursor={1}",
 					username,
-					page.toString());
+					cursor.toString());
 			this.loader = new URLLoaderThread(TwitSession.createRequest(url));
 		}
 		
@@ -38,9 +39,14 @@ package socialfaceicon.model.twitter.threads
 		private function onLoad():void {
 			_users = [];
 			_statuses = [];
+			//trace(loader.loader.data);
 			var xml:XML = new XML(loader.loader.data);
-			for each (var x:XML in xml.children()) {
+			for each (var x:XML in xml..user) {
 				setUserAndStatus(x);
+			}
+			if (xml.next_cursor) {
+				this._nextCursor = xml.next_cursor;
+				trace("nextCursor:" + _nextCursor);
 			}
 		}
 		
@@ -65,6 +71,10 @@ package socialfaceicon.model.twitter.threads
 		
 		public function get statuses():Array {
 			return _statuses || [];
+		}
+		
+		public function get nextCursor():String {
+			return this._nextCursor || null;
 		}
 	}
 }

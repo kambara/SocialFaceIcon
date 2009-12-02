@@ -194,8 +194,8 @@
 				DesktopGroup.createAndOpen(
 						desktopIcon.getUser(),
 						user,
-						desktopIcon.x - 12,
-						desktopIcon.y - 50);
+						desktopIcon.x - 8,
+						desktopIcon.y - 28);
 				// Delete DesktopIcon
 				callLater(function():void { // for DragComplete Event Handler
 					desktopIcon.closeAndDelete();
@@ -240,8 +240,8 @@
 				DesktopGroup.createAndOpen(
 						desktopIcon.getUser(),
 						sourceDesktopIcon.getUser(),
-						desktopIcon.x - 12,
-						desktopIcon.y - 50);
+						desktopIcon.x - 8,
+						desktopIcon.y - 28);
 				// Delete DesktopIcons
 				callLater(function():void { // for DragComplete Event Handler
 					sourceDesktopIcon.closeAndDelete();
@@ -263,8 +263,8 @@
 				DesktopGroup.createAndOpen(
 						desktopIcon.getUser(),
 						groupIcon.getUser(),
-						desktopIcon.x - 12,
-						desktopIcon.y - 50);
+						desktopIcon.x - 8,
+						desktopIcon.y - 28);
 				
 				// Delete DesktopIcon and GroupIcon
 				var group:DesktopGroup = groupIcon.getDesktopGroup();
@@ -289,8 +289,8 @@
 				DesktopGroup.createAndOpen(
 						desktopIcon.getUser(),
 						user,
-						desktopIcon.x - 12,
-						desktopIcon.y - 50);
+						desktopIcon.x - 8,
+						desktopIcon.y - 28);
 				
 				callLater(function():void {
 					desktopIcon.closeAndDelete();
