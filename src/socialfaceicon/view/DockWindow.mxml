@@ -64,6 +64,7 @@
 			private var faceIconTable:Object = {};
 			private var pullOutTimeoutId:int;
 			private var position:String = DockPosition.BOTTOM;
+			private var hitMargin:int = 2;
 			
 			[Embed(source="socialfaceicon/assets/system-users.png")]
 			[Bindable]
@@ -177,12 +178,12 @@
 						bgContainer.width = background.width;
 						bgContainer.height = background.height - 8;
 						background.x = 0;
-						// area
+						// hit area
 						hitZone.width = bounds.width;
-						hitZone.height = bgContainer.height + 20;
+						hitZone.height = bgContainer.height + hitMargin;
 						// centering
 						bgContainer.x = (hitZone.width - bgContainer.width)/2;
-						bgContainer.y = 20;
+						bgContainer.y = hitMargin;
 						break;
 					case DockPosition.LEFT:
 						// trim bg
@@ -190,7 +191,7 @@
 						bgContainer.height = background.height;
 						background.x = -10;
 						// area
-						hitZone.width = bgContainer.width + 20;
+						hitZone.width = bgContainer.width + hitMargin;
 						hitZone.height = bounds.height;
 						// centering
 						bgContainer.x = 0;
@@ -202,32 +203,33 @@
 						bgContainer.height = background.height;
 						background.x = 0;
 						// area
-						hitZone.width = bgContainer.width + 20;
+						hitZone.width = bgContainer.width + hitMargin;
 						hitZone.height = bounds.height;
 						// centering
-						bgContainer.x = 20;
+						bgContainer.x = hitMargin;
 						bgContainer.y = (hitZone.height - bgContainer.height)/2;
 						break;
 				}
 			}
 			
+			/*
 			private var isMac:Number = NaN;
 			private function fillHitZone():void {
 				if (isNaN(isMac)) {
 					isMac = Capabilities.os.indexOf("Mac");
 				}
-				if (isMac < 0) return;
+				//if (isMac < 0) return;
 				
 				var g:Graphics = this.hitZone.graphics;
 				g.clear();
-				g.lineStyle(1, 0x000000, 0.1);
+				g.lineStyle(1, 0x0000FF, 0.1);
 				switch (this.position) {
 					case DockPosition.BOTTOM:
-						g.moveTo(0, 20-1);
-						g.lineTo(hitZone.width, 20-1);
+						g.moveTo(0, 1);
+						g.lineTo(hitZone.width, 1);
 						break;
 					case DockPosition.LEFT:
-						var _x:Number = hitZone.width - 20;
+						var _x:Number = hitZone.width - 1;
 						g.moveTo(_x, 0);
 						g.lineTo(_x, hitZone.height);
 						break;
@@ -237,6 +239,7 @@
 						break;
 				}
 			}
+			*/
 			
 			private function onResize():void {
 				if (!nativeWindow || nativeWindow.closed) return;
@@ -247,9 +250,7 @@
 					case DockPosition.BOTTOM:
 						nativeWindow.x = bounds.left + (bounds.width - nativeWindow.width)/2;
 						nativeWindow.y = bounds.bottom - nativeWindow.height;
-						if (this.y > nativeWindow.height) {
-							this.y = nativeWindow.height;
-						}
+						correctPosition();
 						break;
 					case DockPosition.LEFT:
 						nativeWindow.x = bounds.left;
@@ -271,7 +272,7 @@
 			}
 			
 			private function onRollOut():void {
-				pullOutTimeoutId = setTimeout(slideOut, 1500);
+				pullOutTimeoutId = setTimeout(slideOut, 500);
 			}
 			
 			public function slideIn():void {
@@ -294,7 +295,6 @@
 					return;
 				}
 				
-				this.hitZone.setStyle("backgroundAlpha", 0.01);
 				var to:Object = {};
 				switch (this.position) {
 					case DockPosition.BOTTOM:
@@ -310,10 +310,19 @@
 				var tw:ITween = BetweenAS3.tween(
 					this, to, null, 0.2, Cubic.easeOut
 				);
+				var self:DockWindow = this;
 				tw.addEventListener(TweenEvent.COMPLETE, function():void {
-					fillHitZone();
+					correctPosition();
+					hitZone.setStyle("backgroundAlpha", 0.1/*0.01*/);
+					//fillHitZone();
 				});
 				tw.play();
+			}
+			
+			private function correctPosition():void {
+				if (this.y >= nativeWindow.height) {
+					this.y = nativeWindow.height - this.hitMargin;
+				}
 			}
 			
 			//
@@ -486,83 +495,83 @@
 		verticalScrollPolicy="off"
 		horizontalScrollPolicy="off"
 		
-		backgroundColor="#FF0000"
+		backgroundColor="#000000"
 		backgroundAlpha="0"
 		
 		borderColor="#0000FF"
 		borderThickness="1"
 		borderStyle="none"
 		>
-	<mx:Canvas
-		id="bgContainer"
-		x="0"
-		y="0"
-		
-		verticalScrollPolicy="off"
-		horizontalScrollPolicy="off"
-		
-		borderColor="#0000FF"
-		borderThickness="1"
-		borderStyle="none"
-		>
 		<mx:Canvas
-			id="background"
+			id="bgContainer"
 			x="0"
 			y="0"
-			
-			backgroundColor="#000000"
-			backgroundAlpha="0.4"
-			
-			borderColor="#333333"
-			borderThickness="2"
-			borderStyle="solid"
-			cornerRadius="8"
 			
 			verticalScrollPolicy="off"
 			horizontalScrollPolicy="off"
 			
-			resize="onBackgroundResize()"
+			borderColor="#0000FF"
+			borderThickness="1"
+			borderStyle="none"
 			>
-			<mx:Box
-				id="dockItemContainer"
-				x="8"
-				y="8"
-				direction="horizontal"
-				horizontalAlign="center"
+			<mx:Canvas
+				id="background"
+				x="0"
+				y="0"
 				
-				borderColor="#FF0000"
+				backgroundColor="#000000"
+				backgroundAlpha="0.4"
+				
+				borderColor="#333333"
 				borderThickness="2"
-				borderStyle="none"
+				borderStyle="solid"
+				cornerRadius="8"
 				
-				resize="onDockItemContainerResize()"
+				verticalScrollPolicy="off"
+				horizontalScrollPolicy="off"
+				
+				resize="onBackgroundResize()"
 				>
 				<mx:Box
-					id="faceIconContainer"
+					id="dockItemContainer"
+					x="8"
+					y="8"
 					direction="horizontal"
-					minWidth="60"
-					minHeight="60"
-					verticalGap="0"
-					horizontalGap="0"
-					/>
-				<mx:Canvas
-					id="separator"
-					width="1"
-					height="100%"
-					backgroundColor="#555555"
-					/>
-				<mx:LinkButton
-					id="friendsButton"
-					icon="{UsersImage}"
-					label="Friends"
-					labelPlacement="bottom"
-					color="#EEEEEE"
-					fontWeight="normal"
-					fontSize="12"
+					horizontalAlign="center"
 					
-					click="onFriendsButtonClick()"
-					/>
-			</mx:Box>
+					borderColor="#FF0000"
+					borderThickness="2"
+					borderStyle="none"
+					
+					resize="onDockItemContainerResize()"
+					>
+					<mx:Box
+						id="faceIconContainer"
+						direction="horizontal"
+						minWidth="60"
+						minHeight="60"
+						verticalGap="0"
+						horizontalGap="0"
+						/>
+					<mx:Canvas
+						id="separator"
+						width="1"
+						height="100%"
+						backgroundColor="#555555"
+						/>
+					<mx:LinkButton
+						id="friendsButton"
+						icon="{UsersImage}"
+						label="Friends"
+						labelPlacement="bottom"
+						color="#EEEEEE"
+						fontWeight="normal"
+						fontSize="12"
+						
+						click="onFriendsButtonClick()"
+						/>
+				</mx:Box>
+			</mx:Canvas>
 		</mx:Canvas>
-	</mx:Canvas>
 	</mx:Canvas>
 </mx:Window>
