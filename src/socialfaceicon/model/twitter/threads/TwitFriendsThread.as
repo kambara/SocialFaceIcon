@@ -23,11 +23,11 @@ package socialfaceicon.model.twitter.threads
 		public function TwitFriendsThread(username:String, cursor:String)
 		{
 			super();
-			var url:String = StringUtil.substitute(
-					"http://twitter.com/statuses/friends/{0}.xml?cursor={1}",
-					username,
-					cursor.toString());
-			this.loader = new URLLoaderThread(TwitSession.createRequest(url));
+			this.loader = new URLLoaderThread(
+								TwitSession.getInstance().createGetRequest(
+									"http://twitter.com/statuses/friends/"+username+".xml",
+									{ cursor: cursor.toString() }
+									));
 		}
 		
 		override protected function run():void {

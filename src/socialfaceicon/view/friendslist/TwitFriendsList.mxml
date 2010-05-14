@@ -6,6 +6,10 @@
 	xmlns:friendslist="socialfaceicon.view.friendslist.*">
 	<mx:Script>
 		<![CDATA[
+			import socialfaceicon.model.twitter.TwitSessionEvent;
+			import socialfaceicon.model.twitter.TwitOAuthEvent;
+			import socialfaceicon.config.Config;
+			import socialfaceicon.model.twitter.TwitOAuth;
 			import flash.utils.setTimeout;
 			import socialfaceicon.view.DesktopWindow;
 			import socialfaceicon.model.twitter.TwitUser;
@@ -17,24 +21,55 @@
 			[Bindable]
 			private var friendsDataList:Array;
 			
+			private var twitOAuth:TwitOAuth;
+			
 			private function onInitialize():void {
-				loadingLabel.visible = false;
-				var username:String = Setting.twitterUsername;
-				var password:String = Setting.twitterPassword;
-				if (username) {
-					usernameTextInput.text = username;
-					passwordTextInput.text = password || "";
+				//loadingLabel.visible = false;
+				
+				twitOAuth = new TwitOAuth(
+						Config.TWITTER_CONSUMER_KEY,
+						Config.TWITTER_CONSUMER_SECRET);
+				twitOAuth.addEventListener(
+					TwitOAuthEvent.REQUEST_TOKEN, onRequestToken);
+				twitOAuth.addEventListener(
+					TwitOAuthEvent.CONSUMER_ERROR, onConsumerError);
+				twitOAuth.addEventListener(
+					TwitOAuthEvent.ACCESS_TOKEN, onAccessToken);
+				twitOAuth.addEventListener(
+					TwitOAuthEvent.PIN_ERROR, onPinError);
+					
+				TwitSession.getInstance().addEventListener(
+					TwitSessionEvent.START, onSessionStart);
+				TwitSession.getInstance().addEventListener(
+					TwitSessionEvent.VERIFY_ERROR, onSessionVerifyError);
+				
+				if (TwitSession.getInstance().started) {
 					showFriends();
 				}
 			}
 			
-			private function onLoginButtonClick():void {
+			private function onRequestToken(event:TwitOAuthEvent):void {
+				statusLabel1.text = "";
+				pinTextInput.enabled = true;
+			}
+			
+			private function onConsumerError(event:TwitOAuthEvent):void {
+				statusLabel1.text = "Authentication Error!";
+				statusLabel1.setStyle("color", 0xFF0000);
+			}
+			
+			private function onAccessToken(event:TwitOAuthEvent):void {
+				showMessage("Hello! " + twitOAuth.screenName);
+				TwitSession.getInstance().start(twitOAuth.accessToken);
+			}
+			
+			private function onPinError(event:TwitOAuthEvent):void {
+				showError("Error! Invalid PIN");
+			}
+			
+			private function onSessionStart(event:TwitSessionEvent):void {
+				// on session start
 				friendsDataList = [];
-				Setting.twitterUsername = usernameTextInput.text;
-				Setting.twitterPassword = passwordTextInput.text;
-				TwitSession.start(
-						Setting.twitterUsername,
-						Setting.twitterPassword);
 				var t:UpdateTwitFriendsThread =
 						new UpdateTwitFriendsThread(Setting.twitterUsername);
 				t.addEventListener(
@@ -48,13 +83,40 @@
 				loadingFriends = true;
 			}
 			
+			private function onSessionVerifyError(event:TwitSessionEvent):void {
+				
+			}
+			
+			private function showError(msg:String):void {
+				statusLabel2.setStyle("color", 0xFF0000);
+				statusLabel2.text = msg;
+			}
+			
+			private function showMessage(msg:String):void {
+				statusLabel2.setStyle("color", 0x0000FF);
+				statusLabel2.text = msg;
+			}
+			
+			private function onLoginButtonClick():void {
+				twitOAuth.authenticate();
+			}
+			
+			private function onEnterPin():void {
+				if (pinTextInput.text.length < 6) return;
+				twitOAuth.loadAccessToken(parseInt(pinTextInput.text));
+			}
+			
+			private function onPinTextInputChange():void {
+				pinEnterButton.enabled = (pinTextInput.text.length > 6);
+			}
+			
 			private function set loadingFriends(value:Boolean):void {
-				twitterLoginButton.enabled = !value;
-				loadingLabel.visible = value;
+				//twitterLoginButton.enabled = !value;
+				//loadingLabel.visible = value;
 			}
 			
 			private function showFriends():void {
-				var users:Array = TwitFriend.getUsers( TwitSession.username );
+				var users:Array = TwitFriend.getUsers( TwitSession.getInstance().username );
 				if (users && users.length) {
 					friendsDataList = users;
 				}
@@ -64,28 +126,23 @@
 	<mx:VBox width="100%" height="100%" verticalGap="10">
 		<mx:Grid paddingLeft="10" verticalGap="3">
 			<mx:GridRow width="100%" height="100%">
-				<mx:GridItem width="100%" height="100%">
-					<mx:Label text="Username" fontWeight="normal" color="#999999"/>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="1." fontWeight="bold"/>
 				</mx:GridItem>
-				<mx:GridItem width="100%" height="100%">
-					<mx:Label text="Password" fontWeight="normal" color="#999999"/>
-				</mx:GridItem>
-				<mx:GridItem width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Button label="Login and Get a PIN" click="onLoginButtonClick()"/>
+					<mx:Label id="statusLabel1" fontWeight="bold"/>
 				</mx:GridItem>
 			</mx:GridRow>
 			<mx:GridRow width="100%" height="100%">
-				<mx:GridItem width="100%" height="100%">
-					<mx:TextInput width="100" id="usernameTextInput"/>
-				</mx:GridItem>
-				<mx:GridItem width="100%" height="100%">
-					<mx:TextInput width="100" displayAsPassword="true" id="passwordTextInput"/>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="2." fontWeight="bold"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-					<mx:Button
-						 label="Login"
-						 click="onLoginButtonClick()"
-						 id="twitterLoginButton"/>
-					<mx:Label text="Loading Friends..." fontWeight="bold" id="loadingLabel" visible="true"/>
+					<mx:Label text="Enter the PIN:"/>
+					<mx:TextInput id="pinTextInput" maxChars="8" enabled="false" change="onPinTextInputChange()"/>
+					<mx:Button label="OK" click="onEnterPin()" enabled="false" id="pinEnterButton"/>
+					<mx:Label id="statusLabel2" width="100%" fontWeight="bold"/>
 				</mx:GridItem>
 			</mx:GridRow>
 		</mx:Grid>

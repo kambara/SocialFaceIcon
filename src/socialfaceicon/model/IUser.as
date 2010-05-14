@@ -7,7 +7,8 @@ package socialfaceicon.model
 		function get iconTypeImage():Class;
 		
 		function getIconStatuses(max:int):Array;
-		function getIconCurrentStatus():String;
+		function getIconCurrentStatus():IStatus;
+		function getRecentStatusesCount(minutes:uint = 60):uint;
 		function get iconUserUrl():String;
 		
 		// Should be Bindable

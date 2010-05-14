@@ -2,6 +2,7 @@ package socialfaceicon.model.friendfeed
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
+	import socialfaceicon.model.IStatus;
 	import socialfaceicon.model.IUser;
 	import socialfaceicon.model.IconType;
 
@@ -48,9 +49,8 @@ package socialfaceicon.model.friendfeed
 		public function get iconTypeImage():Class {
 			return this.FriendfeedIconImage;
 		}
-		public function getIconCurrentStatus():String {
-			var e:FFeedEntry = this.getCurrentEntry();
-			return e ? e.body : null;
+		public function getIconCurrentStatus():IStatus {
+			return this.getCurrentEntry();
 		}
 		public function getIconStatuses(max:int):Array {
 			var entryObjects:Array = (new FFeedEntry()).find(
@@ -67,6 +67,16 @@ package socialfaceicon.model.friendfeed
 								   eObj.date));
 			}
 			return entries;
+		}
+		public function getRecentStatusesCount(minutes:uint = 60):uint {
+			var from:Number = (new Date()).getTime() - (minutes * 60 * 1000);
+			var cond:String = [
+				"userId = " + this.id.toString(),
+				"AND",
+				"date > " + from
+			].join(" ");
+			var statusObjects:Array = (new FFeedEntry()).find(cond);
+			return statusObjects ? statusObjects.length : 0;
 		}
 		public function get iconUserUrl():String {
 			return "http://friendfeed.com/" + this.id;

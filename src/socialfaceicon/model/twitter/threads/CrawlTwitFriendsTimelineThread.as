@@ -19,14 +19,14 @@ package socialfaceicon.model.twitter.threads
 		
 		protected override function run():void {
 			trace("==== " + this.className + " ====");
-			if (TwitSession.username) {
+			if (TwitSession.getInstance().started) {
 				friendsTimeline = new TwitFriendsTimelineThread(200);
 				friendsTimeline.start();
 				friendsTimeline.join();
 				next(onLoad);
 				error(Error, onError);
 			} else {
-				trace(this.className + ": No username");
+				trace(this.className + ": Session closed");
 				next(restart);
 			}
 		}
@@ -39,12 +39,12 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function onError(err:Error, t:Thread):void {
-			trace(this.className + err.message);
+			trace(this.className + ": " + err.message);
 			next(restart);
 		}
 		
 		private function restart():void {
-			trace(this.className + ": restart");
+			trace(this.className + ": Restart");
 			sleep(interval);
 			next(run);
 		}

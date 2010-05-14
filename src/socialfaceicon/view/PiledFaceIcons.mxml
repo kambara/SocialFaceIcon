@@ -40,7 +40,7 @@
 				if (iconCount <= 2) {
 					if (iconCount == 0) {
 						this._name = user.iconName;
-						this._status = user.getIconCurrentStatus();
+						this._status = user.getIconCurrentStatus().statusMessage;
 					}
 					this["iconSource" + iconCount] = user.iconImageUrl;
 				}
@@ -66,7 +66,7 @@
 					if (groupIcon) {
 						var user:IUser = groupIcon.getUser();
 						if (user) {
-							this._status = user.getIconCurrentStatus();
+							this._status = user.getIconCurrentStatus().statusMessage;
 						}
 					}
 				}

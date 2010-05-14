@@ -47,10 +47,12 @@
 			private var _iconNameChanged:Boolean = false;
 			private var _iconImageUrl:String;
 			private var _iconImageUrlChanged:Boolean = false;
-			private var _iconStatus:String;
+			private var _iconStatus:IStatus;
 			private var _iconStatusChanged:Boolean = false;
 			private var _iconTypeImage:Class;
 			private var _iconTypeImageChanged:Boolean = false;
+			private var _iconIsHot:Boolean = false;
+			private var _iconIsHotChanged:Boolean = false;
 			//private var imgCache:ImageCache;
 			
 			private var iconUserUrl:String;
@@ -67,6 +69,9 @@
 				this._iconImageUrlChanged = true;
 				this._iconTypeImage = user.iconTypeImage;
 				this._iconTypeImageChanged = true;
+				var hotCount:uint = user.getRecentStatusesCount(12 * 60);
+				this._iconIsHot = (hotCount > 3);
+				this._iconIsHotChanged = true;
 				
 				this.iconUserUrl = user.iconUserUrl;
 				this.status = user.getIconCurrentStatus();
@@ -82,7 +87,6 @@
 							});
 					t.start();
 				}
-				
 				initContextMenu(user);
 				return this;
 			}
@@ -97,7 +101,9 @@
 				}
 				if (this._iconStatusChanged) {
 					this._iconStatusChanged = false;
-					this.statusText.text = this._iconStatus;
+					this.statusText.text = this._iconStatus.statusMessage;
+					//this.alpha = this.calcTimeToAlpha(this._iconStatus.statusTime);
+					this.changeAlpha( this.calcTimeToAlpha(this._iconStatus.statusTime) );
 				}
 				if (this._iconImageUrlChanged) {
 					this._iconImageUrlChanged = false;
@@ -107,13 +113,74 @@
 					this._iconTypeImageChanged = false;
 					this.iconTypeImage.source = this._iconTypeImage;
 				}
+				if (this._iconIsHotChanged) {
+					this._iconIsHotChanged = false;
+					if (this._iconIsHot) {
+						this.glowOn();
+					} else {
+						this.glowOff();
+					}
+				}
 			}
 			
-			public function set status(str:String):void {
-				this._iconStatus = str;
+			public function set status(stat:IStatus):void {
+				this._iconStatus = stat;
 				this._iconStatusChanged = true;
 				this.invalidateProperties();
 				this.invalidateDisplayList();
+			}
+			
+			public function set hot(value:Boolean):void {
+				this._iconIsHot = value;
+				this._iconIsHotChanged = true;
+				this.invalidateProperties();
+				this.invalidateDisplayList();
+			}
+			
+			private function calcTimeToAlpha(msec:uint):Number {
+				var now:uint = (new Date()).getTime();
+				var d:int = Math.floor( (now - msec) / (24*60*60*1000) );
+				if (d < 1) {
+					return 1;
+				} else if (d < 3) {
+					return 0.8;
+				} else if (d < 7) {
+					return 0.6;
+				} else if (d < 30) {
+					return 0.4;
+				} else if (d < 180) {
+					return 0.3;
+				} else {
+					return 0.2;
+				}
+			}
+			
+			private function changeAlpha(a:Number):void {
+				this.image.alpha = a;
+				this.nameText.alpha = a;
+				this.statusText.alpha = a;
+			}
+			
+			//
+			// Hot Glow
+			//
+			private function glowOn():void {
+				var glowFilter:GlowFilter = new GlowFilter(
+						0xFF0000,
+						0.7,  // alpha
+						10, 10, // blurX,Y
+						5,    // strength
+						1     // quality
+						);
+				this.setFilters([glowFilter]);
+			}
+			
+			private function glowOff():void {
+				this.setFilters([]);
+			}
+			
+			private function setFilters(fs:Array):void {
+				this.frame.filters = fs;
 			}
 			
 			//

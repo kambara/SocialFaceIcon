@@ -2,6 +2,8 @@ package socialfaceicon.config
 {
 	public class Config
 	{
+		public static const TWITTER_CONSUMER_KEY:String = "";
+		public static const TWITTER_CONSUMER_SECRET:String = "";
 		public static const FACEBOOK_API_KEY:String = "";
 	}
 }

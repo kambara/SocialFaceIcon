@@ -16,16 +16,16 @@ package socialfaceicon.model.twitter.threads
 		
 		protected override function run():void {
 			trace("==== " + this.className + " ====");
-			if (TwitSession.username) {
+			if (TwitSession.getInstance().started) {
 				var t:UpdateTwitFriendsThread =
 						new UpdateTwitFriendsThread(
-								TwitSession.username );
+								TwitSession.getInstance().username );
 				t.start();
 				t.join();
 				next(restart);
 				error(Error, onError);
 			} else {
-				trace(this.className + ": No username");
+				trace(this.className + ": Session closed");
 				next(restart);
 			}
 		}

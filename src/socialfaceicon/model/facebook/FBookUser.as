@@ -2,6 +2,7 @@ package socialfaceicon.model.facebook
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
+	import socialfaceicon.model.IStatus;
 	import socialfaceicon.model.IUser;
 	import socialfaceicon.model.IconType;
 
@@ -58,9 +59,8 @@ package socialfaceicon.model.facebook
 		public function get iconTypeImage():Class {
 			return this.FacebookIconImage;
 		}
-		public function getIconCurrentStatus():String {
-			var s:FBookStatus = this.getCurrentStatus();
-			return s ? s.message : null;
+		public function getIconCurrentStatus():IStatus {
+			return this.getCurrentStatus();
 		}
 		public function getIconStatuses(max:int):Array {
 			var statusObjects:Array = (new FBookStatus()).find(
@@ -76,6 +76,16 @@ package socialfaceicon.model.facebook
 									sObj.time));
 			}
 			return statuses;
+		}
+		public function getRecentStatusesCount(minutes:uint = 60):uint {
+			var from:Number = (new Date()).getTime() - (minutes * 60 * 1000);
+			var cond:String = [
+				"userId = " + this.id.toString(),
+				"AND",
+				"time > " + from
+			].join(" ");
+			var statusObjects:Array = (new FBookStatus()).find(cond);
+			return statusObjects ? statusObjects.length : 0;
 		}
 		public function get iconUserUrl():String {
 			return this.profileUrl;

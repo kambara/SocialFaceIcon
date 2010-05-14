@@ -1,47 +1,85 @@
 package socialfaceicon.model.twitter
 {
+	import flash.events.EventDispatcher;
+	import flash.net.SharedObject;
 	import flash.net.URLRequest;
-	import flash.net.URLRequestHeader;
 	
-	import mx.utils.Base64Encoder;
+	import org.iotashan.oauth.OAuthToken;
 	
-	public class TwitSession
+	import socialfaceicon.config.Config;
+	
+	public class TwitSession extends EventDispatcher
 	{
-		private static var _username:String;
-		private static var _password:String;
-		private static var _authHeader:URLRequestHeader;
+		private var twitOAuth:TwitOAuth;
+		private static var instance:TwitSession;
 		
-		public static function get username():String {
-			return TwitSession._username;
+		public function TwitSession():void {
+			twitOAuth = new TwitOAuth(
+							Config.TWITTER_CONSUMER_KEY,
+							Config.TWITTER_CONSUMER_SECRET);
+			twitOAuth.addEventListener(TwitOAuthEvent.VERIFY_TOKEN,
+				function(event:TwitOAuthEvent):void {
+					saveToken(event.token);
+					dispatchEvent( new TwitSessionEvent(TwitSessionEvent.START) );
+				});
+			twitOAuth.addEventListener(TwitOAuthEvent.VERIFY_ERROR, function(event:TwitOAuthEvent):void {
+				dispatchEvent( new TwitSessionEvent(TwitSessionEvent.VERIFY_ERROR) );
+			});
 		}
 		
-		public static function get password():String {
-			return TwitSession._password;
-		}
-		
-		public static function start(username:String, password:String):void {
-			TwitSession._username = username;
-			TwitSession._password = password;
-			TwitSession._authHeader = createAuthHeader();
-		}
-		
-		private static function createAuthHeader():URLRequestHeader {
-			if (!TwitSession.username || !TwitSession.password) {
-				return null;
+		public static function getInstance():TwitSession {
+			if (!instance) {
+				instance = new TwitSession();
 			}
-			var encoder:Base64Encoder = new Base64Encoder();
-			encoder.encode(TwitSession.username + ":" + TwitSession.password);
-			return new URLRequestHeader(
-						"Authorization",
-						"Basic " + encoder.toString());
+			return instance;
 		}
 		
-		public static function createRequest(url:String):URLRequest {
-			var r:URLRequest = new URLRequest(url);
-			if (TwitSession._authHeader) {
-				r.requestHeaders = [TwitSession._authHeader];
+		public function get started():Boolean {
+			return (twitOAuth.accessToken
+					&& twitOAuth.userId
+					&& twitOAuth.screenName);
+		}
+		
+		public function get username():String {
+			return twitOAuth.screenName;
+		}
+		
+		public function get userId():String {
+			return twitOAuth.userId;
+		}
+		
+		public function start(accessToken:OAuthToken):void {
+			twitOAuth.verifyAccessToken(accessToken);
+		}
+		
+		public function restart():void {
+			var token:Object = loadToken();
+			if (token != null) {
+				trace("TwitSession: exist token: " + token.key);
+				twitOAuth.verifyAccessToken(
+						new OAuthToken(token.key, token.secret));
 			}
-			return r;
+		}
+		
+		private function loadToken():Object {
+			var so:SharedObject = SharedObject.getLocal("twitter");
+			var key:String = "accessToken";
+			return so.data[key];
+		}
+		
+		private function saveToken(token:OAuthToken):void {
+			trace("TwitSession.saveToken");
+			var so:SharedObject = SharedObject.getLocal("twitter");
+			var key:String = "accessToken";
+			so.data[key] = {
+				key:    token.key,
+				secret: token.secret
+			};
+			so.flush();
+		}
+		
+		public function createGetRequest(baseUrl:String, params:Object=null):URLRequest {
+			return twitOAuth.createGetRequest(baseUrl, params);
 		}
 	}
 }

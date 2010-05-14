@@ -115,6 +115,7 @@
 			}
 			
 			private function initTwitter():void {
+				/*
 				if (Setting.twitterUsername
 					&& Setting.twitterUsername)
 				{
@@ -122,6 +123,8 @@
 							Setting.twitterUsername,
 							Setting.twitterPassword);
 				}
+				*/
+				TwitSession.getInstance().restart();
 			}
 			
 			private function initFriendfeed():void {

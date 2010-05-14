@@ -20,10 +20,17 @@ package socialfaceicon.model.twitter.threads
 		public function TwitFriendsTimelineThread(count:uint = 20)
 		{
 			super();
+			/*
 			var url:String = StringUtil.substitute(
 					"http://twitter.com/statuses/friends_timeline.xml?count={0}",
 					count.toString());
-			loader = new URLLoaderThread(TwitSession.createRequest(url));
+					*/
+			var baseUrl:String = "http://twitter.com/statuses/friends_timeline.xml";
+			var params:Object = {count: count.toString()};
+			loader = new URLLoaderThread(
+							TwitSession.getInstance().createGetRequest(
+								baseUrl,
+								params));
 		}
 		
 		override protected function run():void {

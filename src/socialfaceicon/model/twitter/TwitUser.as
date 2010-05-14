@@ -2,6 +2,7 @@ package socialfaceicon.model.twitter
 {
 	import jp.cre8system.framework.airrecord.model.ARModel;
 	
+	import socialfaceicon.model.IStatus;
 	import socialfaceicon.model.IUser;
 	import socialfaceicon.model.IconType;
 
@@ -70,9 +71,8 @@ package socialfaceicon.model.twitter
 		public function get iconTypeImage():Class {
 			return this.TwitterIconImage;
 		}
-		public function getIconCurrentStatus():String {
-			var s:TwitStatus = this.getCurrentTwitStatus();
-			return s ? s.text : null;
+		public function getIconCurrentStatus():IStatus {
+			return this.getCurrentTwitStatus();
 		}
 		public function getIconStatuses(max:int):Array {
 			var statusObjects:Array = (new TwitStatus()).find(
@@ -88,6 +88,17 @@ package socialfaceicon.model.twitter
 								   sObj.createdAt));
 			}
 			return statuses;
+		}
+		public function getRecentStatusesCount(minutes:uint = 60):uint {
+			var from:Number = (new Date()).getTime() - (minutes * 60 * 1000);
+			var cond:String = [
+				"userId = " + this.id.toString(),
+				"AND",
+				"createdAt > " + from
+			].join(" ");
+			
+			var statusObjects:Array = (new TwitStatus()).find(cond);
+			return statusObjects ? statusObjects.length : 0;
 		}
 		public function get iconUserUrl():String {
 			return "http://twitter.com/" + this.screenName;
