@@ -61,15 +61,16 @@ package socialfaceicon.model.twitter
 			}
 		}
 		
+		private const SO_NAME:String = "twitter-v1";
 		private function loadToken():Object {
-			var so:SharedObject = SharedObject.getLocal("twitter");
+			var so:SharedObject = SharedObject.getLocal(SO_NAME);
 			var key:String = "accessToken";
 			return so.data[key];
 		}
 		
 		private function saveToken(token:OAuthToken):void {
 			trace("TwitSession.saveToken");
-			var so:SharedObject = SharedObject.getLocal("twitter");
+			var so:SharedObject = SharedObject.getLocal(SO_NAME);
 			var key:String = "accessToken";
 			so.data[key] = {
 				key:    token.key,

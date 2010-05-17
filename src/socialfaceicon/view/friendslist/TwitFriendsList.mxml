@@ -20,11 +20,10 @@
 			
 			[Bindable]
 			private var friendsDataList:Array;
-			
 			private var twitOAuth:TwitOAuth;
 			
 			private function onInitialize():void {
-				//loadingLabel.visible = false;
+				loadingLabel.visible = false;
 				
 				twitOAuth = new TwitOAuth(
 						Config.TWITTER_CONSUMER_KEY,
@@ -45,9 +44,13 @@
 				
 				if (TwitSession.getInstance().started) {
 					showFriends();
+					showHello();
 				}
 			}
 			
+			//
+			// OAuth Event Handler
+			//
 			private function onRequestToken(event:TwitOAuthEvent):void {
 				statusLabel1.text = "";
 				pinTextInput.enabled = true;
@@ -55,49 +58,56 @@
 			
 			private function onConsumerError(event:TwitOAuthEvent):void {
 				statusLabel1.text = "Authentication Error!";
-				statusLabel1.setStyle("color", 0xFF0000);
+				loginButton.enabled = true;
 			}
 			
 			private function onAccessToken(event:TwitOAuthEvent):void {
-				showMessage("Hello! " + twitOAuth.screenName);
+				statusLabel2.text = "";
+				loginButton.enabled = true;
 				TwitSession.getInstance().start(twitOAuth.accessToken);
 			}
 			
 			private function onPinError(event:TwitOAuthEvent):void {
-				showError("Error! Invalid PIN");
+				statusLabel2.text = "Error! Invalid PIN";
+				loginButton.enabled = true;
 			}
 			
+			private function showHello():void {
+				helloLabel.text = "Hello! " + TwitSession.getInstance().username;
+			}
+			
+			private function hideHello():void {
+				helloLabel.text = "";
+			}
+			
+			//
+			// Session Event Handler
+			//
 			private function onSessionStart(event:TwitSessionEvent):void {
-				// on session start
+				showHello();
+				loadingLabel.visible = true;
+				
 				friendsDataList = [];
 				var t:UpdateTwitFriendsThread =
-						new UpdateTwitFriendsThread(Setting.twitterUsername);
+						new UpdateTwitFriendsThread(TwitSession.getInstance().username);
 				t.addEventListener(
 					UpdateTwitFriendsThread.FINISH,
 					function():void {
-						loadingFriends = false;
+						loadingLabel.visible = false;
 						showFriends();
 					});
 				t.start();
-				
-				loadingFriends = true;
 			}
 			
 			private function onSessionVerifyError(event:TwitSessionEvent):void {
 				
 			}
 			
-			private function showError(msg:String):void {
-				statusLabel2.setStyle("color", 0xFF0000);
-				statusLabel2.text = msg;
-			}
-			
-			private function showMessage(msg:String):void {
-				statusLabel2.setStyle("color", 0x0000FF);
-				statusLabel2.text = msg;
-			}
-			
+			//
+			// Buttons Event Handler
+			//
 			private function onLoginButtonClick():void {
+				loginButton.enabled = false;
 				twitOAuth.authenticate();
 			}
 			
@@ -108,11 +118,6 @@
 			
 			private function onPinTextInputChange():void {
 				pinEnterButton.enabled = (pinTextInput.text.length > 6);
-			}
-			
-			private function set loadingFriends(value:Boolean):void {
-				//twitterLoginButton.enabled = !value;
-				//loadingLabel.visible = value;
 			}
 			
 			private function showFriends():void {
@@ -130,7 +135,7 @@
 					<mx:Label text="1." fontWeight="bold"/>
 				</mx:GridItem>
 				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
-					<mx:Button label="Login and Get a PIN" click="onLoginButtonClick()"/>
+					<mx:Button id="loginButton" label="Login and Get a PIN" click="onLoginButtonClick()"/>
 					<mx:Label id="statusLabel1" fontWeight="bold"/>
 				</mx:GridItem>
 			</mx:GridRow>
@@ -143,6 +148,16 @@
 					<mx:TextInput id="pinTextInput" maxChars="8" enabled="false" change="onPinTextInputChange()"/>
 					<mx:Button label="OK" click="onEnterPin()" enabled="false" id="pinEnterButton"/>
 					<mx:Label id="statusLabel2" width="100%" fontWeight="bold"/>
+				</mx:GridItem>
+			</mx:GridRow>
+			<mx:GridRow width="100%" height="100%">
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					
+				</mx:GridItem>
+				<mx:GridItem width="100%" height="100%" verticalAlign="middle">
+					<mx:Label text="Hello !" color="#0000FF" fontWeight="bold" id="helloLabel"/>
+					<mx:Label text="Loading friends..." id="loadingLabel" color="#999999" fontWeight="bold"/>
+					
 				</mx:GridItem>
 			</mx:GridRow>
 		</mx:Grid>

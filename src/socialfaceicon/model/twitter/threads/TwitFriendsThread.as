@@ -1,7 +1,5 @@
 package socialfaceicon.model.twitter.threads
 {
-	import mx.utils.StringUtil;
-	
 	import org.libspark.thread.Thread;
 	import org.libspark.thread.threads.net.URLLoaderThread;
 	
@@ -51,9 +49,9 @@ package socialfaceicon.model.twitter.threads
 		}
 		
 		private function setUserAndStatus(xml:XML):void {
-			var user:TwitUser = TwitUser.newFromUserXml(xml)
+			var user:TwitUser = TwitUser.newFromUserXml(xml);
+			if (!user.id || !user.screenName) return;
 			_users.push( user );
-			
 			if (xml.status
 				&& xml.status[0]
 				&& xml.status[0].text)

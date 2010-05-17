@@ -25,6 +25,9 @@ package socialfaceicon.model.twitter.threads
 		public function UpdateTwitFriendsThread(username:String)
 		{
 			super();
+			if (!username) {
+				throw new Error("UpdateTwitFriendsThread: Error: no username");
+			}
 			this.username = username;
 		}
 		
@@ -76,9 +79,22 @@ package socialfaceicon.model.twitter.threads
 		//
 		private function saveAllFriends():void {
 			trace(this.className + ": Saving");
+			allUsers = unique(allUsers);
 			(new TwitUser()).saveAll( allUsers );
 			TwitFriend.updateAll(username, allUsers);
 			(new TwitStatus()).insertAll( allStatuses );
+		}
+		
+		private function unique(models:Array):Array {
+			var obj:Object = {};
+			var results:Array = [];
+			for each (var modelObj:Object in models) {
+				if (!obj[ modelObj.id ]) {
+					results.push( modelObj );
+					obj[ modelObj.id ] = true;
+				}
+			}
+			return results;
 		}
 		
 		private function onError(err:Error, t:Thread):void {

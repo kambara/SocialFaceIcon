@@ -33,6 +33,7 @@ package socialfaceicon.model
 		//
 		// Twitter
 		//
+		/*
 		public static function get twitterUsername():String {
 			return Setting.getValue(TWITTER_USERNAME);
 		}
@@ -48,6 +49,7 @@ package socialfaceicon.model
 		public static function set twitterPassword(val:String):void {
 			Setting.setValue(TWITTER_PASSWORD, val);
 		}
+		*/
 		
 		//
 		// Friendfeed

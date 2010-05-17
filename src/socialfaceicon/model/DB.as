@@ -4,7 +4,7 @@ package socialfaceicon.model
 	
 	public class DB
 	{
-		private static const VERSION:String = "alpha9";
+		private static const VERSION:String = "alpha12";
 		
 		private static const TEXT:String     = "TEXT";
 		private static const INTEGER:String  = "INTEGER";
