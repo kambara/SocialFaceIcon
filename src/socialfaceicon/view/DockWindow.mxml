@@ -341,7 +341,8 @@
 					if (faceIcon) {
 						var user:IUser = dockIcon.getUser();
 						if (user) {
-							faceIcon.status = user.getIconCurrentStatus();
+							////faceIcon.status = user.getIconCurrentStatus();
+							faceIcon.invalidateStatusAndHotness(user);
 						}
 					}
 				}

@@ -106,7 +106,8 @@
 			public function updateStatus():void {
 				var desktopIcon:DesktopIcon = this.getDesktopIcon();
 				if (desktopIcon) {
-					this.faceIcon.status = desktopIcon.getUser().getIconCurrentStatus();
+					////this.faceIcon.status = desktopIcon.getUser().getIconCurrentStatus();
+					this.faceIcon.invalidateStatusAndHotness(desktopIcon.getUser());
 				}
 			}
 			

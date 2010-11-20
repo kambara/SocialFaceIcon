@@ -69,12 +69,15 @@
 				this._iconImageUrlChanged = true;
 				this._iconTypeImage = user.iconTypeImage;
 				this._iconTypeImageChanged = true;
+				
+				/*
 				var hotCount:uint = user.getRecentStatusesCount(12 * 60);
 				this._iconIsHot = (hotCount > 3);
 				this._iconIsHotChanged = true;
-				
+				*/
 				this.iconUserUrl = user.iconUserUrl;
 				this.status = user.getIconCurrentStatus();
+				this.invalidateHotness(user);
 				
 				// Load Friendfeed Entry if not
 				if (!_iconStatus && user.iconType == IconType.FRIENDFEED) {
@@ -101,9 +104,10 @@
 				}
 				if (this._iconStatusChanged) {
 					this._iconStatusChanged = false;
-					this.statusText.text = this._iconStatus.statusMessage;
-					//this.alpha = this.calcTimeToAlpha(this._iconStatus.statusTime);
-					this.changeAlpha( this.calcTimeToAlpha(this._iconStatus.statusTime) );
+					if (this._iconStatus) {
+						this.statusText.text = this._iconStatus.statusMessage;
+						this.changeAlpha( this.calcTimeToAlpha(this._iconStatus.statusTime) );
+					}
 				}
 				if (this._iconImageUrlChanged) {
 					this._iconImageUrlChanged = false;
@@ -130,11 +134,26 @@
 				this.invalidateDisplayList();
 			}
 			
+			/****
 			public function set hot(value:Boolean):void {
 				this._iconIsHot = value;
 				this._iconIsHotChanged = true;
 				this.invalidateProperties();
 				this.invalidateDisplayList();
+			}
+			*/
+			
+			public function invalidateHotness(user:IUser):void {
+				var hotCount:uint = user.getRecentStatusesCount(60);
+				this._iconIsHot = (hotCount > 3);
+				this._iconIsHotChanged = true;
+				this.invalidateProperties();
+				this.invalidateDisplayList();
+			}
+			
+			public function invalidateStatusAndHotness(user:IUser):void {
+				this.status = user.getIconCurrentStatus();
+				this.invalidateHotness(user);
 			}
 			
 			private function calcTimeToAlpha(msec:uint):Number {
@@ -156,6 +175,7 @@
 			}
 			
 			private function changeAlpha(a:Number):void {
+				//a = 0.2; // TEST
 				this.image.alpha = a;
 				this.nameText.alpha = a;
 				this.statusText.alpha = a;

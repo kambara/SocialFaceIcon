@@ -71,7 +71,7 @@ package socialfaceicon.model.friendfeed
 		public function getRecentStatusesCount(minutes:uint = 60):uint {
 			var from:Number = (new Date()).getTime() - (minutes * 60 * 1000);
 			var cond:String = [
-				"userId = " + this.id.toString(),
+				"userId = '" + this.id.toString() + "'",
 				"AND",
 				"date > " + from
 			].join(" ");

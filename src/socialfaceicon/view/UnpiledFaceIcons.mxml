@@ -80,7 +80,8 @@
 					if (faceIcon) {
 						var user:IUser = groupIcon.getUser();
 						if (user) {
-							faceIcon.status = user.getIconCurrentStatus();
+							////faceIcon.status = user.getIconCurrentStatus();
+							faceIcon.invalidateStatusAndHotness(user);
 						}
 					}
 				}

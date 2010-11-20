@@ -111,7 +111,10 @@ package socialfaceicon.model.facebook.threads
 		}
 		
 		private function addFBookUserAndNoIdStatus(facebookUser:FacebookUser):void {
-			if (!facebookUser) return;
+			if (!facebookUser
+				|| !facebookUser.uid) {
+				return;
+			}
 			_fbookUsers.push(
 					new FBookUser(
 							facebookUser.uid,
@@ -121,7 +124,8 @@ package socialfaceicon.model.facebook.threads
 							facebookUser.pic,
 							facebookUser.pic_big,
 							facebookUser.pic_small));
-			if (facebookUser.status && facebookUser.status.message) {
+			if (facebookUser.status
+				&& facebookUser.status.message) {
 				_fbookStatuses.push(
 						new FBookStatus(
 								null,
